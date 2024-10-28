@@ -22,7 +22,7 @@ clear
 no_economy_pass = 416;
 no_business_pass = 84;
 no_crew = 12;
-economy_baggage = 18;
+economy_baggage = 20;
 business_baggage = 40;
 crew_baggage = 10;
 
@@ -33,9 +33,9 @@ Wp = (no_economy_pass + no_business_pass) * mass_pass + economy_baggage * no_eco
 
 %L/D max
 kld = 15.5;
-s_wet_s_ref = 6.25;
+s_wet_s_ref = 5.5;
 
-AR_temp = 9.2; % change this when the program returns the correct value
+AR_temp = 8.9; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 %Weight fractions
@@ -128,7 +128,6 @@ C_D_o = (e * pi * AR_temp) / (L_D_max * 2) ^ 2; %zero lift drag coeff
 C_D_o_up = C_D_o + 0.02; %flaps but gear up
 C_D_o_TO = C_D_o + 0.06; %takeoff configuration
 C_D_o_L = C_D_o + 0.11; %landing configuration
-S_ref = 552.8; %reference area in m^2
 % cruise parameters
 V_cruise_1 = 245; %cruise 1 speed in m/s
 V_cruise_2 = 241.5; %cruise 2 speed in m/s (M=0.78)
@@ -144,10 +143,12 @@ rho_loiter = 1.0555; %density at loiter (5000ft)
 V_loiter = 120; %velocity when loitering in m/s
 % calculated values
 C_L_TO = C_L_max / 1.21; % takeoff configuration
-V_s = sqrt((2 * Wo * 9.81) / (rho_sl * S_ref * C_L_TO));
 constraint_landing = ((S_L - S_a) .* C_L_max) * 9.81 / (5 * 5/3);
-S_W_min = Wo * 9.81 / constraint_landing * 0.9; %min reference area OF WING - seems to be around 85-90% of total area
+S_W_min = Wo * 9.81 / constraint_landing; %min reference area OF WING - seems to be around 85-90% of total area
 AR = max_wingspan ^ 2 / S_W_min; %max aspect ratio
+V_s = sqrt((2 * Wo * 9.81) / (rho_sl * S_W_min * C_L_max));
+% landing and stall
+constraint_stall = 0.5 * rho_sl * V_s * V_s * C_L_max;
 
 % output weight Wo and AR to the console. Don't use scientific notation for weight
 print_weight = floor(Wo);
@@ -200,8 +201,6 @@ constraint_climb_2c = (4/3) * a_b(5) * (1 / (V_3)) * climb_rate2 + ((0.5 * rho_s
 constraint_cruise_2 = a_b(6) .* ((0.5 * rho_cruise_2 * V_cruise_2 * V_cruise_2 * C_D_o) ./ (MWF(6) .* W_S) + (MWF(6) * n(6) * n(6) .* W_S) ./ (0.5 * rho_cruise_2 * V_cruise_2 * V_cruise_2 * pi * AR * e));
 % loiter
 constraint_loiter = a_b(7) .* ((0.5 * rho_loiter * V_loiter * V_loiter * C_D_o) ./ (MWF(7) .* W_S) + (MWF(7) * n(7) * n(7) .* W_S) ./ (0.5 * rho_loiter * V_loiter * V_loiter * pi * AR * e));
-% landing and stall
-constraint_stall = 0.5 * rho_sl * V_s * V_s * C_L_max;
 
 %landing and stall and climbs stuff for plotting
 T_W = [0, 1.5];

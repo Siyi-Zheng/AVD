@@ -22,8 +22,8 @@ clear
 no_economy_pass = 416;
 no_business_pass = 84;
 no_crew = 12;
-economy_baggage = 20;
-business_baggage = 40;
+economy_baggage = 16;
+business_baggage = 33;
 crew_baggage = 10;
 
 mass_pass = 75;
@@ -33,9 +33,9 @@ Wp = (no_economy_pass + no_business_pass) * mass_pass + economy_baggage * no_eco
 
 %L/D max
 kld = 15.5;
-s_wet_s_ref = 5.5;
+s_wet_s_ref = 6;
 
-AR_temp = 8.9; % change this when the program returns the correct value
+AR_temp = 8.77; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 %Weight fractions
@@ -122,7 +122,7 @@ e = 0.85; %oswald efficiency
 e_TO_up = e - 0.05; % flaps but gear up
 e_TO = e - 0.1; %takeoff configuration
 e_L = e - 0.15; %landing configuration
-C_L_max = 2.5; % landing configuration
+C_L_max = 2.6; % landing configuration
 C_L = 1.4; % clean configuration
 C_D_o = (e * pi * AR_temp) / (L_D_max * 2) ^ 2; %zero lift drag coeff
 C_D_o_up = C_D_o + 0.02; %flaps but gear up
@@ -144,7 +144,7 @@ V_loiter = 120; %velocity when loitering in m/s
 % calculated values
 C_L_TO = C_L_max / 1.21; % takeoff configuration
 constraint_landing = ((S_L - S_a) .* C_L_max) * 9.81 / (5 * 5/3);
-S_W_min = Wo * 9.81 / constraint_landing; %min reference area OF WING - seems to be around 85-90% of total area
+S_W_min = Wo * 9.81 / constraint_landing; %min reference area
 AR = max_wingspan ^ 2 / S_W_min; %max aspect ratio
 V_s = sqrt((2 * Wo * 9.81) / (rho_sl * S_W_min * C_L_max));
 % landing and stall
@@ -153,8 +153,8 @@ constraint_stall = 0.5 * rho_sl * V_s * V_s * C_L_max;
 % output weight Wo and AR to the console. Don't use scientific notation for weight
 print_weight = floor(Wo);
 fprintf("Weight: %.0f kg\n", print_weight);
-fprintf("Max. wing aspect ratio: %.3g\n", AR);
-disp(S_W_min)
+fprintf("Wing aspect ratio: %.3g\n", AR);
+fprintf("Reference Area: %.2f m^2\n", S_W_min);
 
 % other values
 n = [1, 1, 1, 1, 1, 1, 1, 1, 1]; %load factor for each mission stage
@@ -213,7 +213,6 @@ T_W_landing = constraint_landing / (TOP * C_L_TO);
 T_design = T_W_landing * Wo * 9.81;
 T_engine = T_design / NE;
 print_thrust = floor(T_engine);
-fprintf("Min. thrust per engine: %.0f N\n", print_thrust);
 
 figure(2)
 % takeoff

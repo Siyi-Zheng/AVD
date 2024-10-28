@@ -3,10 +3,22 @@ clc
 
 % Pitot Inlet
 
+
 % Manufacturer Engine data
 mdot = 2559; % takeoff mass flow rate in lbs/sec
 D_fan = 111.1; % fan diamter in inches
 fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
+M = 0.83;
+
+%propulsion intergration corrections
+
+%inlet ram recovery factor
+Cram = 1.35;
+
+pr_ref = 1.0;
+
+perc_thrustloss = Cram * (pr_ref - 0.98) * 100;
+
 
 % Capture Area 
 

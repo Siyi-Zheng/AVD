@@ -33,9 +33,9 @@ Wp = (no_economy_pass + no_business_pass) * mass_pass + economy_baggage * no_eco
 
 %L/D max
 kld = 15.5;
-s_wet_s_ref = 5.9;
+s_wet_s_ref = 6.25;
 
-AR_temp = 7.64; % change this when the program returns the correct value
+AR_temp = 9.2; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 %Weight fractions
@@ -118,7 +118,7 @@ hold off
 % aircraft parameters
 NE = 4; %number of engines
 max_wingspan = 65; %max wingspan in m
-e = 0.8; %oswald efficiency
+e = 0.85; %oswald efficiency
 e_TO_up = e - 0.05; % flaps but gear up
 e_TO = e - 0.1; %takeoff configuration
 e_L = e - 0.15; %landing configuration
@@ -132,7 +132,7 @@ S_ref = 552.8; %reference area in m^2
 % cruise parameters
 V_cruise_1 = 245; %cruise 1 speed in m/s
 V_cruise_2 = 241.5; %cruise 2 speed in m/s (M=0.78)
-rho_cruise_1 = 0.3016; %cruise 1 density in kg/m^3
+rho_cruise_1 = 0.38; %cruise 1 density in kg/m^3
 rho_cruise_2 = 0.54; %cruise 2 density in kg/m^3
 % ground parameteres
 S_L = 2900; %min TO distance / max landing distance
@@ -153,12 +153,11 @@ AR = max_wingspan ^ 2 / S_W_min; %max aspect ratio
 print_weight = floor(Wo);
 fprintf("Weight: %.0f kg\n", print_weight);
 fprintf("Max. wing aspect ratio: %.3g\n", AR);
-disp(S_W_min / 0.9);
+disp(S_W_min)
 
 % other values
 n = [1, 1, 1, 1, 1, 1, 1, 1, 1]; %load factor for each mission stage
 To = 316000 * NE; %100 % thrust for our engine in N (we need to choose one)
-v_x = 147.84; %prob wrong cause of change in CD0 however we havent used it anywhere
 V_2 = 1.2 * V_s; % in takeoff configuration
 V_3 = 1.25 * V_s; % used in the third phase of the climb
 

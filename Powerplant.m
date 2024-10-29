@@ -62,7 +62,7 @@ D_max = 1.5*D_fan;
 % (b+d) = L_diff*0.18 (factor from 0.15-0.2)
 % b = 1.4*d (factor from 1.5-2)
 d = (L_diff*0.18)/(1+1.4);
-b = 1.5*d;
+b = 1.4*d;
 a = 2*b; % factor from 1.5-3
 c = 4*d; % factor from 3-5
 fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
@@ -72,4 +72,5 @@ fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
 L_nozzle = 0.75*D_fan; % reference from book example
 L_nacelle = L_diff + L_engine + L_nozzle;
 L_nacelle/D_max; % should be in range 2-3
+D_nozzle = 0.6*D_th % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
 

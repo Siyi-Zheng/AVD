@@ -24,14 +24,14 @@ Wp = (no_economy_pass + no_business_pass) * mass_pass + economy_baggage * no_eco
 
 %L/D max
 AR_temp_values= 7:0.1:10;
-s_wet_s_ref= 5:0.05:6.5;
+s_wet_s_ref_values= 5:0.05:6.5;
 % Wo_results= zeros(size(AR_temp_values));
 
 for i= 1:length(AR_temp_values)
-    for abc= 1:length(s_wet_s_ref)
+    for abc= 1:length(s_wet_s_ref_values)
 AR_temp = AR_temp_values(i);
 kld = 15.5;
-s_wet_s_ref = 6.25;
+s_wet_s_ref = s_wet_s_ref_values(abc);
  % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
@@ -100,8 +100,8 @@ for j= 1:length(We_Wo)
 end
 
 [~, index] = min(close_list);
-Wo= Wo2(index)
-Wo_results(i)=Wo
+Wo= Wo2(index);
+Wo_results(i,abc)=Wo;
 We_Wo_final = We_Wo(index);
 We = We_Wo_final * Wo;
 Wf = Wf_Wo * Wo;
@@ -111,28 +111,33 @@ Wf = Wf_Wo * Wo;
 % xline(Wo, 'Color', [1 0.6 0.2], LineWidth = 1.5);
 % legend("W_o guess", "W_o calculated", 'Converged value')
 % hold off
+    end
 end
 
+[AR_temp_grid, s_wet_grid] = meshgrid(AR_temp_values, s_wet_s_ref_values);
+
+% Plot the surface
 figure;
-plot(AR_temp_values, Wo_results, '-o');
+surf(AR_temp_grid, s_wet_grid, Wo_results);
 xlabel('Aspect Ratio (AR\_temp)');
-ylabel('Wo');
-title('Sensitivity of We to AR\_temp');
-grid on;
+ylabel('s_wet');
+zlabel('wo');
+title('Sensitivity of Wo to AR\_temp and s_wet_sref');
+colorbar;
 
-W_S_takeoff= 7637;
-Sref= 458.9;
-MTOW= Wo;
-fuel_weight= 198928;
-T_W_TO= 0.2898;
+figure;
+contourf(AR_temp_grid, s_wet_grid, Wo_results', 20); % 20 contours for more detail
+xlabel('Aspect Ratio (AR\_temp)');
+ylabel('Specific Fuel Consumption (sfc\_cruise)');
+title('Contour Plot of Sensitivity of We to AR\_temp and sfc\_cruise');
+colorbar;
 
-weight_average_cruise = (MWF(1)*MWF(2)*0.8055)*MTOW*9.81;
-q_cruise= 0.5*altitude_data(4,3)*(0.83 * 294)^2;
-
-design_cl_average= (1/q_cruise) * (weight_average_cruise/Sref);
-
-
-
+% figure;
+% plot(AR_temp_values, Wo_results, '-o');
+% xlabel('Aspect Ratio (AR\_temp)');
+% ylabel('Wo');
+% title('Sensitivity of We to AR\_temp');
+% grid on;
 %Function for weight fractions
 
 function MWF = MWF_Calculation(sfc_cruise, sfc_loiter, Range_1, Velocity_cruise_1, L_D_cruise_1, Range_2, Velocity_cruise_2, L_D_cruise_2, endurance, L_D_loiter)

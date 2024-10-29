@@ -138,18 +138,6 @@ colorbar;
 % ylabel('Wo');
 % title('Sensitivity of We to AR\_temp');
 % grid on;
-
-W_S_takeoff= 7900;
-Sref= 482;
-MTOW= 390000;
-fuel_weight= 198928;
-T_W_TO= 0.2898;
-
-weight_average_cruise = (MWF(1)*MWF(2)*0.8055)*MTOW*9.81;
-q_cruise= 0.5*altitude_data(4,3)*(0.83 * 294)^2;
-
-design_cl_average= (1/q_cruise) * (weight_average_cruise/Sref)
-
 %Function for weight fractions
 
 function MWF = MWF_Calculation(sfc_cruise, sfc_loiter, Range_1, Velocity_cruise_1, L_D_cruise_1, Range_2, Velocity_cruise_2, L_D_cruise_2, endurance, L_D_loiter)

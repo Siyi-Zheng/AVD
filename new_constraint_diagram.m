@@ -245,6 +245,18 @@ xlabel("Wing Loading (kg/m^2)");
 ylabel("Sea-level Thrust-to-Weight Ratio");
 legend("Takeoff", "Climb 1a", "Climb 1b", "Climb 1c", "Cruise 1", "Service Ceiling", "Absolute Ceiling", "Climb 2a", "Climb 2b", "Climb 2c", "Cruise 2", "Loiter", "Landing", "Stall", "Design Point");
 
+W_S_takeoff= constraint_landing;
+Sref= S_W_min;
+MTOW= Wo;
+fuel_weight= 198928;
+T_W_TO= 0.2898;
+
+weight_average_cruise = (MWF(1)*MWF(2)*0.8055)*MTOW*9.81;
+q_cruise= 0.5*0.38*(0.83 * 295.4)^2;
+
+design_cl_average= (1/q_cruise) * (weight_average_cruise/Sref);
+
+
 %Function for weight fractions
 
 function MWF = MWF_Calculation(sfc_cruise, sfc_loiter, Range_1, Velocity_cruise_1, L_D_cruise_1, Range_2, Velocity_cruise_2, L_D_cruise_2, endurance, L_D_loiter)

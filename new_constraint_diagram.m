@@ -22,8 +22,8 @@ clear
 no_economy_pass = 416;
 no_business_pass = 84;
 no_crew = 12;
-economy_baggage = 18;
-business_baggage = 40;
+economy_baggage = 16;
+business_baggage = 33;
 crew_baggage = 10;
 
 mass_pass = 75;
@@ -33,9 +33,9 @@ Wp = (no_economy_pass + no_business_pass) * mass_pass + economy_baggage * no_eco
 
 %L/D max
 kld = 15.5;
-s_wet_s_ref = 5.9;
+s_wet_s_ref = 6;
 
-AR_temp = 7.64; % change this when the program returns the correct value
+AR_temp = 8.77; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 %Weight fractions
@@ -118,21 +118,20 @@ hold off
 % aircraft parameters
 NE = 4; %number of engines
 max_wingspan = 65; %max wingspan in m
-e = 0.8; %oswald efficiency
+e = 0.85; %oswald efficiency
 e_TO_up = e - 0.05; % flaps but gear up
 e_TO = e - 0.1; %takeoff configuration
 e_L = e - 0.15; %landing configuration
-C_L_max = 2.5; % landing configuration
+C_L_max = 2.6; % landing configuration
 C_L = 1.4; % clean configuration
 C_D_o = (e * pi * AR_temp) / (L_D_max * 2) ^ 2; %zero lift drag coeff
 C_D_o_up = C_D_o + 0.02; %flaps but gear up
 C_D_o_TO = C_D_o + 0.06; %takeoff configuration
 C_D_o_L = C_D_o + 0.11; %landing configuration
-S_ref = 552.8; %reference area in m^2
 % cruise parameters
 V_cruise_1 = 245; %cruise 1 speed in m/s
 V_cruise_2 = 241.5; %cruise 2 speed in m/s (M=0.78)
-rho_cruise_1 = 0.3016; %cruise 1 density in kg/m^3
+rho_cruise_1 = 0.38; %cruise 1 density in kg/m^3
 rho_cruise_2 = 0.54; %cruise 2 density in kg/m^3
 % ground parameteres
 S_L = 2900; %min TO distance / max landing distance
@@ -144,21 +143,22 @@ rho_loiter = 1.0555; %density at loiter (5000ft)
 V_loiter = 120; %velocity when loitering in m/s
 % calculated values
 C_L_TO = C_L_max / 1.21; % takeoff configuration
-V_s = sqrt((2 * Wo * 9.81) / (rho_sl * S_ref * C_L_TO));
 constraint_landing = ((S_L - S_a) .* C_L_max) * 9.81 / (5 * 5/3);
-S_W_min = Wo * 9.81 / constraint_landing * 0.9; %min reference area OF WING - seems to be around 85-90% of total area
+S_W_min = Wo * 9.81 / constraint_landing; %min reference area
 AR = max_wingspan ^ 2 / S_W_min; %max aspect ratio
+V_s = sqrt((2 * Wo * 9.81) / (rho_sl * S_W_min * C_L_max));
+% landing and stall
+constraint_stall = 0.5 * rho_sl * V_s * V_s * C_L_max;
 
 % output weight Wo and AR to the console. Don't use scientific notation for weight
 print_weight = floor(Wo);
 fprintf("Weight: %.0f kg\n", print_weight);
-fprintf("Max. wing aspect ratio: %.3g\n", AR);
-disp(S_W_min / 0.9);
+fprintf("Wing aspect ratio: %.3g\n", AR);
+fprintf("Reference Area: %.2f m^2\n", S_W_min);
 
 % other values
 n = [1, 1, 1, 1, 1, 1, 1, 1, 1]; %load factor for each mission stage
 To = 316000 * NE; %100 % thrust for our engine in N (we need to choose one)
-v_x = 147.84; %prob wrong cause of change in CD0 however we havent used it anywhere
 V_2 = 1.2 * V_s; % in takeoff configuration
 V_3 = 1.25 * V_s; % used in the third phase of the climb
 
@@ -201,8 +201,6 @@ constraint_climb_2c = (4/3) * a_b(5) * (1 / (V_3)) * climb_rate2 + ((0.5 * rho_s
 constraint_cruise_2 = a_b(6) .* ((0.5 * rho_cruise_2 * V_cruise_2 * V_cruise_2 * C_D_o) ./ (MWF(6) .* W_S) + (MWF(6) * n(6) * n(6) .* W_S) ./ (0.5 * rho_cruise_2 * V_cruise_2 * V_cruise_2 * pi * AR * e));
 % loiter
 constraint_loiter = a_b(7) .* ((0.5 * rho_loiter * V_loiter * V_loiter * C_D_o) ./ (MWF(7) .* W_S) + (MWF(7) * n(7) * n(7) .* W_S) ./ (0.5 * rho_loiter * V_loiter * V_loiter * pi * AR * e));
-% landing and stall
-constraint_stall = 0.5 * rho_sl * V_s * V_s * C_L_max;
 
 %landing and stall and climbs stuff for plotting
 T_W = [0, 1.5];
@@ -215,7 +213,6 @@ T_W_landing = constraint_landing / (TOP * C_L_TO);
 T_design = T_W_landing * Wo * 9.81;
 T_engine = T_design / NE;
 print_thrust = floor(T_engine);
-fprintf("Min. thrust per engine: %.0f N\n", print_thrust);
 
 figure(2)
 % takeoff

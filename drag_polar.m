@@ -1,41 +1,84 @@
-clear
+clear all
 clc
-close all 
 
-kld = 15.5;
-s_wet_s_ref = 5.9;
+% read the data from polar_data.csv
+% columns are alpha(deg), cl, cd, cdp, cm, top_xtr, bot_xtr, then repeats for the second airfoil
+% remove the header row
+% airfoils are in order NASA SC(2)-0714 (landing), NASA SC(2)-0614 (landing), NASA SC(2)-0714 (cruise), NASA SC(2)-0614 (cruise)
+data = csvread('polar_data.csv', 1, 0);
+data = data(1:end, :);
+alpha = data(:, 1);
+cl = data(:, 2);
+cd = data(:, 3);
+cdp = data(:, 4);
+cm = data(:, 5);
+top_xtr = data(:, 6);
+bot_xtr = data(:, 7);
+alpha2 = data(:, 8);
+cl2 = data(:, 9);
+cd2 = data(:, 10);
+cdp2 = data(:, 11);
+cm2 = data(:, 12);
+top_xtr2 = data(:, 13);
+bot_xtr2 = data(:, 14);
+alpha3 = data(:, 15);
+cl3 = data(:, 16);
+cd3 = data(:, 17);
+cdp3 = data(:, 18);
+cm3 = data(:, 19);
+top_xtr3 = data(:, 20);
+bot_xtr3 = data(:, 21);
+alpha4 = data(:, 22);
+cl4 = data(:, 23);
+cd4 = data(:, 24);
+cdp4 = data(:, 25);
+cm4 = data(:, 26);
+top_xtr4 = data(:, 27);
+bot_xtr4 = data(:, 28);
 
-AR_temp = 8.49; % change this when the program returns the correct value
-L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
+% prandtl-glauert correction at cruise (aerfoil 3 and 4)
+M = 0.83;
+beta = sqrt(1 - M^2);
+cl3 = cl3 ./ beta;
+cd3 = cd3 ./ beta;
+cl4 = cl4 ./ beta;
+cd4 = cd4 ./ beta;
 
-e = 0.8; %oswald efficiency
-e_TO_flaps= e - 0.05; %take off with flaps
-e_TO_flaps_gear= e-0.1; %take off with flaps and gear
-e_L_flaps = e - 0.1; %landing configuration
-e_L_flaps_gear= e -0.15; %with flaps and gear
-
-C_L_max = 2.5; % landing configuration
-C_L = 1.8; % clean configuration
-C_D_o = (e * pi * AR_temp) / (L_D_max * 2) ^ 2; %zero lift drag coeff
-C_D_o_TO_flaps = C_D_o + 0.02; %flaps but gear up
-C_D_o_TO_flaps_gear = C_D_o + 0.04; %takeoff configuration
-C_D_o_L_flaps = C_D_o + 0.07; %landing configuration
-C_D_o_L_flaps_gears= C_D_o + 0.09;
-
-syms Cd
-Lift_coeffcient= @(Cd, C_D_o, e) sqrt((Cd-C_D_o)/(1/(pi*AR_temp*e)));
-figure
-fplot(@(Cd) Lift_coeffcient(Cd, C_D_o, e), [0 0.6], 'LineWidth',1.5)
-
+% plot the cl vs alpha
+figure(1)
+plot(alpha, cl, 'k', 'LineWidth', 2)
 hold on
-fplot(@(Cd) Lift_coeffcient(Cd, C_D_o_TO_flaps, e_TO_flaps), [0 0.6], 'LineWidth',1.5)
-fplot(@(Cd) Lift_coeffcient(Cd, C_D_o_TO_flaps_gear, e_TO_flaps_gear), [0 0.6], 'LineWidth',1.5)
-fplot(@(Cd) Lift_coeffcient(Cd, C_D_o_L_flaps, e_L_flaps), [0 0.6], 'LineWidth',1.5)
-fplot(@(Cd) Lift_coeffcient(Cd, C_D_o_L_flaps_gears, e_L_flaps_gear), [0 0.6], 'LineWidth',1.5)
-hold off
-legend('Clean', 'take off with flaps','take off with flaps and gear','landing with flaps','landing with flaps and gear')
-title('Drag polar')
-xlabel('Cd')
-ylabel('Cl')
+plot(alpha2, cl2, 'r', 'LineWidth', 2)
+plot(alpha3, cl3, 'r:', 'LineWidth', 2)
+plot(alpha4, cl4, 'k:', 'LineWidth', 2)
+xlabel('Angle of attack (deg)')
+ylabel('Lift coefficient')
+grid on
+set(gca, 'FontSize', 12)
+legend(["NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (cruise)", "NASA SC(2)-0614 (cruise)"], "Location", "northwest")
 
+% plot the cd vs alpha
+figure(2)
+plot(alpha, cd, 'k', 'LineWidth', 2)
+hold on
+plot(alpha2, cd2, 'r', 'LineWidth', 2)
+plot(alpha3, cd3, 'r:', 'LineWidth', 2)
+plot(alpha4, cd4, 'k:', 'LineWidth', 2)
+xlabel('Angle of attack (deg)')
+ylabel('Drag coefficient')
+grid on
+set(gca, 'FontSize', 12)
+legend(["NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (cruise)", "NASA SC(2)-0614 (cruise)"], "Location", "northwest")
 
+% plot cl/cd vs alpha
+figure(3)
+plot(alpha, cl./cd, 'k', 'LineWidth', 2)
+hold on
+plot(alpha2, cl2./cd2, 'r', 'LineWidth', 2)
+plot(alpha3, cl3./cd3, 'r:', 'LineWidth', 2)
+plot(alpha4, cl4./cd4, 'k:', 'LineWidth', 2)
+xlabel('Angle of attack (deg)')
+ylabel('Lift-to-drag ratio')
+grid on
+set(gca, 'FontSize', 12)
+legend(["NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (cruise)", "NASA SC(2)-0614 (cruise)"], "Location", "northwest")

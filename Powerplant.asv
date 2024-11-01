@@ -9,14 +9,10 @@ mdot = 2559; % takeoff mass flow rate in lbs/sec
 D_fan = 111.1; % fan diamter in inches
 L_engine = 184.7; % inches
 fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
-W = 
 
 %thrust required to meet T/W ratio
-T_W = 0.289;
 
-MTOW = 290000;
 
-T_req = T_W * MTOW;
 
 % Flight Condition
 M_cruise = 0.83;
@@ -42,18 +38,9 @@ perc_thrustloss1 = Cram * (pr_ref - 0.98) * 100;
 
 %Rubber engines scaling
 
-Thrustloss = Thrust_to * (1 - perc_thrustloss1);
+Thrustloss = Thrust_to * (1 - perc_thrustloss1)
 
-SF = T_req / Thrustloss;
-
-%sizing corrections
-
-L_engine = L_engine * (SF)^0.4;
-
-D_engine = D_engine * (SF)^0.5;
-
-W_engine = W_engine * (SF)^1.1;
-
+SF = Thrustloss / 
 
 % Capture Area 
 

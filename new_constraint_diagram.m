@@ -18,6 +18,7 @@ clear
 %Wo = Wc + Wp + (Wf/Wo)Wo + (We/Wo)Wo
 %Wo = (Wc + Wp)/(1- Wf/Wo - We/Wo)
 
+
 %INITIAL WEIGHT
 no_economy_pass = 416;
 no_business_pass = 84;

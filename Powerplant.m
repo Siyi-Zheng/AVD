@@ -9,14 +9,18 @@ mdot = 2559; % takeoff mass flow rate in lbs/sec
 D_fan = 111.1; % fan diamter in inches
 L_engine = 184.7; % inches
 fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
-W = 
+W = 6147.1;
 
 %thrust required to meet T/W ratio
-T_W = 0.289;
+T_W = 0.33;
 
-MTOW = 290000;
+MTOW = 390000;
 
 T_req = T_W * MTOW;
+
+T_req = (T_req / 4) * 9.81;
+
+
 
 % Flight Condition
 M_cruise = 0.83;
@@ -29,7 +33,7 @@ L_engine = L_engine*0.0254; % inch to metre
 %rubber engine corrections
 
 %GEnx 1B75/P1 Engine Thrust
-Thrust_to =345200; 
+Thrust_to =341200; 
 
 %propulsion intergration corrections
 
@@ -42,7 +46,7 @@ perc_thrustloss1 = Cram * (pr_ref - 0.98) * 100;
 
 %Rubber engines scaling
 
-Thrustloss = Thrust_to * (1 - perc_thrustloss1);
+Thrustloss = Thrust_to * (100 - perc_thrustloss1)/100;
 
 SF = T_req / Thrustloss;
 
@@ -50,9 +54,9 @@ SF = T_req / Thrustloss;
 
 L_engine = L_engine * (SF)^0.4;
 
-D_engine = D_engine * (SF)^0.5;
+D_fan = D_fan * (SF)^0.5;
 
-W_engine = W_engine * (SF)^1.1;
+W_engine = W * (SF)^1.1;
 
 
 % Capture Area 

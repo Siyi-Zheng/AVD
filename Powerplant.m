@@ -25,8 +25,7 @@ Cram = 1.35;
 
 pr_ref = 1.0;
 
-perc_thrustloss = Cram * (pr_ref - 0.98) * 100;
-
+perc_thrustloss1 = Cram * (pr_ref - 0.98) * 100;
 
 % Capture Area 
 

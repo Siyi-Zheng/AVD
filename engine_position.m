@@ -1,4 +1,4 @@
-span = 65; 
+span = 65/2; 
 engine_mass = 6147; 
 engine_thrust = 341200; % Thrust per engine in Newtons
 mean_chord = 7; % Mean chord length in meters 

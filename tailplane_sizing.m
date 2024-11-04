@@ -10,6 +10,7 @@ S_ref = 482;
 b = 32.5;
 mac = S_ref / (2 * b);
 x_w = 30; % idk
+x_cg = 25;
 x_h = 70;
 x_v = 65;
 

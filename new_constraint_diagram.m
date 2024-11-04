@@ -40,10 +40,10 @@ AR_temp = 8.77; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 S_ref=481.77;
-S_wet= S_ref*s_wet_s_ref
+S_wet= S_ref*s_wet_s_ref;
 
 S_wet_calc= 2*S_ref + 0.3*S_ref*2 + 2*pi*(0.5*6.7)*70 + 2*pi*(0.5*6.7)^2;
-s_wet_s_ref_calc= S_wet_calc/S_ref
+s_wet_s_ref_calc= S_wet_calc/S_ref;
 
 %Weight fractions
 

@@ -12,13 +12,13 @@ fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
 W = 6147.1;
 
 %thrust required to meet T/W ratio
-T_W = 0.33;
+T_W = 0.29;
 
 MTOW = 390000;
 
-T_req = T_W * MTOW;
+T_total = (T_W * MTOW) * 9.81;
 
-T_req = (T_req / 4) * 9.81;
+T_req = (T_total / 4) ;
 
 
 
@@ -103,5 +103,5 @@ fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
 L_nozzle = 0.75*D_fan; % reference from book example
 L_nacelle = L_diff + L_engine + L_nozzle;
 L_nacelle/D_max; % should be in range 2-3
-D_nozzle = 0.6*D_th % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+D_nozzle = 0.6*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
 

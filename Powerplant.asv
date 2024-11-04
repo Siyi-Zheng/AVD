@@ -103,5 +103,5 @@ fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
 L_nozzle = 0.75*D_fan; % reference from book example
 L_nacelle = L_diff + L_engine + L_nozzle;
 L_nacelle/D_max; % should be in range 2-3
-D_nozzle = 0.6*D_th % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+D_nozzle = 0.6*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
 

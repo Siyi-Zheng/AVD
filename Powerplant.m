@@ -85,12 +85,15 @@ d = (L_diff*0.15)/(1+1.4);
 b = 1.4*d;
 a = 2*b; % factor from 1.5-3
 c = 4*d; % factor from 3-5
-fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
+fprintf("a: %.3f, b: %.3f, c: %.3f, d: %.3f, \n",a,b,c,d)
 
 
 % Nozzle
 L_nozzle = 0.75*D_fan; % reference from book example
 L_nacelle = L_diff + L_engine + L_nozzle;
 L_nacelle/D_max % should be in range 2-3
-D_nozzle = 0.7*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+D_nozzle = sqrt(0.75)*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+
+% distance from fan to fan case 34.4cm
+
 

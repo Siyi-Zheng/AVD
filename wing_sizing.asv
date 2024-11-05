@@ -1,5 +1,4 @@
 clear
-clf
 clc
 
 area = 481.77; % m^2
@@ -61,9 +60,6 @@ figure
 x = linspace(0, wing_span/2, 1000);
 % get leading edge coordinates
 le = le_root + (le_tip - le_root) .* x ./ (wing_span / 2);
-te1 = te_root + (te_root - te_tip) .* (kink_span - x) ./ ((wing_span / 2) - kink_span);
-te = min(te_root, te1);
-chord = le - te;
-csa = chord .^ 2 * area_ratio;
-plot(x, csa)
-wing_vol = trapz(x, csa);
+te1 = 
+te = min(te_root, )
+plot()

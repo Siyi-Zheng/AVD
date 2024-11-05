@@ -55,7 +55,7 @@ sfc_loiter = sfc_loiter_mg * 1e-6 * 9.81;
 
 %cruise 1 parameters
 Range_1 = 7500 * 1852; %change from nautical miles to metres
-Velocity_cruise_1 = 0.83 * 295; %speed of sound at 40,000 feet
+Velocity_cruise_1 = 0.83 * 295; %speed of sound at 35,000 feet
 L_D_cruise_1 = 0.866 * L_D_max;
 
 %cruise 2 parameters

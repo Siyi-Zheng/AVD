@@ -44,7 +44,7 @@ optimal_yaw_moment = inf;
 for pos1 = engine_positions
     for pos2 = engine_positions
         % Ensure pos2 is at least 10 meters after pos1
-        if pos2 > pos1 + 5
+        if pos2 > pos1 + 10
             % Calculate moment contributions from engines (weight and thrust)
             weight_moment_engine1 = -engine_mass * 9.81 * (span - pos1); 
             weight_moment_engine2 = -engine_mass * 9.81 * (span - pos2);

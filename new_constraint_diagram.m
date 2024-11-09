@@ -243,7 +243,7 @@ plot(W_S, constraint_loiter, color = [0 0.7 0.7], LineWidth = 1.5, linestyle = "
 % landing, stall
 plot(landing, s_w, color = [0.7 0.7 0], LineWidth = 1.5);
 plot(stall, s_w, color = [0.7 0.7 0], LineWidth = 1.5, linestyle = "--");
-scatter(constraint_landing-100, 306000*4/(Wo*9.81), "kx", "LineWidth", 1); % change this when we know our thrust and wing area
+scatter(constraint_landing-100, 277000*4/(Wo*9.81), "kx", "LineWidth", 1); % change this when we know our thrust and wing area
 hold off
 xlim([0 13000]);
 ylim([0 0.6]);

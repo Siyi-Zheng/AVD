@@ -33,7 +33,7 @@ L_engine = L_engine*0.0254; % inch to metre
 %rubber engine corrections
 
 %GEnx 1B75/P1 Engine Thrust
-Thrust_to =341200; 
+Thrust_to =29900; 
 
 %propulsion intergration corrections
 

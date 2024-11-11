@@ -40,10 +40,10 @@ AR_temp = 8.77; % change this when the program returns the correct value
 L_D_max = kld * sqrt(AR_temp / s_wet_s_ref);
 
 S_ref=481.77;
-S_wet= S_ref*s_wet_s_ref
+S_wet= S_ref*s_wet_s_ref;
 
 S_wet_calc= 2*S_ref + 0.3*S_ref*2 + 2*pi*(0.5*6.7)*70 + 2*pi*(0.5*6.7)^2;
-s_wet_s_ref_calc= S_wet_calc/S_ref
+s_wet_s_ref_calc= S_wet_calc/S_ref;
 
 %Weight fractions
 
@@ -243,7 +243,7 @@ plot(W_S, constraint_loiter, color = [0 0.7 0.7], LineWidth = 1.5, linestyle = "
 % landing, stall
 plot(landing, s_w, color = [0.7 0.7 0], LineWidth = 1.5);
 plot(stall, s_w, color = [0.7 0.7 0], LineWidth = 1.5, linestyle = "--");
-scatter(constraint_landing-100, 306000*4/(Wo*9.81), "kx", "LineWidth", 1); % change this when we know our thrust and wing area
+scatter(constraint_landing-100, 277000*4/(Wo*9.81), "kx", "LineWidth", 1); % change this when we know our thrust and wing area
 hold off
 xlim([0 13000]);
 ylim([0 0.6]);

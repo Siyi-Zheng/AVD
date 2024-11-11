@@ -12,13 +12,13 @@ fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
 W = 6147.1;
 
 %thrust required to meet T/W ratio
-T_W = 0.33;
+T_W = 0.29;
 
 MTOW = 390000;
 
-T_req = T_W * MTOW;
+T_total = (T_W * MTOW) * 9.81;
 
-T_req = (T_req / 4) * 9.81;
+T_req = (T_total / 4) ;
 
 
 
@@ -33,7 +33,7 @@ L_engine = L_engine*0.0254; % inch to metre
 %rubber engine corrections
 
 %GEnx 1B75/P1 Engine Thrust
-Thrust_to =341200; 
+Thrust_to =29900; 
 
 %propulsion intergration corrections
 

@@ -214,14 +214,14 @@ clear
   0.990000, -0.010800;
   1.000000, -0.006600];
 % Separate upper and lower surfaces
-upper_surface = airfoil(1:103, :);
-lower_surface = airfoil(104:206, :);
+upper_surfacea = airfoil(1:103, :);
+lower_surfacea = airfoil(104:206, :);
 
 % Compute the thickness (distance between upper and lower surfaces at each x position)
-thickness = upper_surface(:, 2) - lower_surface(:, 2);
+thickness = upper_surfacea(:, 2) - lower_surfacea(:, 2);
 
 % Numerical integration to find area under the airfoil
-area_under_airfoil = cumtrapz(upper_surface(:, 1), thickness);
+area_under_airfoil = cumtrapz(upper_surfacea(:, 1), thickness);
 
 % Total area of the airfoil with chord length of 1
 final_area = area_under_airfoil(end);
@@ -277,8 +277,8 @@ hold off
 
 
 %plotting area distribution
-area1 = final_area * chord1;
-area2 = final_area * chord2;
+area1 = final_area * chord1.^2;
+area2 = final_area * chord2.^2;
 
 figure
 hold on
@@ -305,11 +305,12 @@ volume_holdl = volume_hold * 1000;
 
 %increasing to factor foam area, tank area and extra volume for desnity
 
-volume_req = volume_hold * 1.1;
+volume_req = volume_hold * 1.15;
 
 volume_wings = (volume_hold * 0.60) * 2;
 
 % Fuel tank data (transposed for easier handling in rows)
+%{
 fueltank = [
     0.150000 , 0.059100;
     0.160000 , 0.060200;
@@ -357,6 +358,27 @@ fueltank = [
     0.580000 , 0.064000;
     0.590000 , 0.063300;
     0.600000 , 0.062600;
+    0.610000 , 0.061800;
+    0.620000 , 0.061000;
+    0.630000 , 0.060100;
+    0.640000 , 0.059100;
+    0.650000 , 0.058100;
+    0.660000 , 0.057000;
+    0.670000 , 0.055900;
+    0.680000 , 0.054700;
+    0.690000 , 0.053500;
+    0.700000 , 0.052200;
+    0.700000, -0.031500;
+    0.690000, -0.033600;
+    0.680000, -0.035600;
+    0.670000, -0.037700;
+    0.660000, -0.039700;
+    0.650000, -0.041700;
+    0.640000, -0.043600;
+    0.630000, -0.045500;
+    0.620000, -0.047300;
+    0.610000, -0.049100;
+
     0.600000, -0.050800;
     0.590000, -0.052500;
     0.580000, -0.054100;
@@ -403,20 +425,58 @@ fueltank = [
     0.170000, -0.061500;
     0.160000, -0.060500;
     0.150000, -0.059400
-]';
+    0.150000 , 0.059100]';
+%}
+
+fueltank = [upper_surfacea(18:73 , :) ; flipud(lower_surfacea(18:73 , :)) ; upper_surfacea(18 , :)];
+%central tank and front tank seperation
+%structural member coordinates
 
 % Separate upper and lower surfaces
-upper_surface = fueltank(:, 1:46); % Columns 1-46 for upper surface
-lower_surface = fueltank(:, 47:92); % Columns 47-92 for lower surface
+upper_surface = fueltank(1:56 , :); % Columns 1-46 for upper surface
+lower_surface = fueltank(57:112 , :); % Columns 47-92 for lower surface
 
 % Calculate thickness between upper and lower surfaces
-thickness = upper_surface(2, :) - lower_surface(2, :);
+thickness = upper_surface(: , 2) - flipud(lower_surface(: , 2));
 
 % Calculate the area by integrating thickness along the chord positions
-Tankarea = trapz(upper_surface(1, :), thickness);
+Tankarea = trapz(upper_surface(: , 1), thickness);
 
 % Display the area
 disp(['The total cross-sectional area of the fuel tank is: ', num2str(Tankarea), ' square units']);
+
+% Plot the airfoil
+figure
+hold on
+plot(upper_surfacea(:, 1), upper_surfacea(:, 2), 'b', 'DisplayName', 'Upper Surface');
+plot(lower_surfacea(:, 1), lower_surfacea(:, 2), 'r', 'DisplayName', 'Lower Surface');
+plot(fueltank(:,1),fueltank(:,2),'k','DisplayName','Fuel Tank')
+xlabel('Chord Position (x/c)');
+ylabel('Thickness (y/c)');
+title('Airfoil Profile');
+legend;
+ylim([-0.8 0.8]);
+hold off
+
+%plotting area distribution
+area3 = Tankarea * chord1.^2;
+area4 = Tankarea * chord2.^2;
+
+figure
+hold on
+plot(span1, area3)
+plot(span2, area4)
+title("Area Ratio")
+hold off
+
+%volume calculations
+volume1 = (trapz(span1 , area3) * 0.85);
+volume2 = trapz(span2 , area4) * 0.85;
+
+
+
+
+
 
 
 

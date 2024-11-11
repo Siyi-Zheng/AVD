@@ -287,11 +287,9 @@ plot(span2, area2)
 title("Area Ratio")
 hold off
 
-%volume calculations
-volume_available1 = (trapz(span1 , area1));
-volume_available2 = trapz(span2 , area2);
-
-
+%calculating available wing volume
+volume_available1 = 0.5 * (13.89 + outer_chord) * 9.75;
+volume_available2 = 0.5 * (outer_chord + 3.47) * (29.45 - 9.75);
 
 total_availablevolume = volume_available1 + volume_available2;
 
@@ -512,8 +510,6 @@ volume1 = (trapz(span1 , area3) * 0.85);
 volume2 = trapz(span2 , area4) * 0.85;
 
 total_tank_volume = volume1 * 2 + volume2 * 2;
-
-Volumer_needed = volume_req - total_tank_volume;
 
 
 

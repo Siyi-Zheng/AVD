@@ -9,8 +9,8 @@ V_v = 0.09;
 S_ref = 482;
 b = 32.5;
 mac = S_ref / (2 * b);
-x_w = 44;
-x_cg = 41;
+x_w = 38;
+x_cg = 37;
 x_h = 75;
 x_v = 73;
 C_m_0 = -0.1433; % check this but its what xfoil gives
@@ -27,4 +27,4 @@ S_v = V_v * S_ref * b / (x_v - x_w);
 % C_m = C_m_0 + (x_cg - x_w) * C_l - eta_h * V_h * C_l_h;
 
 % static margin
-K_n = x_w - x_cg + eta_h * V_h * (1 - downwash_derivative) * a_h / a;
+K_n = (x_w - x_cg + eta_h * V_h * (1 - downwash_derivative) * a_h / a) / mac;

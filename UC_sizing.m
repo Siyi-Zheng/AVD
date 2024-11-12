@@ -8,7 +8,7 @@ L_ws = 65; % wing span in meters
 %Weights
 W_o = 390057;        %MTOW
 W_ng = 0.1*W_o;      %Nose gear weight carrying capability
-W_mg = W_o - W_ng;     %Main gear weight carrying capability
+W_mg = W_o - W_ng;   %Main gear weight carrying capability
 
 MAC = 9.7; %mean aerodynamic chord in meters
 
@@ -31,7 +31,7 @@ disp(sprintf("Tipback Angle (Degree): %.2f",rad2deg(tan((x_mg-x_cg)/H))))
 
 
 %Main Gear Separation
-L_mg = 5.5; % horizontal distance from main landing gear to plane centre axis in meters
+L_mg = 5; % horizontal distance from main landing gear to plane centre axis in meters
 % angle between line connecting main and nose gear to plane centre axis
 a = rad2deg(atan(L_mg/(x_mg-x_ng)));
 d = (x_cg-x_ng)*sin(deg2rad(a)); % static ground line
@@ -58,11 +58,16 @@ Wth_mw =  0.1043*W_mw^0.48; %Width of main wheel in INCH
 %Three-part Name Tire: 47 x 18-18
 R_r = 19.2; % Rolling Radius in inch
 
+
 %Tire Pressure
 A_p = 2.3*sqrt(Wth_mw*D_mw)*(D_mw/2 - R_r); %wheel contact area in inch^2
 P_mw = W_mw/(A_p*0.00064516);
 
-%W_o < 200 000 lbs so we need 2 wheels per main strut
+
+%Brake
+W_landing = 0.8*W_o; % account for emergency landing short aft takeoff
+KE = 0.5*W_landing/9.81 * 70.4^2; % total KE required to absorb by the brake
+KE_per_wheel = KE/18; % KE required for each wheel with break
 
 %ACN - Aircraft Classification Number
 %The follwoing values are generated from the COMFAA software

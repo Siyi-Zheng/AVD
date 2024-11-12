@@ -226,7 +226,7 @@ area_under_airfoil = cumtrapz(upper_surfacea(:, 1), thickness);
 % Total area of the airfoil with chord length of 1
 final_area = area_under_airfoil(end);
 
-disp(["Final CSA for 1m of chord length is" num2str(final_area)])
+%disp(["Final CSA for 1m of chord length is" num2str(final_area)])
 
 % Define a range of chord lengths to calculate the CSA
 chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
@@ -235,7 +235,7 @@ chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
 for i = 1:length(chord_lengths)
     chord = chord_lengths(i);
     CSA = final_area * chord^2;
-    disp(['For a chord length of ', num2str(chord), ' m, the cross-sectional area is: ', num2str(CSA), ' square meters']);
+    %disp(['For a chord length of ', num2str(chord), ' m, the cross-sectional area is: ', num2str(CSA), ' square meters']);
 end
 
 %calculating chord distribution
@@ -247,7 +247,7 @@ a = b - 3.47/4;
 aa = (a + 3.47)/32.45;
 
 %sweep_angle = atand(aa);
-sweep_angle = 29.6;
+sweep_angle = atand(aa);
 
 %chord distribution for first section
 outer_chord = 13.89 - (9.75 * tand(sweep_angle));
@@ -257,7 +257,7 @@ gradient1 = (outer_chord - 13.89)/9.75;
 %for outer section
 gradient2 = (3.47 - outer_chord)/(32.45 - 9.75);
 
-span1 = 0:0.01:9.75;
+span1 = 3:0.01:9.75;
 span2 = 9.75:0.01:29.45;
 
 c2 = outer_chord - gradient2 * 9.75;
@@ -277,8 +277,8 @@ hold off
 
 
 %plotting area distribution
-area1 = final_area * chord1.^2;
-area2 = final_area * chord2.^2;
+area1 = (final_area * chord1.^2) ./ cosd(sweep_angle);
+area2 = (final_area * chord2.^2) ./ cosd(sweep_angle);
 
 figure
 hold on
@@ -307,7 +307,7 @@ volume_holdl = volume_hold * 1000;
 
 %increasing to factor foam area, tank area and extra volume for desnity
 
-volume_req = volume_hold * 1.15;
+volume_req = volume_hold * 1.10;
 
 volume_wings = (volume_hold * 0.60) * 2;
 
@@ -430,7 +430,7 @@ fueltank = [
     0.150000 , 0.059100]';
 %}
 
-fueltank = [upper_surfacea(19:71 , :) ; flipud(lower_surfacea(19:71 , :)) ; upper_surfacea(19 , :)];
+fueltank = [upper_surfacea(15:71 , :) ; flipud(lower_surfacea(15:71 , :)) ; upper_surfacea(15 , :)];
 %central tank and front tank seperation
 %structural member coordinates
 
@@ -445,12 +445,67 @@ thickness = upper_surface(: , 2) - flipud(lower_surface(: , 2));
 Tankarea = trapz(upper_surface(: , 1), thickness);
 
 % Display the area
-disp(['The total cross-sectional area of the fuel tank is: ', num2str(Tankarea), ' square units']);
+%disp(['The total cross-sectional area of the fuel tank is: ', num2str(Tankarea), ' square units']);
 
 
 %creating spar 
-spar1 = [upper_surfacea(17:19,:) ; flipud(lower_surfacea(17:19,:)) ; upper_surfacea(17,:)];
+spar1 = [upper_surfacea(13:15,:) ; flipud(lower_surfacea(13:15,:)) ; upper_surfacea(13,:)];
 spar2 = [upper_surfacea(71:73,:) ; flipud(lower_surfacea(71:73,:)) ; upper_surfacea(71,:)];
+
+
+
+%plotting area distribution
+area3 = (Tankarea * chord1.^2) / cosd(sweep_angle);
+area4 = (Tankarea * chord2.^2) / cosd(sweep_angle);
+
+figure
+hold on
+plot(span1, area3)
+plot(span2, area4)
+title("Area Ratio")
+hold off
+
+%volume calculations
+volume1 = (trapz(span1 , area3) * 0.85);
+volume2 = trapz(span2 , area4) * 0.85;
+
+total_tank_volume = volume1 * 2 + volume2 * 2;
+
+Volumer_needed = volume_req - total_tank_volume;
+
+% Define the collector area by combining upper and lower surfaces
+collector = [upper_surfacea(1:11, :); flipud(lower_surfacea(1:11, :)); upper_surfacea(1, :)];
+
+% Separate collector into upper and lower parts
+collector_upper = collector(1:11, :); % First 15 points for upper surface
+collector_lower = collector(12:22, :); % Next 15 points for lower surface
+
+% Calculate thickness between upper and lower surfaces (only y-coordinates)
+thickness = collector_upper(:, 2) - flipud(collector_lower(:, 2));
+
+% Calculate the area of the collector using numerical integration
+collector_area = trapz(collector_upper(:, 1), thickness);
+
+areac_ratio1 = collector_area * chord1.^2;
+areac_ratio2 = collector_area * chord2.^2;
+
+figure
+hold on
+plot(span1 , areac_ratio1)
+plot(span2 , areac_ratio2)
+hold off
+
+% Calculate collector area integration over specified ranges
+collector1 = trapz(span1(240:676), areac_ratio1(240:676)); % Corrected typo
+collector2 = trapz(span2(1195:1971), areac_ratio2(1195:1971));      % Corrected typo
+
+
+%collector lengths
+length1 = (span1(676) - span1(240)) * tand(30.15);
+length2 = (span2(1971) - span2(1195)) * tand(30.15);
+
+
+difference = Volumer_needed - (collector1 + collector2) * 2;
 
 
 
@@ -487,6 +542,17 @@ y_fill = [ys_fill1; flipud(ys_fill2)];
 % Fill the area between the spars
 fill(x_fill, y_fill, [0.5, 0.5, 0.5], 'FaceAlpha', 0.3, 'EdgeColor', 'none');
 
+% Extract x and y coordinates from the collector data
+x_collector = collector(:, 1);  % x-coordinates
+y_collector = collector(:, 2);  % y-coordinates
+
+% Plot upper and lower surfaces (for reference)
+plot(upper_surfacea(:, 1), upper_surfacea(:, 2), 'b', 'DisplayName', 'Upper Surface');
+plot(lower_surfacea(:, 1), lower_surfacea(:, 2), 'r', 'DisplayName', 'Lower Surface');
+
+% Fill the collector area in blue with transparency
+fill(x_collector, y_collector, 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+
 % Additional plot settings
 xlabel('Chord Position (x/c)');
 ylabel('Thickness (y/c)');
@@ -496,24 +562,125 @@ axis equal
 
 hold off
 
-%plotting area distribution
-area3 = Tankarea * chord1.^2;
-area4 = Tankarea * chord2.^2;
 
-figure
-hold on
-plot(span1, area3)
-plot(span2, area4)
-title("Area Ratio")
-hold off
 
-%volume calculations
-volume1 = (trapz(span1 , area3) * 0.85);
-volume2 = trapz(span2 , area4) * 0.85;
+% Airfoil data (with y-coordinates inverted)
+lower_surfacet = [
+    0.000000  -0.000000;
+    0.000150  -0.009560;
+    0.006280  -0.020300;
+    0.018650  -0.031760;
+    0.037300  -0.043240;
+    0.062030  -0.053820;
+    0.092300  -0.062650;
+    0.127320  -0.069150;
+    0.166040  -0.073200;
+    0.207380  -0.075240;
+    0.251310  -0.075970;
+    0.297960  -0.075540;
+    0.346810  -0.074020;
+    0.397330  -0.071500;
+    0.448970  -0.068110;
+    0.501170  -0.063970;
+    0.553350  -0.059240;
+    0.604960  -0.054050;
+    0.655410  -0.048540;
+    0.704170  -0.042850;
+    0.750700  -0.037120;
+    0.794490  -0.031450;
+    0.835060  -0.025970;
+    0.871970  -0.020790;
+    0.904820  -0.016020;
+    0.933240  -0.011760;
+    0.956930  -0.008120;
+    0.975630  -0.005180;
+    0.989140  -0.003020;
+    0.997300  -0.001700;
+    1.000030  -0.001260
+];
 
-total_tank_volume = volume1 * 2 + volume2 * 2;
+upper_surfacet = [
+    0.000000  -0.000000;
+    0.005330  0.007920;
+    0.015570  0.014010;
+    0.030290  0.018700;
+    0.049150  0.022480;
+    0.071950  0.025860;
+    0.098680  0.029220;
+    0.129540  0.032820;
+    0.164830  0.036600;
+    0.204830  0.040160;
+    0.248690  0.042830;
+    0.295310  0.044460;
+    0.344180  0.045100;
+    0.394760  0.044820;
+    0.446500  0.043710;
+    0.498830  0.041880;
+    0.551170  0.039450;
+    0.602960  0.036550;
+    0.653600  0.033270;
+    0.702570  0.029750;
+    0.749300  0.026070;
+    0.793300  0.022350;
+    0.834070  0.018660;
+    0.871180  0.015120;
+    0.904200  0.011800;
+    0.932790  0.008800;
+    0.956610  0.006210;
+    0.975430  0.004100;
+    0.989010  0.002540;
+    0.997220  0.001580;
+    0.999970  0.001260
+];
 
-Volumer_needed = volume_req - total_tank_volume;
+% Plotting the inverted airfoil
+figure;
+hold on;
+
+% Plot upper and lower surfaces with inverted y-coordinates
+plot(upper_surfacet(:, 1), upper_surfacet(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
+plot(lower_surfacet(:, 1), lower_surfacet(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');
+
+% Additional plot settings
+xlabel('Chord Position (x/c)');
+ylabel('Thickness (y/c)');
+title('Inverted Airfoil Profile');
+legend;
+grid on;
+axis equal;
+hold off;
+
+% parameters
+area = 40.28 * 2; % m^2
+AR = 5.8;
+wing_span = (area * AR / 2) ^ 0.5; % m
+taper_ratio = 0.4;
+quarter_chord_sweep = 35; % degrees
+
+% simple design
+total_chord = 1 + 1 / taper_ratio;
+tip_chord = 2 * area / (wing_span * total_chord);
+root_chord = tip_chord / taper_ratio;
+qcy = -wing_span / 2 * tand(quarter_chord_sweep);
+le_tip = qcy + tip_chord / 4;
+te_tip = qcy - 3 * tip_chord / 4;
+le_root = root_chord / 4;
+te_root = -3 * root_chord / 4;
+
+chord_grad = (tip_chord - root_chord) / wing_span;
+
+wing_span1 = 0:0.01:wing_span;
+
+chord = chord_grad * wing_span1 + root_chord;
+
+
+% Calculate thickness (distance between upper and lower surfaces)
+thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
+
+% Integrate thickness over chord to find cross-sectional area
+cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
+
+
 
 
 

@@ -1,8 +1,8 @@
 span = 65/2; 
 engine_mass = 6147;
 engine_thrust = 341200; % Thrust per engine in Newtons
-mean_chord = 7; % Mean chord length in meters 
-fan_diameter = 3; 
+mean_chord = 7.41; % Mean chord length in meters 
+fan_diameter = 266; 
 wing_mass_per_unit_span = 500; % Wing mass per meter of span in kg, average of a wide body
 total_lift = (engine_mass * 9.81 * 4); 
 

@@ -9,6 +9,7 @@ Ah = 5.8; %- Horizontal tailplane aspect ratio (unitless)
 Av = 5.8; %- Vertical tailplane aspect ratio (unitless)
 Afc = 0; %- Cargo hold floor area (ft^2), set to 0 initially, replace with actual value
 Bw = 213.2; %- Wing span (ft), set to 0 initially, replace with actual value
+Bh = 51; % - Horizontal tailplane span (ft)
 D = 20.8; %- Maximum fuselage diameter (ft), set to 0 initially, replace with actual value
 Fw = 0; %- Fuselage width at horizontal tail intersection (ft), set to 0, replace as needed
 HtHv = 0; % - Location of horizontal tailplane on vertical tail (0 for fuselage-mounted, 1 for T-tail)
@@ -22,17 +23,16 @@ Knp = 1; %- Nose gear factor, 1.15 for kneeling nose gear, 1.0 otherwise
 Kr = 1; %      - Engine factor, 1.133 for reciprocating engines, 1.0 otherwise
 Ktp = 1; %- Turboprop factor, 0.793 for turboprop, 1.0 otherwise
 Kuht = 1; %- Factor for all-moving tail, 1.143 for all-moving, 1.0 otherwise
-% Kws      - Wing sweep factor, calculated as 0.75 * [(1 + 2*lambda)/(1 + lambda)] * Bw * tan(Lambda) / L
-% Ky       - Aircraft pitching radius of gyration, approx. 0.3*Lht (ft)
-% Kz       - Aircraft yaw radius of gyration, approx. Lvt (ft)
 L = 80; %- Fuselage structural length (ft), to be assigned
-% La       - Electrical routing distance; generators to avionics to cockpit (ft)
-% Lec      - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
+La = 0; %       - Electrical routing distance; generators to avionics to cockpit (ft)
+Lec = 0; %        - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
 Lf = 85.3; %- Total fuselage length (ft)
-% Lht      - Length from wing aerodynamic center to horizontal tail aerodynamic center (ft)
-% Lm       - Main landing gear length (inches)
-% Ln       - Nose landing gear length (inches)
-% Lvt      - Length from wing aerodynamic center to vertical tail aerodynamic center (ft)
+Lht = 121.4; %    - Length from wing aerodynamic center to horizontal tail aerodynamic center (ft)
+Lm = 0; %         - Main landing gear length (inches)
+Ln = 0; %         - Nose landing gear length (inches)
+Lvt = 114.8; %    - Length from wing aerodynamic center to vertical tail aerodynamic center (ft)
+Ky = 0.3 * Lht; % - Aircraft pitching radius of gyration, approx. 0.3*Lht (ft)
+Kz = Lvt; % - Aircraft yaw radius of gyration, approx. Lvt (ft)
 Nc = 12; %       - Number of crew, typically set as required by the design
 Nen = 4; %     - Number of engines
 Nf = 5; %     - Number of control functions, typically 4-7
@@ -41,28 +41,28 @@ Ngen = 5; %    - Number of generators, typically equal to Nen
 Nl = 1.5 * Ngear; %    - Ultimate landing gear load factor, typically 1.5*Ngear
 NLt = 17.4; %- Nacelle length (ft)
 Nm = 1; % - Number of mechanical functions performed by controls, usually 0-2
-% Nmss     - Number of main gear shock struts
-% Nmw      - Number of main wheels
-% Nnw      - Number of nose wheels
+Nmss = 0; %       - Number of main gear shock struts
+Nmw = 4; %     - Number of main wheels
+Nnw = 2; %     - Number of nose wheels
 Np = 516; % - Total number of persons onboard (crew + passengers)
 Nseat = 516; %- Number of seats of given type
 Nt = 2; % - Total number of fuel tanks
 Nw = 6.9; % - Nacelle width (ft)
 Nz = 3; %- Ultimate load factor, typically 1.5 * limit load factor
 Rkva = 50; % - Electrical system rating, usually 40-60 kVA for transports
-% Scs      - Total control surface area (ft^2)
-% Scsw     - Area of wing-mounted control surfaces (ft^2)
-% Se       - Elevator area (ft^2)
+Scs = 0; %    - Total control surface area (ft^2)
+Scsw = 530; %   - Area of wing-mounted control surfaces (ft^2)
+Se = 0; %    - Elevator area (ft^2)
 Sf = 37027; %- Fuselage wetted area (ft^2)
-% Sht      - Horizontal tailplane area (ft^2)
-% Sn       - Nacelle wetted area (ft^2)
+Sht = 1039.8; %     - Horizontal tailplane area (ft^2)
+Sn = 650; %     - Nacelle wetted area (ft^2)
 Sw = 5188.2; %- Reference wing area (ft^2)
-% Svt      - Vertical tailplane area (ft^2)
+Svt = 433.6; %      - Vertical tailplane area (ft^2)
 tc_root = 0.14; %- Wing root thickness-to-chord ratio
 tc_rootv = 0.12; %- Vertical tailplane root thickness-to-chord ratio
 Vi = 59438.7; %- Integral fuel tank volume (gal)
 Vp = 0; % - Self-sealing tank volume (gal)
-% Vpr      - Volume of pressurized sections (ft^3)
+Vpr = 150000; %     - Volume of pressurized sections (ft^3)
 Vs = 231.6; %- Landing stall speed (ft/s)
 Vt = Vi +Vp; %- Total volume of fuel tanks (gal)
 WAPU = 500; %- Uninstalled APU weight (lb)
@@ -70,14 +70,16 @@ Wc = 0; % - Maximum cargo weight (lb)
 Wdg = 859928.486; % - Design gross weight (lb)
 Wen = 13552; %- Engine weight (lb)
 Wenc = 19841.6; %- Weight of engine and contents (lb)
-% Wl       %- Landing design gross weight (lb)
+Wl = 859928.486; %- Landing design gross weight (lb)
 Wseat = 13; %- Weight of single seat (lb)
 Wuav = 11000; % - Uninstalled avionics weight, typically 800-1400 lb
 lambda = 0.25; %- Wing taper ratio
 Lambda = 0.464; %- Wing quarter chord sweep angle (radians)
 Lambda_ht = 0.26; %- Horizontal tailplane quarter chord sweep (radians)
 Lambda_vt = 0.26; %- Vertical tailplane quarter chord sweep (radians)
+g = 9.81;
 Iy = Wdg * Ky ^ 2 / g; %- Pitching moment of inertia (lb*ft^2), approximated as Wo*Ky^2/g
+Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing sweep factor, calculated as 0.75 * [(1 + 2*lambda)/(1 + lambda)] * Bw * tan(Lambda) / L
 
 % % Default values for unspecified variables (set to zero, modify as needed):
 % A = 0; % Wing aspect ratio
@@ -89,18 +91,18 @@ Iy = Wdg * Ky ^ 2 / g; %- Pitching moment of inertia (lb*ft^2), approximated as 
 
 % Begin Calculations
 % 1. Aircraft Wing Weight
-Wdg = 0; % Design gross weight, replace with actual value
-Nz = 0; % Ultimate load factor, typically 1.5 * limit load factor
-Sw = 0; % Reference wing area, replace with actual value
-A = 0; % Aspect ratio of the wing
-lambda = 0; % Wing taper ratio
-Scsw = 0; % Area of wing-mounted control surfaces
-Lambda = 0; % Wing quarter chord sweep (radians)
-tc_root = 0; % Wing root thickness-to-chord ratio
+% Wdg = 0; % Design gross weight, replace with actual value
+% Nz = 0; % Ultimate load factor, typically 1.5 * limit load factor
+% Sw = 0; % Reference wing area, replace with actual value
+% A = 0; % Aspect ratio of the wing
+% lambda = 0; % Wing taper ratio
+% Scsw = 0; % Area of wing-mounted control surfaces
+% Lambda = 0; % Wing quarter chord sweep (radians)
+% tc_root = 0; % Wing root thickness-to-chord ratio
 
 % Equation for Wing Weight (Ww)
 Ww = 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
-    Scsw ^ 0.1 * cos(Lambda) * (tc_root) ^ 0.4; % Wing Weight
+    Scsw ^ 0.1 / (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
 % Comment: Replace variables with actual values as needed.
 
 % 2. Horizontal Tailplane Weight (Wht)
@@ -113,7 +115,7 @@ Ww = 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * .
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
 
 Wht = 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
-    Ah ^ 0.166 * (1 + Scsw / Sht) ^ 0.1 * (1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht);
+    Ah ^ 0.166 * (1 + Scsw / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
 % Comment: Replace with actual values for Wht calculation.
 
 % 3. Vertical Tailplane Weight (Wvt)
@@ -136,7 +138,7 @@ Wvt = 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
 % L_D = 0; % Lift-to-drag ratio, typically 10-20 for transport aircraft
 
 Wfus = 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
-    (1 + Kws) ^ 0.04 * (L_D) ^ 0.1;
+    (1 + Kws) ^ 0.04 * (L/D) ^ 0.1;
 % Comment: Replace variables with actual values for fuselage weight.
 
 % 5. Main Landing Gear Weight (Wmlg)
@@ -182,7 +184,7 @@ Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Vp = 0; % Self-sealing tank volume (gal)
 % Vi = 0; % Integral fuel tank volume (gal)
 
-Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) * (1 + Vi / Vt);
+Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Comment: Fuel system weight; define fuel volumes and tank counts.
 
 % 11. Flight Controls Weight (Wfc)
@@ -190,7 +192,7 @@ Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) * (1 + Vi / Vt);
 % Iy = 0; % Pitching moment of inertia (lb*ft^2), usually ≈ Wdg * Ky^2 / g
 % Nm = 0; % Number of mechanical functions performed by controls
 
-Wfc = 145.9 * Nf ^ 0.554 * Scs ^ 0.2 * (Iy * 1e-6) ^ 0.07 * (1 + Nm / Nf);
+Wfc = 145.9 * Nf ^ 0.554 * Scs ^ 0.2 * (Iy * 1e-6) ^ 0.07 / (1 + Nm / Nf);
 % Comment: Flight controls weight; specify control surface area and inertia.
 
 % 12. Installed APU Weight (WAPUinst)
@@ -269,5 +271,12 @@ disp(['Air-Conditioning Weight (Wac): ', num2str(Wac)]);
 disp(['Anti-Icing System Weight (Wai): ', num2str(Wai)]);
 disp(['Civilian Handling Gear Weight (Whg_civilian): ', num2str(Whg_civilian)]);
 disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military)]);
+
+% get total weight
+Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
+    Wfc + WAPUinst + Winstr + Whydr + Wel + Wav + Wfurn + Wac + Wai + ...
+    Whg_civilian + Whg_military;
+
+disp(['Total Weight: ', num2str(Wtotal)]);
 
 % End of MATLAB Code for Weight and Balance Estimation

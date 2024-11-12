@@ -67,7 +67,7 @@ P_mw = W_mw/(A_p*0.00064516);
 %Brake
 W_landing = 0.8*W_o; % account for emergency landing short aft takeoff
 KE = 0.5*W_landing/9.81 * 70.4^2; % total KE required to absorb by the brake
-KE_per_wheel = KE/18; % KE required for each wheel with break
+KE_per_wheel = KE/16; % KE required for each wheel with break
 
 %ACN - Aircraft Classification Number
 %The follwoing values are generated from the COMFAA software

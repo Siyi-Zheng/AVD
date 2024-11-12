@@ -466,8 +466,8 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume1 = (trapz(span1 , area3) * 0.85);
-volume2 = trapz(span2 , area4) * 0.85;
+volume1 = (trapz(span1 , area3) * 0.95);
+volume2 = trapz(span2 , area4) * 0.95;
 
 total_tank_volume = volume1 * 2 + volume2 * 2;
 
@@ -638,8 +638,8 @@ figure;
 hold on;
 
 % Plot upper and lower surfaces with inverted y-coordinates
-plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1.5, 'DisplayName', 'Upper Surface');
-plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1.5, 'DisplayName', 'Lower Surface');
+plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
+plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');
 
 % Additional plot settings
 xlabel('Chord Position (x/c)');
@@ -650,21 +650,36 @@ grid on;
 axis equal;
 hold off;
 
+% parameters
+area = 40.28 * 2; % m^2
+AR = 5.8;
+wing_span = (area * AR / 2) ^ 0.5; % m
+taper_ratio = 0.4;
+quarter_chord_sweep = 35; % degrees
+
+% simple design
+total_chord = 1 + 1 / taper_ratio;
+tip_chord = 2 * area / (wing_span * total_chord);
+root_chord = tip_chord / taper_ratio;
+qcy = -wing_span / 2 * tand(quarter_chord_sweep);
+le_tip = qcy + tip_chord / 4;
+te_tip = qcy - 3 * tip_chord / 4;
+le_root = root_chord / 4;
+te_root = -3 * root_chord / 4;
+
+chord_grad = (tip_chord - root_chord) / wing_span;
+
+wing_span1 = 0:0.01:wing_span;
+
+chord = chord_grad * wing_span1 + root_chord;
+
 
 % Calculate thickness (distance between upper and lower surfaces)
 thickness = upper_surface(:, 2) - lower_surface(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
-chord_positions = upper_surface(:, 1); % x-coordinates (chordwise positions)
 cross_sectional_area = trapz(chord_positions, thickness);
 
-% Define the span of the wing (in meters, example value)
-span = 7.64; % Adjust span value as required
-
-
-
-% Calculate the total available volume by multiplying cross-sectional area by span
-available_volume_tail = cross_sectional_area * span;
 
 
 

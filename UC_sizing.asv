@@ -27,12 +27,8 @@ W_mw = W_mg/12; %Weight on each main wheel
 D_mw = 5.3*W_mw^0.315; %Diameter of main wheel in CM
 Wth_mw =  0.39*W_mw^0.48; %Width of main wheel in CM
 
-%Tire Sizing (statistical approach): Nose wheel
-W_nw = W_ng/2;
-D_nw = 5.3*W_nw^0.315;
-Wth_nw =  0.39*W_nw^0.48;
-
-
+% Tire Sizing: Nose wheel
+W_
 
 %W_o < 200 000 lbs so we need 2 wheels per main strut
 

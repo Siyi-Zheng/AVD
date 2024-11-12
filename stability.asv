@@ -1,0 +1,26 @@
+mac = 7.4; % aircraft mean aero chord
+xcg = 37; % aircraft cg
+claw = 7.16; % wing lift curve slope
+xacw = 38; % aero centre of wing
+kf = 1.4; % some bullshit constant
+lf = 80.8; % fuselage length
+wf = 6.34; % fuselage width
+sw = 482; % wing area
+etah = 0.9; % tailplane efficiency
+clah = 6; % tailplane lift curve slope
+AR = 8.77; % wing aspect ratio
+lam = 0.25; % wing taper ratio
+b = 65; % wingsp
+
+deda = 4.44 * ((1 / AR - 1 / (1 + AR ^ 1.7))...
+    * ((10 - 3 * lam) / 7) * (1 - hh / beta) /...
+    (2 * lh / b) ^ (1 / 3) * ...
+    (cos(sweep) ^ 0.5)) ^ 1.19; %downwash derivative
+
+cmaf = kf * lf * wf^2 / (mac * sw); % fuselage pitching moment
+
+xnp = (claw * xacw / mac - cmaf + etah * clah * ...
+    (1 - deda) * sh / sw * xach / mac) ...
+    / (claw + etah * clah * (1 - deda) * sh / sw); % neutral pt
+
+kn = (xnp - xcg) / mac;

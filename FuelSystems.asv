@@ -638,8 +638,8 @@ figure;
 hold on;
 
 % Plot upper and lower surfaces with inverted y-coordinates
-plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1.5, 'DisplayName', 'Upper Surface');
-plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1.5, 'DisplayName', 'Lower Surface');
+plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
+plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');chord
 
 % Additional plot settings
 xlabel('Chord Position (x/c)');
@@ -650,6 +650,27 @@ grid on;
 axis equal;
 hold off;
 
+% parameters
+area = 40.28 * 2; % m^2
+AR = 5.8;
+wing_span = (area * AR / 2) ^ 0.5; % m
+taper_ratio = 0.4;
+quarter_chord_sweep = 35; % degrees
+
+% simple design
+total_chord = 1 + 1 / taper_ratio;
+tip_chord = 2 * area / (wing_span * total_chord);
+root_chord = tip_chord / taper_ratio;
+qcy = -wing_span / 2 * tand(quarter_chord_sweep);
+le_tip = qcy + tip_chord / 4;
+te_tip = qcy - 3 * tip_chord / 4;
+le_root = root_chord / 4;
+te_root = -3 * root_chord / 4;
+
+chord_grad = (root_chord - tip_chord) / wing_span;
+
+
+
 
 % Calculate thickness (distance between upper and lower surfaces)
 thickness = upper_surface(:, 2) - lower_surface(:, 2);
@@ -659,10 +680,12 @@ chord_positions = upper_surface(:, 1); % x-coordinates (chordwise positions)
 cross_sectional_area = trapz(chord_positions, thickness);
 
 % Define the span of the wing (in meters, example value)
-span = 30; % Adjust span value as required
+span = 7.64; % Adjust span value as required
+
+
 
 % Calculate the total available volume by multiplying cross-sectional area by span
-available_volume_ = cross_sectional_area * span;
+available_volume_tail = cross_sectional_area * span;
 
 
 

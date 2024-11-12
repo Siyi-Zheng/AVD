@@ -277,8 +277,8 @@ hold off
 
 
 %plotting area distribution
-area1 = final_area * chord1.^2;
-area2 = final_area * chord2.^2;
+area1 = (final_area * chord1.^2) ./ cosd(sweep_angle);
+area2 = (final_area * chord2.^2) ./ cosd(sweep_angle);
 
 figure
 hold on
@@ -307,7 +307,7 @@ volume_holdl = volume_hold * 1000;
 
 %increasing to factor foam area, tank area and extra volume for desnity
 
-volume_req = volume_hold * 1.15;
+volume_req = volume_hold * 1.10;
 
 volume_wings = (volume_hold * 0.60) * 2;
 
@@ -455,8 +455,8 @@ spar2 = [upper_surfacea(71:73,:) ; flipud(lower_surfacea(71:73,:)) ; upper_surfa
 
 
 %plotting area distribution
-area3 = Tankarea * chord1.^2;
-area4 = Tankarea * chord2.^2;
+area3 = (Tankarea * chord1.^2) / cosd(sweep_angle);
+area4 = (Tankarea * chord2.^2) / cosd(sweep_angle);
 
 figure
 hold on
@@ -565,7 +565,7 @@ hold off
 
 
 % Airfoil data (with y-coordinates inverted)
-upper_surface = [
+lower_surfacet = [
     0.000000  -0.000000;
     0.000150  -0.009560;
     0.006280  -0.020300;
@@ -599,7 +599,7 @@ upper_surface = [
     1.000030  -0.001260
 ];
 
-lower_surface = [
+upper_surfacet = [
     0.000000  -0.000000;
     0.005330  0.007920;
     0.015570  0.014010;
@@ -638,8 +638,8 @@ figure;
 hold on;
 
 % Plot upper and lower surfaces with inverted y-coordinates
-plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
-plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');
+plot(upper_surfacet(:, 1), upper_surfacet(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
+plot(lower_surfacet(:, 1), lower_surfacet(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');
 
 % Additional plot settings
 xlabel('Chord Position (x/c)');
@@ -675,10 +675,11 @@ chord = chord_grad * wing_span1 + root_chord;
 
 
 % Calculate thickness (distance between upper and lower surfaces)
-thickness = upper_surface(:, 2) - lower_surface(:, 2);
+thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
-cross_sectional_area = trapz(chord_positions, thickness);
+cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
+
 
 
 

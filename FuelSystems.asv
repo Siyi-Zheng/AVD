@@ -229,7 +229,7 @@ final_area = area_under_airfoil(end);
 %disp(["Final CSA for 1m of chord length is" num2str(final_area)])
 
 % Define a range of chord lengths to calculate the CSA
-chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
+%chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
 
 % Calculate CSA for each chord length and display
 for i = 1:length(chord_lengths)
@@ -277,8 +277,8 @@ hold off
 
 
 %plotting area distribution
-area1 = final_area * chord1.^2;
-area2 = final_area * chord2.^2;
+area1 = (final_area * chord1.^2) / cos(s);
+area2 = (final_area * chord2.^2);
 
 figure
 hold on
@@ -307,7 +307,7 @@ volume_holdl = volume_hold * 1000;
 
 %increasing to factor foam area, tank area and extra volume for desnity
 
-volume_req = volume_hold * 1.15;
+volume_req = volume_hold * 1.10;
 
 volume_wings = (volume_hold * 0.60) * 2;
 
@@ -436,10 +436,10 @@ fueltank = [upper_surfacea(15:71 , :) ; flipud(lower_surfacea(15:71 , :)) ; uppe
 
 % Separate upper and lower surfaces
 upper_surface = fueltank(1:53 , :); % Columns 1-46 for upper surface
-lower_surface = fueltank(54:106 , :); % Columns 47-92 for lower surface
+upper_surface = fueltank(54:106 , :); % Columns 47-92 for lower surface
 
 % Calculate thickness between upper and lower surfaces
-thickness = upper_surface(: , 2) - flipud(lower_surface(: , 2));
+thickness = upper_surface(: , 2) - flipud(upper_surface(: , 2));
 
 % Calculate the area by integrating thickness along the chord positions
 Tankarea = trapz(upper_surface(: , 1), thickness);
@@ -466,8 +466,8 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume1 = (trapz(span1 , area3) * 0.85);
-volume2 = trapz(span2 , area4) * 0.85;
+volume1 = (trapz(span1 , area3) * 0.95);
+volume2 = trapz(span2 , area4) * 0.95;
 
 total_tank_volume = volume1 * 2 + volume2 * 2;
 
@@ -565,7 +565,7 @@ hold off
 
 
 % Airfoil data (with y-coordinates inverted)
-upper_surface = [
+lower_surfacet = [
     0.000000  -0.000000;
     0.000150  -0.009560;
     0.006280  -0.020300;
@@ -599,7 +599,7 @@ upper_surface = [
     1.000030  -0.001260
 ];
 
-lower_surface = [
+upper_surfacet = [
     0.000000  -0.000000;
     0.005330  0.007920;
     0.015570  0.014010;
@@ -638,8 +638,8 @@ figure;
 hold on;
 
 % Plot upper and lower surfaces with inverted y-coordinates
-plot(upper_surface(:, 1), upper_surface(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
-plot(lower_surface(:, 1), lower_surface(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');chord
+plot(upper_surfacet(:, 1), upper_surfacet(:, 2), 'b', 'LineWidth', 1, 'DisplayName', 'Upper Surface');
+plot(lower_surfacet(:, 1), lower_surfacet(:, 2), 'r', 'LineWidth', 1, 'DisplayName', 'Lower Surface');
 
 % Additional plot settings
 xlabel('Chord Position (x/c)');
@@ -667,25 +667,20 @@ te_tip = qcy - 3 * tip_chord / 4;
 le_root = root_chord / 4;
 te_root = -3 * root_chord / 4;
 
-chord_grad = (root_chord - tip_chord) / wing_span;
+chord_grad = (tip_chord - root_chord) / wing_span;
 
+wing_span1 = 0:0.01:wing_span;
 
+chord = chord_grad * wing_span1 + root_chord;
 
 
 % Calculate thickness (distance between upper and lower surfaces)
-thickness = upper_surface(:, 2) - lower_surface(:, 2);
+thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
-chord_positions = upper_surface(:, 1); % x-coordinates (chordwise positions)
-cross_sectional_area = trapz(chord_positions, thickness);
-
-% Define the span of the wing (in meters, example value)
-span = 7.64; % Adjust span value as required
+cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
 
 
-
-% Calculate the total available volume by multiplying cross-sectional area by span
-available_volume_tail = cross_sectional_area * span;
 
 
 

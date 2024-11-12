@@ -24,7 +24,9 @@ x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;     %x distance of nose gears
 
 %Main Gear Height
 beta = 15; % tipback angle in degree
-H = atan(deg2rad(beta))*(L_plane-x_mg);
+gamma = 12; % rotation clearance angle
+H = atan(deg2rad(gamma))*(L_plane-x_mg);
+disp(sprintf("Tipback Angle (Degree): %.2f",rad2deg(tan((x_mg-x_cg)/H))))
 %check wing tip do not hit the ground at 5 degree roll and AOA 90% Cl_max
 
 
@@ -33,7 +35,7 @@ L_mg = 5.5; % horizontal distance from main landing gear to plane centre axis in
 % angle between line connecting main and nose gear to plane centre axis
 a = rad2deg(atan(L_mg/(x_mg-x_ng)));
 d = (x_cg-x_ng)*sin(deg2rad(a)); % static ground line
-gamma = rad2deg(atan(H/d));
+a_overturn = rad2deg(atan(H/d));
 
 %Assumed values: tire pressure, number of u/c struts and wheels per strut
 

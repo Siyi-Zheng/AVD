@@ -5,9 +5,9 @@ clc
 
 
 % Manufacturer Engine data
-mdot = 2559; % takeoff mass flow rate in lbs/sec
-D_fan = 111.1; % fan diamter in inches
-L_engine = 184.7; % inches
+mdot = 2297; % takeoff mass flow rate in lbs/sec
+D_fan = 104.7; % fan diamter in inches
+L_engine = 169.7; % inches
 fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
 W = 6147.1;
 
@@ -48,16 +48,6 @@ perc_thrustloss1 = Cram * (pr_ref - 0.98) * 100;
 
 Thrustloss = Thrust_to * (100 - perc_thrustloss1)/100;
 
-SF = T_req / Thrustloss;
-
-%sizing corrections
-
-L_engine = L_engine * (SF)^0.4;
-
-D_fan = D_fan * (SF)^0.5;
-
-W_engine = W * (SF)^1.1;
-
 
 % Capture Area 
 
@@ -76,32 +66,34 @@ fprintf("Capture area diameter (isentropic): %.3fm \n",D_th)
 
 
 % Diffuser Length (D_diff = 0.6-1 * D_fan)
-diffuser_angle = 5; % in degree
+diffuser_angle = 7; % in degree
 L_diff = ((D_fan-D_th)/2) /tan(deg2rad(diffuser_angle));
 
 
 % Highlight Diameter
 D_1 = 0.92*D_fan; % factor 0.9-0.95
-D_1 = sqrt(1.15)*D_th; % factor sqrt(1.05-1.2)
 
 
 % Max macella diameter
-D_max = 1.5*D_fan;
+D_max = 1.3*D_fan;
 
 
 % Lip Geometry (a,b,c,d)
-% (b+d) = L_diff*0.18 (factor from 0.15-0.2)
+% (b+d) = L_diff*0.15 (factor from 0.15-0.2)
 % b = 1.4*d (factor from 1.5-2)
-d = (L_diff*0.18)/(1+1.4);
+d = (L_diff*0.15)/(1+1.4);
 b = 1.4*d;
 a = 2*b; % factor from 1.5-3
 c = 4*d; % factor from 3-5
-fprintf("a: %.2f, b: %.2f, c: %.2f, d: %.2f, \n",a,b,c,d)
+fprintf("a: %.3f, b: %.3f, c: %.3f, d: %.3f, \n",a,b,c,d)
 
 
 % Nozzle
 L_nozzle = 0.75*D_fan; % reference from book example
 L_nacelle = L_diff + L_engine + L_nozzle;
-L_nacelle/D_max; % should be in range 2-3
-D_nozzle = 0.6*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+L_nacelle/D_max % should be in range 2-3
+D_nozzle = sqrt(0.75)*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
+
+% distance from fan to fan case 34.4cm
+
 

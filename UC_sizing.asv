@@ -24,11 +24,21 @@ x_mg = (W_o*x_cg - W_mg*x_ng)/W_mg;     %x distance of main gears
 
 %Tire Sizing (statistical approach): main wheel
 W_mw = W_mg/12; %Weight on each main wheel
-D_mw = 5.3*W_mw^0.315; %Diameter of main wheel in CM
-Wth_mw =  0.39*W_mw^0.48; %Width of main wheel in CM
+D_mw = 1.63*W_mw^0.315; %Diameter of main wheel in INCH
+Wth_mw =  0.1043*W_mw^0.48; %Width of main wheel in INCH
 
-% Tire Sizing: Nose wheel
-W_
+%Tire Sizing (statistical approach): Nose wheel
+W_nw = W_ng/2;
+D_nw = 1.63*W_nw^0.315;
+Wth_nw = 0.1043*W_nw^0.48;
+
+%Tire Selection (From a table on Raymer's book), based on Max loading
+%Three-part Name Tire: 47 x 18-18
+R_r = 19.2; % Rolling Radius in inch
+
+%Tire Pressure
+A_p = 2.3*sqrt(Wth_mw*D_mw)*(D_mw/2 - R_r); %wheel contact area in inch^2
+P_mw = W_mw/(A_p*0.00064516);
 
 %W_o < 200 000 lbs so we need 2 wheels per main strut
 

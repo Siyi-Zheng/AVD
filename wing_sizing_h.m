@@ -3,8 +3,8 @@ clf
 clc
 
 % parameters
-area = 96.6; % m^2
-AR = 5;
+area = 51.68; % m^2
+AR = 5.8;
 wing_span = (area * AR / 2) ^ 0.5; % m
 taper_ratio = 0.4;
 quarter_chord_sweep = 35; % degrees

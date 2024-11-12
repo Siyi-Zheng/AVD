@@ -466,8 +466,8 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume1 = (trapz(span1 , area3) * 0.95);
-volume2 = trapz(span2 , area4) * 0.95;
+volume1 = (trapz(span1 , area3) * 0.85);
+volume2 = trapz(span2 , area4) * 0.85;
 
 total_tank_volume = volume1 * 2 + volume2 * 2;
 

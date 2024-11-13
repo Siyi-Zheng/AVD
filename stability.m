@@ -35,4 +35,11 @@ xnp = mac * ((claw * xacw / mac - cmaf + etah * clah * ...
 
 kn = (xnp - xcg) / mac; % we want this to be ~7% (power off)
 
+kn_on = kn-0.02 ; %power on
+
+%this must be negative to ensure longitudinal pitch stabilty
+dcmcg_dalpha = (-claw*(xacw - xcg)/mac + cmaf - etah*clah *(1- deda)*(sh/sw)*(xach/mac))/(claw + etah*clah*(1-deda)*(sh/sw));
+
+% trim analysis
+
 % trim analysis

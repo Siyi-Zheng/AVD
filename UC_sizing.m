@@ -44,10 +44,9 @@ a_overturn = rad2deg(atan(H/d)); % should be below 63 degree
 x_cg_foremost = x_cg - 0.20*MAC; % foremost cg location in METRE
 W_mg_max = W_o*(x_cg-x_ng)/(x_mg-x_ng) * 1.07; % max static loading on main gear in KG
 W_ng_max = W_o*(x_mg-x_cg_foremost)/(x_mg-x_ng) * 1.07; % max static loading on nose gear in KG
-H_feet = H*3.28084;
+H_feet = H*3.28084; % METRE to FEET
 W_ng_braking_lbs = 10*H_feet*Wo_lbs/(32.2*(x_mg-x_ng) * 3.28084) * 1.07; % dynamic braking load in lbs
 W_ng_braking = 0.453592*W_ng_braking_lbs; % lbs to KG
-3*H*W_o/(x_mg-x_ng)
 
 %Nose Gear: one struct, two wheels
 %Tire Sizing (statistical approach): Nose wheel
@@ -55,7 +54,6 @@ W_ng_lbs = W_ng_max*2.20462; % convert loading from KG to lbs
 W_nw_lbs = (W_ng_lbs+W_ng_braking_lbs)/2; %Weight on each nose wheel, factor 1.07 from errikos's slide
 D_nw = 1.63*W_nw_lbs^0.315; %Diameter of nose wheel in INCH
 Wth_nw = 0.1043*W_nw_lbs^0.48; %Width of nose wheel in INCH
-
 
 %Main Gear: four struct, each with 4 wheels (twin tandem)
 %Tire Sizing (statistical approach): main wheel

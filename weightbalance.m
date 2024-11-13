@@ -24,12 +24,12 @@ Kr = 1; %      - Engine factor, 1.133 for reciprocating engines, 1.0 otherwise
 Ktp = 1; %- Turboprop factor, 0.793 for turboprop, 1.0 otherwise
 Kuht = 1; %- Factor for all-moving tail, 1.143 for all-moving, 1.0 otherwise
 L = 80; %- Fuselage structural length (ft), to be assigned
-La = 0; %       - Electrical routing distance; generators to avionics to cockpit (ft)
-Lec = 0; %        - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
+La = 250; %       - Electrical routing distance; generators to avionics to cockpit (ft)
+Lec = 800; %        - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
 Lf = 85.3; %- Total fuselage length (ft)
 Lht = 121.4; %    - Length from wing aerodynamic center to horizontal tail aerodynamic center (ft)
-Lm = 0; %         - Main landing gear length (inches)
-Ln = 0; %         - Nose landing gear length (inches)
+Lm = 160; %         - Main landing gear length (inches)
+Ln = 120; %         - Nose landing gear length (inches)
 Lvt = 114.8; %    - Length from wing aerodynamic center to vertical tail aerodynamic center (ft)
 Ky = 0.3 * Lht; % - Aircraft pitching radius of gyration, approx. 0.3*Lht (ft)
 Kz = Lvt; % - Aircraft yaw radius of gyration, approx. Lvt (ft)
@@ -41,7 +41,7 @@ Ngen = 5; %    - Number of generators, typically equal to Nen
 Nl = 1.5 * Ngear; %    - Ultimate landing gear load factor, typically 1.5*Ngear
 NLt = 17.4; %- Nacelle length (ft)
 Nm = 1; % - Number of mechanical functions performed by controls, usually 0-2
-Nmss = 0; %       - Number of main gear shock struts
+Nmss = 4; %       - Number of main gear shock struts
 Nmw = 4; %     - Number of main wheels
 Nnw = 2; %     - Number of nose wheels
 Np = 516; % - Total number of persons onboard (crew + passengers)
@@ -50,15 +50,15 @@ Nt = 2; % - Total number of fuel tanks
 Nw = 6.9; % - Nacelle width (ft)
 Nz = 3; %- Ultimate load factor, typically 1.5 * limit load factor
 Rkva = 50; % - Electrical system rating, usually 40-60 kVA for transports
-Scs = 0; %    - Total control surface area (ft^2)
+Scs = 540; %    - Total control surface area (ft^2)
 Scsw = 530; %   - Area of wing-mounted control surfaces (ft^2)
-Se = 0; %    - Elevator area (ft^2)
+Se = 100; %    - Elevator area (ft^2)
 Sf = 37027; %- Fuselage wetted area (ft^2)
 Sht = 1039.8; %     - Horizontal tailplane area (ft^2)
 Sn = 650; %     - Nacelle wetted area (ft^2)
 Sw = 5188.2; %- Reference wing area (ft^2)
 Svt = 433.6; %      - Vertical tailplane area (ft^2)
-tc_root = 0.14; %- Wing root thickness-to-chord ratio
+tc_root = 0.14; %- Wing root thickness-to-chord rEngineWenatio
 tc_rootv = 0.12; %- Vertical tailplane root thickness-to-chord ratio
 Vi = 59438.7; %- Integral fuel tank volume (gal)
 Vp = 0; % - Self-sealing tank volume (gal)
@@ -101,7 +101,7 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 % tc_root = 0; % Wing root thickness-to-chord ratio
 
 % Equation for Wing Weight (Ww)
-Ww = 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
+Ww = 0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 / (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
 % Comment: Replace variables with actual values as needed.
 
@@ -114,7 +114,7 @@ Ww = 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * .
 % Lht = 0; % Length from wing aerodynamic center to horizontal tail aerodynamic center
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
 
-Wht = 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
+Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
     Ah ^ 0.166 * (1 + Scsw / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
 % Comment: Replace with actual values for Wht calculation.
 
@@ -126,7 +126,7 @@ Wht = 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
 % Lambda_vt = 0; % Vertical tail quarter-chord sweep (radians)
 % tc_rootv = 0; % Vertical tail root thickness-to-chord ratio
 
-Wvt = 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
+Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
     Ky ^ 0.875 * Av ^ 0.35 * Lvt ^ 0.5 * cos(Lambda_vt) * (tc_rootv) ^ 0.5;
 % Comment: Replace variables for accurate vertical tail weight estimation.
 
@@ -137,7 +137,7 @@ Wvt = 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
 % Sf = 0; % Fuselage wetted area (ft^2)
 % L_D = 0; % Lift-to-drag ratio, typically 10-20 for transport aircraft
 
-Wfus = 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
+Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
     (1 + Kws) ^ 0.04 * (L/D) ^ 0.1;
 % Comment: Replace variables with actual values for fuselage weight.
 
@@ -147,14 +147,14 @@ Wfus = 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
 % Nmw = 0; % Number of main wheels
 % Vs = 0; % Landing stall speed (ft/s)
 
-Wmlg = 0.0106 * Kmp * Wdg ^ 0.888 * Lm ^ 0.25 * L ^ 0.4 * Nmss ^ 0.5 * Vs ^ 0.1;
+Wmlg = 0.88 * 0.0106 * Kmp * Wdg ^ 0.888 * Lm ^ 0.25 * L ^ 0.4 * Vs ^ 0.1 / (Nmss ^ 0.5);
 % Comment: Replace values for main landing gear weight.
 
 % 6. Nose Landing Gear Weight (Wnlg)
 % Ln = 0; % Nose landing gear length (inches)
 % Nnw = 0; % Number of nose wheels
 
-Wnlg = 0.032 * Knp * Wdg ^ 0.646 * Ln ^ 0.2 * L ^ 0.5 * Nnw ^ 0.45;
+Wnlg = 0.88 * 0.032 * Knp * Wdg ^ 0.646 * Ln ^ 0.2 * L ^ 0.5 * Nnw ^ 0.45;
 % Comment: Replace variables with actual values for nose landing gear weight.
 
 % 7. Nacelle Weight (Winl)
@@ -163,7 +163,7 @@ Wnlg = 0.032 * Knp * Wdg ^ 0.646 * Ln ^ 0.2 * L ^ 0.5 * Nnw ^ 0.45;
 % Wenc = 0; % Weight of engine and contents (lb)
 % Sn = 0; % Nacelle wetted area (ft^2)
 
-Winl = 0.6724 * Kng * Ngen ^ 0.1 * NLt ^ 0.294 * Nw ^ 0.119 * Wenc ^ 0.611 * Sn ^ 0.224;
+Winl = 0.85 * 0.6724 * Kng * Ngen ^ 0.1 * NLt ^ 0.294 * Nw ^ 0.119 * Wenc ^ 0.611 * Sn ^ 0.224;
 % Comment: Replace values for nacelle weight.
 
 % 8. Engine Controls Weight (Wec)
@@ -276,6 +276,9 @@ disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military)]);
 Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
     Wfc + WAPUinst + Winstr + Whydr + Wel + Wav + Wfurn + Wac + Wai + ...
     Whg_civilian + Whg_military;
+
+Wtotal_tons = Wtotal / 2204;
+disp(Wtotal_tons)
 
 disp(['Total Weight: ', num2str(Wtotal)]);
 

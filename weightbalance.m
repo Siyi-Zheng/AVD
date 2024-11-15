@@ -31,7 +31,7 @@ Lht = 121.4; %    - Length from wing aerodynamic center to horizontal tail aerod
 Lm = 160; %         - Main landing gear length (inches)
 Ln = 120; %         - Nose landing gear length (inches)
 Lvt = 114.8; %    - Length from wing aerodynamic center to vertical tail aerodynamic center (ft)
-Ky = 0.3 * Lht; % - Aircraft pitching radius of gyration, approx. 0.3*Lht (ft)
+Ky = 0.238 * Lht; % - Aircraft pitching radius of gyration, approx. 0.3*Lht (ft)
 Kz = Lvt; % - Aircraft yaw radius of gyration, approx. Lvt (ft)
 Nc = 12; %       - Number of crew, typically set as required by the design
 Nen = 4; %     - Number of engines
@@ -316,3 +316,19 @@ CGluggage = 40; % m
 
 CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_full;
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
+
+% get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)
+Iyy = Ww * (CGw - CGtotal)^2 + Wht * (CGht - CGtotal)^2 + Wvt * (CGvt - CGtotal)^2 + ...
+    Wfus * (CGfus - CGtotal)^2 + Wmlg * (CGmlg - CGtotal)^2 + Wnlg * (CGnlg - CGtotal)^2 + ...
+    Winl * (CGinl - CGtotal)^2 + Wec * (CGec - CGtotal)^2 + Wes * (CGes - CGtotal)^2 + ...
+    Wfs * (CGfs - CGtotal)^2 + Wfc * (CGfc - CGtotal)^2 + WAPUinst * (CGapu - CGtotal)^2 + ...
+    Winstr * (CGinstr - CGtotal)^2 + Whydr * (CGhydr - CGtotal)^2 + Wel * (CGel - CGtotal)^2 + ...
+    Wav * (CGav - CGtotal)^2 + Wfurn * (CGfurn - CGtotal)^2 + Wac * (CGac - CGtotal)^2 + ...
+    Wai * (CGai - CGtotal)^2 + Whg_civilian * (CGwhg - CGtotal)^2 + Whg_military * (CGmil - CGtotal)^2 + ...
+    W_engines * (CGeng - CGtotal)^2 + Wfuel * (CGfuel - CGtotal_full)^2 + ...
+    Wpax * (CGpax - CGtotal_full)^2 + Wluggage * (CGluggage - CGtotal_full)^2;
+
+% convert from lb*m^2 to kg*m^2
+Iyy = Iyy * 0.453592;
+
+disp(['Iyy: ', num2str(Iyy), ' kg*m^2']);

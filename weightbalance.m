@@ -101,6 +101,7 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 % tc_root = 0; % Wing root thickness-to-chord ratio
 
 % Equation for Wing Weight (Ww)
+CGw = 37; % Wing CG location (m)
 Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
 % Comment: Replace variables with actual values as needed.
@@ -113,7 +114,7 @@ Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^
 % Bh = 0; % Horizontal tailplane span in ft
 % Lht = 0; % Length from wing aerodynamic center to horizontal tail aerodynamic center
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
-
+CGht = 76;
 Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
     Ah ^ 0.166 * (1 + Se / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
 % Comment: Replace with actual values for Wht calculation.
@@ -125,7 +126,7 @@ Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * 
 % Lvt = 0; % Length from wing aerodynamic center to vertical tail aerodynamic center
 % Lambda_vt = 0; % Vertical tail quarter-chord sweep (radians)
 % tc_rootv = 0; % Vertical tail root thickness-to-chord ratio
-
+CGvt = 77;
 Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
     Ky ^ 0.875 * Av ^ 0.35 * Lvt ^ 0.5 * cos(Lambda_vt) * (tc_rootv) ^ 0.5;
 % Comment: Replace variables for accurate vertical tail weight estimation.
@@ -136,7 +137,7 @@ Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 
 % 4. Fuselage Weight (Wfus)
 % Sf = 0; % Fuselage wetted area (ft^2)
 % L_D = 0; % Lift-to-drag ratio, typically 10-20 for transport aircraft
-
+CGfus = L * 0.435 / 3.281;
 Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
     (1 + Kws) ^ 0.04 * (L/D) ^ 0.1;
 % Comment: Replace variables with actual values for fuselage weight.
@@ -146,14 +147,14 @@ Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * 
 % Nmss = 0; % Number of main gear shock struts
 % Nmw = 0; % Number of main wheels
 % Vs = 0; % Landing stall speed (ft/s)
-
+CGmlg = 43;
 Wmlg = 0.88 * 0.0106 * Kmp * Wl ^ 0.888 * Nl ^ 0.25* Lm ^ 0.4 *Nmw^0.321 * Vs ^ 0.1 / (Nmss ^ 0.5);
 % Comment: Replace values for main landing gear weight.
 
 % 6. Nose Landing Gear Weight (Wnlg)
 % Ln = 0; % Nose landing gear length (inches)
 % Nnw = 0; % Number of nose wheels
-
+CGnlg = 7;
 Wnlg = 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
 % Comment: Replace variables with actual values for nose landing gear weight.
 
@@ -162,19 +163,19 @@ Wnlg = 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
 % Nw = 0; % Nacelle width (ft)
 % Wenc = 0; % Weight of engine and contents (lb)
 % Sn = 0; % Nacelle wetted area (ft^2)
-
+CGinl = 40;
 Winl = 0.85 * 0.6724 * Kng * NLt ^ 0.1 * Nw ^ 0.294 * Nz ^ 0.119 * Wenc ^ 0.611 *Nen^0.984* Sn ^ 0.224;
 % Comment: Replace values for nacelle weight.
 
 % 8. Engine Controls Weight (Wec)
 % Lec = 0; % Engine control routing distance (ft)
-
+CGec = 20;
 Wec = 5 * Nen + 0.8 * Lec;
 % Comment: Weight of engine controls; set Nen and Lec as needed.
 
 % 9. Engine Starter Weight (Wes)
 % Wen = 0; % Engine weight (lb)
-
+CGes = CGinl;
 Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Comment: Engine starter weight; specify engine weight and number of engines.
 
@@ -183,7 +184,7 @@ Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Nt = 0; % Number of fuel tanks
 % Vp = 0; % Self-sealing tank volume (gal)
 % Vi = 0; % Integral fuel tank volume (gal)
-
+CGfs = 39;
 Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Comment: Fuel system weight; define fuel volumes and tank counts.
 
@@ -191,36 +192,37 @@ Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Scs = 0; % Total control surface area (ft^2)
 % Iy = 0; % Pitching moment of inertia (lb*ft^2), usually ≈ Wdg * Ky^2 / g
 % Nm = 0; % Number of mechanical functions performed by controls
-
+CGfc = 10;
 Wfc = 145.9 * Nf ^ 0.554 * Scs ^ 0.2 * (Iy * 1e-6) ^ 0.07 / (1 + Nm / Nf);
 % Comment: Flight controls weight; specify control surface area and inertia.
 
 % 12. Installed APU Weight (WAPUinst)
 % WAPU = 0; % Uninstalled APU weight (lb)
-
+CGapu = 75;
 WAPUinst = 2.2 * WAPU;
 % Comment: Installed APU weight; specify WAPU.
 
 % 13. Instruments Weight (Winstr)
 % Kr = 1; % Engine type factor, 1.133 for reciprocating engines, 1.0 otherwise
 % Ktp = 1; % Turboprop factor, 0.793 for turboprop, 1.0 otherwise
-
+CGinstr = 10;
 Winstr = 4.509 * Kr * Ktp * Nc ^ 0.541 * Nen * (Lf + Bw) ^ 0.5;
 % Comment: Instrument weight; define factors, number of crew, and dimensions.
 
 % 14. Hydraulic System Weight (Whydr)
+CGhydr = 40;
 Whydr = 0.2673 * Nf * (Lf + Bw) ^ 0.937;
 % Comment: Hydraulic system weight; replace Nf, Lf, Bw as needed.
 
 % 15. Electrical System Weight (Wel)
 % Rkva = 0; % System electrical rating (kVA)
-
+CGel = 35;
 Wel = 7.291 * Rkva ^ 0.782 * La ^ 0.346 * Ngen ^ 0.1;
 % Comment: Electrical system weight; set electrical rating and routing distance.
 
 % 16. Avionics Weight (Wav)
 % Wuav = 0; % Uninstalled avionics weight, typically 800-1400 lb
-
+CGav = 10;
 Wav = 1.73 * Wuav ^ 0.983;
 % Comment: Avionics weight; specify Wuav.
 
@@ -229,26 +231,30 @@ Wav = 1.73 * Wuav ^ 0.983;
 % Wseat = 0; % Weight of single seat, e.g., 60 lb for flight deck, 32 lb for passenger
 % Klav = 0; % Lavatory factor
 % Kbuf = 0; % Buffer factor for furnishings
-
+CGfurn = 35;
 Wfurn = 0.0577 * Nc ^ 0.1 * Wc ^ 0.393 * Sf ^ 0.75 + Nseat * Wseat + Klav * Np ^ 1.33 + Kbuf * Np ^ 1.12;
 % Comment: Furnishings weight; define seating and comfort parameters.
 
 % 18. Air-Conditioning Weight (Wac)
 % Vpr = 0; % Volume of pressurized sections (ft^3)
-
+CGac = 35;
 Wac = 62.36 * Np ^ 0.25 * (Vpr * 1e-3) ^ 0.604 * Wuav ^ 0.1;
 % Comment: Air-conditioning weight; specify volumes and number of persons.
 
 % 19. Anti-Icing System Weight (Wai)
+CGai = CGw;
 Wai = 0.002 * Wdg;
 % Comment: Anti-icing system weight; set Wdg.
 
 % 20. Handling Gear Weight (Whg)
+CGwhg = 35;
 Whg_civilian = 3.0e-4 * Wdg; % Civilian handling gear weight
 % Afc = 0; % Cargo hold floor area (ft^2)
+CGmil = 35;
 Whg_military = 0; % Military handling gear weight
 
 % engine weight
+CGeng = CGinl;
 W_engines = Nen * Wen;
 
 % Final output
@@ -284,6 +290,29 @@ Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
 Wtotal_tons = Wtotal / 2204;
 disp(Wtotal_tons)
 
-disp(['Total Weight: ', num2str(Wtotal)]);
+disp(['Total Weight (empty): ', num2str(Wtotal_tons), ' tons']);
 
 % get cg
+CGtotal = (Ww * CGw + Wht * CGht + Wvt * CGvt + Wfus * CGfus + Wmlg * CGmlg + ...
+    Wnlg * CGnlg + Winl * CGinl + Wec * CGec + Wes * CGes + Wfs * CGfs + ...
+    Wfc * CGfc + WAPUinst * CGapu + Winstr * CGinstr + Whydr * CGhydr + ...
+    Wel * CGel + Wav * CGav + Wfurn * CGfurn + Wac * CGac + Wai * CGai + ...
+    Whg_civilian * CGwhg + Whg_military * CGmil + W_engines * CGeng) / Wtotal;
+
+disp(['Total CG (empty): ', num2str(CGtotal), ' m']);
+
+% add fuel, pax, luggage
+Wfuel = 170; % tons
+Wpax = 38.7; % tons
+Wluggage = 9.42; % tons
+
+Wtotal_full = Wtotal_tons + Wfuel + Wpax + Wluggage;
+disp(['Total Weight (full): ', num2str(Wtotal_full), ' tons']);
+
+% get cg
+CGfuel = CGfs; % m
+CGpax = 40; % m
+CGluggage = 40; % m
+
+CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_full;
+disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);

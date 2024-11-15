@@ -101,8 +101,8 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 % tc_root = 0; % Wing root thickness-to-chord ratio
 
 % Equation for Wing Weight (Ww)
-Ww = 0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
-    Scsw ^ 0.1 / (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
+Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
+    Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
 % Comment: Replace variables with actual values as needed.
 
 % 2. Horizontal Tailplane Weight (Wht)
@@ -115,7 +115,7 @@ Ww = 0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
 
 Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
-    Ah ^ 0.166 * (1 + Scsw / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
+    Ah ^ 0.166 * (1 + Se / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
 % Comment: Replace with actual values for Wht calculation.
 
 % 3. Vertical Tailplane Weight (Wvt)
@@ -147,14 +147,14 @@ Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * 
 % Nmw = 0; % Number of main wheels
 % Vs = 0; % Landing stall speed (ft/s)
 
-Wmlg = 0.88 * 0.0106 * Kmp * Wdg ^ 0.888 * Lm ^ 0.25 * L ^ 0.4 * Vs ^ 0.1 / (Nmss ^ 0.5);
+Wmlg = 0.88 * 0.0106 * Kmp * Wl ^ 0.888 * Nl ^ 0.25* Lm ^ 0.4 *Nmw^0.321 * Vs ^ 0.1 / (Nmss ^ 0.5);
 % Comment: Replace values for main landing gear weight.
 
 % 6. Nose Landing Gear Weight (Wnlg)
 % Ln = 0; % Nose landing gear length (inches)
 % Nnw = 0; % Number of nose wheels
 
-Wnlg = 0.88 * 0.032 * Knp * Wdg ^ 0.646 * Ln ^ 0.2 * L ^ 0.5 * Nnw ^ 0.45;
+Wnlg = 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
 % Comment: Replace variables with actual values for nose landing gear weight.
 
 % 7. Nacelle Weight (Winl)
@@ -163,7 +163,7 @@ Wnlg = 0.88 * 0.032 * Knp * Wdg ^ 0.646 * Ln ^ 0.2 * L ^ 0.5 * Nnw ^ 0.45;
 % Wenc = 0; % Weight of engine and contents (lb)
 % Sn = 0; % Nacelle wetted area (ft^2)
 
-Winl = 0.85 * 0.6724 * Kng * Ngen ^ 0.1 * NLt ^ 0.294 * Nw ^ 0.119 * Wenc ^ 0.611 * Sn ^ 0.224;
+Winl = 0.85 * 0.6724 * Kng * NLt ^ 0.1 * Nw ^ 0.294 * Nz ^ 0.119 * Wenc ^ 0.611 *Nen^0.984* Sn ^ 0.224;
 % Comment: Replace values for nacelle weight.
 
 % 8. Engine Controls Weight (Wec)
@@ -275,7 +275,7 @@ disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military)]);
 % get total weight
 Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
     Wfc + WAPUinst + Winstr + Whydr + Wel + Wav + Wfurn + Wac + Wai + ...
-    Whg_civilian + Whg_military;
+    Whg_civilian;
 
 Wtotal_tons = Wtotal / 2204;
 disp(Wtotal_tons)

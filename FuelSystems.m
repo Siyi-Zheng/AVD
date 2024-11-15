@@ -1,5 +1,6 @@
 clc
 clear
+close all
 
 %Wing available volume calcualtor
 

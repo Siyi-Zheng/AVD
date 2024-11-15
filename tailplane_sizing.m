@@ -2,8 +2,8 @@ clear
 clc
 
 % typical values for airliner
-V_h = 1;
-V_v = 0.09;
+V_h = 0.535;
+V_v = 0.062;
 
 % values from initial sizing
 S_ref = 482;

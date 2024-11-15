@@ -246,7 +246,10 @@ Wai = 0.002 * Wdg;
 % 20. Handling Gear Weight (Whg)
 Whg_civilian = 3.0e-4 * Wdg; % Civilian handling gear weight
 % Afc = 0; % Cargo hold floor area (ft^2)
-Whg_military = 2.4 * Afc; % Military handling gear weight
+Whg_military = 0; % Military handling gear weight
+
+% engine weight
+W_engines = Nen * Wen;
 
 % Final output
 % Display calculated weights for verification:
@@ -271,15 +274,16 @@ disp(['Air-Conditioning Weight (Wac): ', num2str(Wac)]);
 disp(['Anti-Icing System Weight (Wai): ', num2str(Wai)]);
 disp(['Civilian Handling Gear Weight (Whg_civilian): ', num2str(Whg_civilian)]);
 disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military)]);
+disp(['Engine Weight (W_engines): ', num2str(W_engines)]);
 
 % get total weight
 Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
     Wfc + WAPUinst + Winstr + Whydr + Wel + Wav + Wfurn + Wac + Wai + ...
-    Whg_civilian;
+    Whg_civilian + Whg_military + W_engines;
 
 Wtotal_tons = Wtotal / 2204;
 disp(Wtotal_tons)
 
 disp(['Total Weight: ', num2str(Wtotal)]);
 
-% End of MATLAB Code for Weight and Balance Estimation
+% get cg

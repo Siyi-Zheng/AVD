@@ -10,7 +10,8 @@ Sref = 482;
 sweep = 24; % at max thickness pt.
 le_sweep = 30;
 
-CLa = [];
+CLa1 = [];
+CLa2 = [];
 M_list1 = [];
 M_list2 = [];
 for M = 0:0.01:2
@@ -28,15 +29,15 @@ for M = 0:0.01:2
     (1 + (tand(sweep) / beta) ^ 2)) ^ 0.5) / Sref;
    
     if M < 1
-        CLa = [CLa CLa_subsonic];
-        M_list = [M_list M];
-    elseif M > 1 &&  M < 1 / cosd(le_sweep)
-        
-    else
-        CLa = [CLa, CLa_supersonic];
+        CLa1 = [CLa1 CLa_subsonic];
+        M_list1 = [M_list1 M];
+    elseif M > 1 &&  M > 1 / cosd(le_sweep)
+        CLa2 = [CLa2, CLa_supersonic];
+        M_list2 = [M_list2 M];
     end
 end
 
-M = 0:0.01:2;
-plot(M, CLa);
-ylim([0 7])
+figure
+plot(M_list1, CLa1)
+hold on
+plot(M_list2, CLa2)

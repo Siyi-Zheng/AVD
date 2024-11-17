@@ -21,7 +21,7 @@ T_sl = Ne * 258.34 * 1000;   % Sea-level static thrust [N]
 
 % Define the grid for Mach number and altitude
 mach = linspace(0, 1.2, 50);         % Mach number range
-altitude = linspace(0, 16000, 50);   % Altitude range
+altitude = linspace(0, 10000, 50);   % Altitude range
 [MACH, ALT] = meshgrid(mach, altitude);
 
 % Atmospheric model

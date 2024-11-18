@@ -10,12 +10,16 @@ S_ref = 482;        %reference area
 sweep = 26;         % sweep at max thickness pt.
 le_sweep = 30;      %leading edge sweep
 
-CLa1 = [];
+% interpolation in the transonic regime
+M_start = 0.85;
+M_end = 1 / cosd(sweep);
+
 CLa2 = [];
 CLa3 = [];
 M_list1 = [];
 M_list2 = [];
-for M = 0:0.01:2
+
+for M = 0:0.01:1.5
 
     beta = (1 - M ^ 2) ^ 0.5;
     eta = Cla / (2 * pi); % remove the beta term as Cla has it already
@@ -23,29 +27,34 @@ for M = 0:0.01:2
 
     CLa_subsonic3 = 2 * pi * AR * S_exp * F / (2 + (4 + (AR * beta / eta)...
         ^ 2 *(1 + (tand(sweep) / beta) ^ 2)) ^ 0.5) / S_ref;
-    CLa_subsonic = 2*pi/sqrt(1-M^2);
     CLa_supersonic = 4/sqrt(-1+M^2);
+    CLa_sonic = 2 * pi * AR * S_exp * F / (2 + (4 + (AR * 1e-6 / eta)...
+        ^ 2 *(1 + (tand(sweep) / 1e-6) ^ 2)) ^ 0.5) / S_ref;
 
-    if M < 1
-        CLa1 = [CLa1 CLa_subsonic];
+    if M < 1 / cosd(sweep) && M ~= 1
         CLa3 = [CLa3 CLa_subsonic3];
         M_list1 = [M_list1 M];
-    elseif M > 1 / cosd(sweep)
+    elseif M == 1
+        CLa3 = [CLa3 CLa_sonic];
+        M_list1 = [M_list1 M];
+    end
+    if M > 1 / cosd(sweep) - 0.1
         CLa2 = [CLa2, CLa_supersonic];
         M_list2 = [M_list2 M];
     end
 end
 
+% plot the results
 figure
-plot(M_list1, CLa1,"red", LineWidth=1.5);
 hold on
 plot(M_list2, CLa2,"blue", LineWidth=1.5);
-plot(M_list1, CLa3,"magenta", LineWidth=1.5);
-xline(0.83, LineWidth=1.5);
+plot(M_list1, CLa3,"red", LineWidth=1.5);
+xline(0.83, LineWidth=1.5, label="Cruise");
+ylim([3 10])
 xlabel("M");
 ylabel("CLa")
-ylim([0 12]);
-legend("Subsonic Theoretical","Supersonic Theoretical","Subsonic Raymer","Subsonic 2");
+% ylim([3 12]);
+legend("Supersonic Theoretical","Subsonic (Raymer)");
 grid on
 
 

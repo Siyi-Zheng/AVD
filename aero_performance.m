@@ -155,10 +155,146 @@ CDi = K * CL_cruise ^ 2 + eta_h * K_h * CL_h ^ 2;
 
 CDi_flaps = 0; % idk what k_h is so we can sort this out later
 
+%=========================================================================
 
-
+% drag prediction AT TAKEOFF
 
 %=========================================================================
 
+% CD0
+% for smooth paint, k = 6.34e-6 m - so we are below the cutoff
+
+% fuselage
+Re = 423e6;
+M = 0.23;
+f = 80/6.34; % fineness ratio
+Cf_fus = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_fus = 0.9 + 5 * f ^ -1.5 + f / 400; % form factor
+S_wet_fus = 1.38e3;
+CD0_fus_TO = S_wet_fus / S_ref * Cf_fus * FF_fus;
+
+% wings
+Re = 39.1e6;
+M = 0.23;
+xc_max = 0.36; % x/c of max. thickness
+tc_max = 0.14; % max thickness-to-chord ratio
+Cf_w = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_w = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_w = S_exp * 2;
+CD0_w_TO = S_wet_w / S_ref * Cf_w * FF_w;
+
+% hstab
+Re = 22.2e6;
+M = 0.23;
+S_h = 51.7;
+xc_max = 0.298; % x/c of max. thickness
+tc_max = 0.12; % max thickness-to-chord ratio
+Cf_h = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_h = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_h = S_h * 2.1;
+CD0_h_TO = S_wet_h / S_ref * Cf_h * FF_h;
+
+% vstab
+Re = 32e6;
+M = 0.23;
+S_v = 27.7;
+xc_max = 0.3; % x/c of max. thickness
+tc_max = 0.12; % max thickness-to-chord ratio
+Cf_v = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_v = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_v = S_v * 2.1;
+CD0_v_TO = S_wet_v / S_ref * Cf_v * FF_v;
+
+% nacelles
+Re = 34.3e6;
+M = 0.23;
+f = 4.64; % fineness ratio
+Q = 1.3; % nacelle-wing interference
+S_wet_nac = 69.5 * 4; % approximate as a cylinder, and there are 4
+Cf_nac = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_nac = 1 + 0.35 / f; % form factor
+CD0_nac_TO = S_wet_nac / S_ref * Cf_nac * FF_nac * Q;
+
+% get takeoff CD0
+CD0_TO = CD0_fus_TO + CD0_w_TO + CD0_h_TO + CD0_v_TO + CD0_nac_TO +...
+    CD_upsweep + CD_flaps_TO + CD_uc;
+
+%=========================================================================
+
+% drag prediction AT LANDING
+
+%=========================================================================
+
+% CD0
+% for smooth paint, k = 6.34e-6 m - so we are below the cutoff
+
+% fuselage
+Re = 500e6;
+M = 0.27;
+f = 80/6.34; % fineness ratio
+Cf_fus = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_fus = 0.9 + 5 * f ^ -1.5 + f / 400; % form factor
+S_wet_fus = 1.38e3;
+CD0_fus_land = S_wet_fus / S_ref * Cf_fus * FF_fus;
+
+% wings
+Re = 46.2e6;
+M = 0.27;
+xc_max = 0.36; % x/c of max. thickness
+tc_max = 0.14; % max thickness-to-chord ratio
+Cf_w = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_w = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_w = S_exp * 2;
+CD0_w_land = S_wet_w / S_ref * Cf_w * FF_w;
+
+% hstab
+Re = 26.2e6;
+M = 0.27;
+S_h = 51.7;
+xc_max = 0.298; % x/c of max. thickness
+tc_max = 0.12; % max thickness-to-chord ratio
+Cf_h = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_h = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_h = S_h * 2.1;
+CD0_h_land = S_wet_h / S_ref * Cf_h * FF_h;
+
+% vstab
+Re = 37.8e6;
+M = 0.27;
+S_v = 27.7;
+xc_max = 0.3; % x/c of max. thickness
+tc_max = 0.12; % max thickness-to-chord ratio
+Cf_v = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_v = (1 + 0.6/xc_max * tc_max + 100 * (tc_max) ^ 4) * ...
+    (1.34 * M ^ 0.18 * cosd(sweep) ^ 0.28); % form factor
+S_wet_v = S_v * 2.1;
+CD0_v_land = S_wet_v / S_ref * Cf_v * FF_v;
+
+% nacelles
+Re = 40.5e6;
+M = 0.27;
+f = 4.64; % fineness ratio
+Q = 1.3; % nacelle-wing interference
+S_wet_nac = 69.5 * 4; % approximate as a cylinder, and there are 4
+Cf_nac = 0.455 / (log10(Re) ^ 2.58 * (1 + 0.144 * M^2) ^ 0.65);
+FF_nac = 1 + 0.35 / f; % form factor
+CD0_nac_land = S_wet_nac / S_ref * Cf_nac * FF_nac * Q;
+
+% get takeoff CD0
+CD0_land = CD0_fus_land + CD0_w_land + CD0_h_land + CD0_v_land +...
+    CD0_nac_land + CD_upsweep + CD_flaps_land + CD_uc;
+
+
+
+
+
 %IMPORTANT VALUES!!!!!
-%CLa = 7.738 FOR THE WING FOR M = 0.83
+% CLa = 7.738 FOR THE WING FOR M = 0.83
+% CD0 clean = 0.0161
+% CD0 takeoff = 0.1026
+% CD0 landing = 0.1424

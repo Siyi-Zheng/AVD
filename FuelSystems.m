@@ -266,7 +266,6 @@ c2 = outer_chord - gradient2 * 9.75;
 chord1 = gradient1 * span1 + 13.89;
 chord2 = gradient2 * span2 + c2;
 
-
 %plotting chord and available csa distributions
 
 figure

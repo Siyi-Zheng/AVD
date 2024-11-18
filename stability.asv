@@ -4,12 +4,12 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
-xcg = 39.57; % aircraft cg
+xcg = 40; % aircraft cg
 claw = 6.701; % wing lift curve slope
 hlaw= 4.39 ; %tailplane lift curve slope
 xacw = 39.6; % aero centre of wing
 kf = 1.4; % some bullshit constant
-lf = 77.82; % fuselage length
+lf = 80.8; % fuselage length
 wf = 6.34; % fuselage width
 sw = 482; % wing area
 etah = 0.9; % tailplane efficiency

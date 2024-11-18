@@ -16,7 +16,7 @@ x_v = 73;
 C_m_0 = -0.1433; % check this but its what xfoil gives
 eta_h = 0.9; % typical value
 downwash_derivative = 0.1; % typical value
-a = 7.16;
+a = 6.74;
 a_h = 6; % this changes when we choose an aerofoil
 
 % sizing

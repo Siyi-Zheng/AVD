@@ -5,7 +5,7 @@ clc
 
 mac = 7.4; % aircraft mean aero chord
 xcg = 37; % aircraft cg
-claw = 7.16; % wing lift curve slope
+claw = 6.74; % wing lift curve slope
 xacw = 36.7; % aero centre of wing
 kf = 1.4; % some bullshit constant
 lf = 80.8; % fuselage length

@@ -135,9 +135,11 @@ flap_extent = 0.65;
 CD_flaps_TO = 0.0023 * flap_extent * 15; % 15deg for takeoff
 CD_flaps_land = 0.0024 * flap_extent * 40; % 40deg for landing
 
-% CDi
-% we need to finish stability to get all these values i think
+%=========================================================================
 
+% CDi
+
+% in cruise
 CL_cruise = 0.53;
 AR_h = 5.88;
 e = 0.85; %oswald efficiency factor
@@ -149,7 +151,7 @@ CDi = K * CL_cruise ^ 2 + eta_h * K_h * CL_h ^ 2;
 
 % also get the change in CDi from flaps
 
-CDi_flaps = 0; % idk what k_h is so we can sort this out later
+CDi_flaps = 
 
 
 

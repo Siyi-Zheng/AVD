@@ -1,6 +1,16 @@
 clear
 clc
 
+
+% wave drag
+M_crit = 0.88;
+LF_DD = 0.875;
+CL_des = 0.54;
+
+M_dd_0 = M_crit + 0.08;
+M_dd = M_dd_0 * LF_DD - 0.05 * CL_des;
+
+
 AR = 8.77;          %aspect ratio
 Cla = 6.74;         %lift curve slope of aerofoil
 d = 6.34;           %diameter of fuselage
@@ -8,11 +18,7 @@ b = 65;             %wing span
 S_exp = 440;        %exposed area
 S_ref = 482;        %reference area
 sweep = 26;         % sweep at max thickness pt.
-le_sweep = 30;      %leading edge sweep
-
-% interpolation in the transonic regime
-M_start = 0.85;
-M_end = 1 / cosd(sweep);
+le_sweep = 30;      %leading edge sweep (degrees)
 
 CLa2 = [];
 CLa3 = [];
@@ -25,10 +31,10 @@ for M = 0:0.01:1.5
     eta = Cla / (2 * pi); % remove the beta term as Cla has it already
     F = 1.07 * (1 + d / b) ^ 2;
 
-    CLa_subsonic3 = 2 * pi * AR * S_exp * F / (2 + (4 + (AR * beta / eta)...
+    CLa_subsonic3 = 2 * pi * AR * S_exp * F * cosd(le_sweep) / (2 + (4 + (AR * beta / eta)...
         ^ 2 *(1 + (tand(sweep) / beta) ^ 2)) ^ 0.5) / S_ref;
     CLa_supersonic = 4/sqrt(-1+M^2);
-    CLa_sonic = 2 * pi * AR * S_exp * F / (2 + (4 + (AR * 1e-6 / eta)...
+    CLa_sonic = 2 * pi * AR * S_exp * F * cosd(le_sweep) / (2 + (4 + (AR * 1e-6 / eta)...
         ^ 2 *(1 + (tand(sweep) / 1e-6) ^ 2)) ^ 0.5) / S_ref;
 
     if M < 1 / cosd(sweep) && M ~= 1
@@ -49,7 +55,9 @@ figure
 hold on
 plot(M_list2, CLa2,"blue", LineWidth=1.5);
 plot(M_list1, CLa3,"red", LineWidth=1.5);
-xline(0.83, LineWidth=1.5, label="Cruise");
+xline(0.83, label="Cruise");
+xline(0.23, label="Takeoff");
+xline(0.27, label="Landing");
 ylim([3 10])
 xlabel("M");
 ylabel("CLa")
@@ -290,11 +298,10 @@ CD0_land = CD0_fus_land + CD0_w_land + CD0_h_land + CD0_v_land +...
     CD0_nac_land + CD_upsweep + CD_flaps_land + CD_uc;
 
 
-
-
-
 %IMPORTANT VALUES!!!!!
-% CLa = 7.738 FOR THE WING FOR M = 0.83
+% CLa = 6.701 FOR THE WING FOR M = 0.83
+% CLa = 5.082 for landing
+% CLa = 5.049 for takeoff
 % CD0 clean = 0.0161
 % CD0 takeoff = 0.1026
 % CD0 landing = 0.1424

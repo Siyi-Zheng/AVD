@@ -15,8 +15,7 @@ AR = 8.7;                    % Aspect Ratio
 e = 0.8;                     % Oswald Efficiency
 W = 350000 * g;              % Weight [N]
 S = 130;                     % Wing reference area in square meters
-CD0 = 0.0162;                % Zero-lift drag coefficient
-CDi = 0.012;
+CD0 = 0.02;                  % Zero-lift drag coefficient
 K = 1 / (pi * AR * e);       % Induced drag factor
 T_sl = Ne * 258.34 * 1000;   % Sea-level static thrust [N]
 

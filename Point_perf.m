@@ -25,14 +25,15 @@ mach = linspace(0, 1.2, 50);         % Mach number range
 altitude = linspace(0, 10000, 50);   % Altitude range
 [MACH, ALT] = meshgrid(mach, altitude);
 
-% Atmospheric model
-sigma_h = exp(-ALT / 7000);                % Simplified density ratio
-Temp = 288.15 - 0.0065 * ALT;              % Temperature [K]
-rho = 1.225 * sigma_h;                     % Air density [kg/m^3]
-a = sqrt(gamma * R * Temp);                % Speed of sound [m/s]
-V = MACH .* a;                             % True airspeed [m/s]
-q = 0.5 * rho .* V.^2;                     % Dynamic pressure
+% % Atmospheric model
+% sigma_h = exp(-ALT / 7000);                % Simplified density ratio
+% Temp = 288.15 - 0.0065 * ALT;              % Temperature [K]
+% rho = 1.225 * sigma_h;                     % Air density [kg/m^3]
+% a = sqrt(gamma * R * Temp);                % Speed of sound [m/s]
+% V = MACH .* a;                             % True airspeed [m/s]
+% q = 0.5 * rho .* V.^2;                     % Dynamic pressure
 
+% used Internation Standard Atmosphere model from matlab
 [T, a, P, rho] = atmosisa(ALT);
 V = MACH .* a; 
 q = 0.5 * rho .* V.^2;
@@ -60,21 +61,22 @@ hold on;
 CL_max = 1.4;                                % Max lift coefficient
 stall_speed = sqrt((2 * W) ./ (rho .* S .* CL_max));
 stall_mach = stall_speed ./ a;
-plot(stall_mach, ALT, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Stall Speed');
+L1 = plot(stall_mach, ALT, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Stall Speed');
 
 % Add cruise Mach line
 cruise_mach = 0.83;                           % Cruise Mach number
-plot(cruise_mach * ones(size(ALT)), ALT, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Cruise Mach');
+L2 = plot(cruise_mach * ones(size(ALT)), ALT, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Cruise Mach');
 
 % Add max Mach number line
 max_mach = 0.9;                              % Max Mach number
-plot(max_mach * ones(size(ALT)), ALT, 'g--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
+L3 = plot(max_mach * ones(size(ALT)), ALT, 'g--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
 
 % Labels and legend
-xlabel('Mach Number');
-ylabel('Altitude (m)');
-title('Specific Excess Power (Ps) Contour');
-legend('Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
+xlabel('Mach Number',FontSize=14);
+ylabel('Altitude (m)',FontSize=14);
+title('Specific Excess Power (Ps) Contour',FontSize=16);
+lgd = legend([h,L1(1),L2(1),L3(1)],'Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
+lgd.FontSize = 14;
 grid on;
 
 %% Drag Model Function

@@ -102,6 +102,7 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 
 % engine weight
 CGeng = 38.626;
+Zeng = -4.5;
 W_engines = Nen * Wen;
 
 % Equation for Wing Weight (Ww)
@@ -259,28 +260,28 @@ Whg_military = 0; % Military handling gear weight
 
 % Final output
 % Display calculated weights for verification:
-disp(['Wing Weight (Ww): ', num2str(Ww)]);
-disp(['Horizontal Tailplane Weight (Wht): ', num2str(Wht)]);
-disp(['Vertical Tailplane Weight (Wvt): ', num2str(Wvt)]);
-disp(['Fuselage Weight (Wfus): ', num2str(Wfus)]);
-disp(['Main Landing Gear Weight (Wmlg): ', num2str(Wmlg)]);
-disp(['Nose Landing Gear Weight (Wnlg): ', num2str(Wnlg)]);
-disp(['Nacelle Weight (Winl): ', num2str(Winl)]);
-disp(['Engine Controls Weight (Wec): ', num2str(Wec)]);
-disp(['Engine Starter Weight (Wes): ', num2str(Wes)]);
-disp(['Fuel System Weight (Wfs): ', num2str(Wfs)]);
-disp(['Flight Controls Weight (Wfc): ', num2str(Wfc)]);
-disp(['Installed APU Weight (WAPUinst): ', num2str(WAPUinst)]);
-disp(['Instruments Weight (Winstr): ', num2str(Winstr)]);
-disp(['Hydraulic System Weight (Whydr): ', num2str(Whydr)]);
-disp(['Electrical System Weight (Wel): ', num2str(Wel)]);
-disp(['Avionics Weight (Wav): ', num2str(Wav)]);
-disp(['Furnishings Weight (Wfurn): ', num2str(Wfurn)]);
-disp(['Air-Conditioning Weight (Wac): ', num2str(Wac)]);
-disp(['Anti-Icing System Weight (Wai): ', num2str(Wai)]);
-disp(['Civilian Handling Gear Weight (Whg_civilian): ', num2str(Whg_civilian)]);
-disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military)]);
-disp(['Engine Weight (W_engines): ', num2str(W_engines)]);
+disp(['Wing Weight (Ww): ', num2str(Ww*0.453592)]);
+disp(['Horizontal Tailplane Weight (Wht): ', num2str(Wht*0.453592)]);
+disp(['Vertical Tailplane Weight (Wvt): ', num2str(Wvt*0.453592)]);
+disp(['Fuselage Weight (Wfus): ', num2str(Wfus*0.453592)]);
+disp(['Main Landing Gear Weight (Wmlg): ', num2str(Wmlg*0.453592)]);
+disp(['Nose Landing Gear Weight (Wnlg): ', num2str(Wnlg*0.453592)]);
+disp(['Nacelle Weight (Winl): ', num2str(Winl*0.453592)]);
+disp(['Engine Controls Weight (Wec): ', num2str(Wec*0.453592)]);
+disp(['Engine Starter Weight (Wes): ', num2str(Wes*0.453592)]);
+disp(['Fuel System Weight (Wfs): ', num2str(Wfs*0.453592)]);
+disp(['Flight Controls Weight (Wfc): ', num2str(Wfc*0.453592)]);
+disp(['Installed APU Weight (WAPUinst): ', num2str(WAPUinst*0.453592)]);
+disp(['Instruments Weight (Winstr): ', num2str(Winstr*0.453592)]);
+disp(['Hydraulic System Weight (Whydr): ', num2str(Whydr*0.453592)]);
+disp(['Electrical System Weight (Wel): ', num2str(Wel*0.453592)]);
+disp(['Avionics Weight (Wav): ', num2str(Wav*0.453592)]);
+disp(['Furnishings Weight (Wfurn): ', num2str(Wfurn*0.453592)]);
+disp(['Air-Conditioning Weight (Wac): ', num2str(Wac*0.453592)]);
+disp(['Anti-Icing System Weight (Wai): ', num2str(Wai*0.453592)]);
+disp(['Civilian Handling Gear Weight (Whg_civilian): ', num2str(Whg_civilian*0.453592)]);
+disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military*0.453592)]);
+disp(['Engine Weight (W_engines): ', num2str(W_engines*0.453592)]);
 
 % get total weight
 Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...

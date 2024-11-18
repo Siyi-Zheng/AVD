@@ -7,7 +7,7 @@ L_ws = 65; % wing span in METRE
 
 %Weights
 W_o = 390057;        %MTOW in KG
-W_ng = 0.085*W_o;      %Nose gear weight carrying capability
+W_ng = 0.083*W_o;      %Nose gear weight carrying capability
 W_mg = W_o - W_ng;   %Main gear weight carrying capability
 
 MAC = 7.41; %mean aerodynamic chord in METRE
@@ -25,7 +25,7 @@ x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;         %x distance of nose gears
 %Main Gear Height
 beta = 15; % tipback angle in degree
 gamma = 15; % rotation clearance angle
-H = tan(deg2rad(gamma))*(L_plane-x_mg-200/39.37); % correction for the rear main gear
+H = tan(deg2rad(gamma))*(L_plane-x_mg-120/39.37); % correction for the rear main gear
 tip_back_angle = rad2deg(tan((x_mg-x_cg)/H)); % between 15 ~ 25 degree
 %check wing tip do not hit the ground at 5 degree roll and AOA 90% Cl_max
 
@@ -51,7 +51,7 @@ W_ng_braking = 0.453592*W_ng_braking_lbs; % lbs to KG
 %Nose Gear: one struct, two wheels
 %Tire Sizing (statistical approach): Nose wheel
 W_ng_lbs = W_ng_max*2.20462; % convert loading from KG to lbs
-W_nw_lbs = (W_ng_lbs+W_ng_braking_lbs)/2; %Weight on each nose wheel, factor 1.07 from errikos's slide
+W_nw_lbs = (W_ng_lbs+W_ng_braking_lbs)/(1.3*2); %Weight on each nose wheel, factor 1.3 for dynamic load
 D_nw = 1.63*W_nw_lbs^0.315; %Diameter of nose wheel in INCH
 Wth_nw = 0.1043*W_nw_lbs^0.48; %Width of nose wheel in INCH
 

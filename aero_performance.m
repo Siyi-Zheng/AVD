@@ -161,7 +161,10 @@ CDi = K * CL_cruise ^ 2 + eta_h * K_h * CL_h ^ 2;
 
 % also get the change in CDi from flaps
 
-CDi_flaps = 0; % idk what k_h is so we can sort this out later
+kf = 1.4;
+delta_CL = 0.139 * 2.5;
+
+CDi_flaps = kf ^ 2 * delta_CL ^ 2 + cosd(sweep); % idk what k_f is so we can sort this out later
 
 %=========================================================================
 
@@ -296,6 +299,7 @@ CD0_nac_land = S_wet_nac / S_ref * Cf_nac * FF_nac * Q;
 % get takeoff CD0
 CD0_land = CD0_fus_land + CD0_w_land + CD0_h_land + CD0_v_land +...
     CD0_nac_land + CD_upsweep + CD_flaps_land + CD_uc;
+
 
 
 %IMPORTANT VALUES!!!!!

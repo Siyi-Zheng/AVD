@@ -4,7 +4,7 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
-xcg = 39.57; % aircraft cg
+xcg = 39.6645; % aircraft cg
 claw = 6.701; % wing lift curve slope
 hlaw= 4.39 ; %tailplane lift curve slope
 xacw = 39.6; % aero centre of wing

@@ -689,4 +689,3 @@ cross_sectional_area = cumtrapz(upper_surfacet(:,2), thickness)
 
 
 
-

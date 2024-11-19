@@ -11,18 +11,18 @@ gamma = 1.4;                 % Ratio of specific heats for air
 % Aircraft parameters
 Ne = 4;                      % Number of engines
 BPR = 7.4;                   % Bypass Ratio
-AR = 8.7;                    % Aspect Ratio
-e = 0.8;                     % Oswald Efficiency
-W = 350000 * g;              % Weight [N]
-S = 130;                     % Wing reference area in square meters
-CD0 = 0.0162;                % Zero-lift drag coefficient
+AR = 8.77;                    % Aspect Ratio
+e = 0.85;                     % Oswald Efficiency
+W = 390000 * g;              % Weight [N]
+S = 482;                     % Wing reference area in square meters
+CD0 = 0.0161;                % Zero-lift drag coefficient
 CDi = 0.012;
 K = 1 / (pi * AR * e);       % Induced drag factor
-T_sl = Ne * 258.34 * 1000;   % Sea-level static thrust [N]
+T_sl = Ne * 295.8 * 1000;   % Sea-level static thrust [N]
 
 % Define the grid for Mach number and altitude
 mach = linspace(0, 1.2, 50);         % Mach number range
-altitude = linspace(0, 10000, 50);   % Altitude range
+altitude = linspace(0, 12000, 50);   % Altitude range
 [MACH, ALT] = meshgrid(mach, altitude);
 
 % % Atmospheric model
@@ -53,7 +53,7 @@ Ps = (T - D) .* V / W;                     % Specific excess power
 
 % Plotting Ps Contours
 figure;
-[c, h] = contour(MACH, ALT, Ps, 0:5:200, 'ShowText', 'on');
+[c, h] = contour(MACH, ALT * 3.2808, Ps, 0:2:200, 'ShowText', 'on');
 clabel(c, h, 'LabelSpacing', 300);
 hold on;
 
@@ -61,19 +61,19 @@ hold on;
 CL_max = 1.4;                                % Max lift coefficient
 stall_speed = sqrt((2 * W) ./ (rho .* S .* CL_max));
 stall_mach = stall_speed ./ a;
-L1 = plot(stall_mach, ALT, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Stall Speed');
+L1 = plot(stall_mach, ALT * 3.2808, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Stall Speed');
 
 % Add cruise Mach line
 cruise_mach = 0.83;                           % Cruise Mach number
-L2 = plot(cruise_mach * ones(size(ALT)), ALT, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Cruise Mach');
+L2 = plot(cruise_mach * ones(size(ALT)), ALT * 3.2808, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Cruise Mach');
 
 % Add max Mach number line
-max_mach = 0.9;                              % Max Mach number
-L3 = plot(max_mach * ones(size(ALT)), ALT, 'g--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
+max_mach = 0.85;                              % Max Mach number
+L3 = plot(max_mach * ones(size(ALT)), ALT * 3.2808, 'b--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
 
 % Labels and legend
 xlabel('Mach Number',FontSize=14);
-ylabel('Altitude (m)',FontSize=14);
+ylabel('Altitude (ft)',FontSize=14);
 title('Specific Excess Power (Ps) Contour',FontSize=16);
 lgd = legend([h,L1(1),L2(1),L3(1)],'Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
 lgd.FontSize = 14;

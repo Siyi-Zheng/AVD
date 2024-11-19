@@ -106,7 +106,7 @@ Zeng = -4.5;
 W_engines = Nen * Wen;
 
 % Equation for Wing Weight (Ww)
-CGw = 41.78; % Wing CG location (m)
+CGw = 39.6; % Wing CG location (m)
 Zw = -1.83;
 Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
@@ -120,7 +120,7 @@ Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^
 % Bh = 0; % Horizontal tailplane span in ft
 % Lht = 0; % Length from wing aerodynamic center to horizontal tail aerodynamic center
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
-CGht = 76;
+CGht = 72.1;
 Zht = 1.55;
 Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
     Ah ^ 0.166 * (1 + Se / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
@@ -133,7 +133,7 @@ Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * 
 % Lvt = 0; % Length from wing aerodynamic center to vertical tail aerodynamic center
 % Lambda_vt = 0; % Vertical tail quarter-chord sweep (radians)
 % tc_rootv = 0; % Vertical tail root thickness-to-chord ratio
-CGvt = 77;
+CGvt = 71.1;
 Zvt = 4.64;
 Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
     Ky ^ 0.875 * Av ^ 0.35 * Lvt ^ 0.5 * cos(Lambda_vt) * (tc_rootv) ^ 0.5;
@@ -198,7 +198,7 @@ Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Nt = 0; % Number of fuel tanks
 % Vp = 0; % Self-sealing tank volume (gal)
 % Vi = 0; % Integral fuel tank volume (gal)
-CGfs = 38.95;
+CGfs = 39.45;
 Zfs = -2.01;
 Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Comment: Fuel system weight; define fuel volumes and tank counts.
@@ -348,6 +348,9 @@ Zluggage = -0.5;
 
 CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_full;
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
+
+zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax + Wluggage * Zluggage) / Wtotal_full;
+disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)
 Iyy = Ww * (CGw - CGtotal)^2 + Wht * (CGht - CGtotal)^2 + Wvt * (CGvt - CGtotal)^2 + ...

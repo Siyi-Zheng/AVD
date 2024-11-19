@@ -1,5 +1,6 @@
 clc
 clear
+close all
 
 %Wing available volume calcualtor
 
@@ -264,7 +265,6 @@ c2 = outer_chord - gradient2 * 9.75;
 
 chord1 = gradient1 * span1 + 13.89;
 chord2 = gradient2 * span2 + c2;
-
 
 %plotting chord and available csa distributions
 
@@ -675,10 +675,12 @@ chord = chord_grad * wing_span1 + root_chord;
 
 
 % Calculate thickness (distance between upper and lower surfaces)
-thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
+thickness = upper_surfacet(:, 2) - lower_surfacet(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
-cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
+cross_sectional_area = cumtrapz(upper_surfacet(:,2), thickness)
+
+
 
 %volume finding
 areat = ( cross_sectional_area * chord.^2 ) / quarter_chord_sweep;

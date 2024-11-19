@@ -109,7 +109,7 @@ Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^
 % Comment: Replace variables with actual values as needed.
 
 % engine weight
-CGeng = CGw - 0.7;
+CGeng = CGw ;
 Zeng = -4.5;
 W_engines = Nen * Wen;
 
@@ -199,7 +199,7 @@ Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Nt = 0; % Number of fuel tanks
 % Vp = 0; % Self-sealing tank volume (gal)
 % Vi = 0; % Integral fuel tank volume (gal)
-CGfs = 39.5;
+CGfs = 39.45;
 Zfs = -2.01;
 Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Comment: Fuel system weight; define fuel volumes and tank counts.

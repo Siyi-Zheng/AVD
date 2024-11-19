@@ -288,12 +288,12 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume_available1 = (trapz(span1 , area1));
-volume_available2 = trapz(span2 , area2);
+%volume_available1 = (trapz(span1 , area1));
+%volume_available2 = trapz(span2 , area2);
 
 
 
-total_availablevolume = volume_available1 + volume_available2;
+%total_availablevolume = volume_available1 + volume_available2;
 
 %fuel volume required at 15 degrees density of 804kg/m^3
 
@@ -309,7 +309,7 @@ volume_holdl = volume_hold * 1000;
 
 volume_req = volume_hold * 1.10;
 
-volume_wings = (volume_hold * 0.60) * 2;
+%volume_wings = (volume_hold * 0.60) * 2;
 
 % Fuel tank data (transposed for easier handling in rows)
 %{
@@ -671,14 +671,33 @@ chord_grad = (tip_chord - root_chord) / wing_span;
 
 wing_span1 = 0:0.01:wing_span;
 
-chord = chord_grad * wing_span1 + root_chord;
+chordt = chord_grad * wing_span1 + root_chord;
 
 
 % Calculate thickness (distance between upper and lower surfaces)
-thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
+thickness = upper_surfacet(:, 2) - lower_surfacet(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
-cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
+cross_sectional_area = trapz(upper_surfacet(:,1), thickness);
+
+%volume finding
+areat = (cross_sectional_area * chordt.^2 ) / cosd(quarter_chord_sweep);
+
+total_tailplane_volume = (trapz(wing_span1 , areat)) * 2;
+
+figure
+hold on
+plot(wing_span1 , areat)
+title("Area vs Span")
+hold off
+
+figure
+hold on
+plot(wing_span1 , chordt)
+title("Area vs Span")
+hold off
+
+
 
 
 

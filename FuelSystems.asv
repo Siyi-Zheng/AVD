@@ -229,7 +229,7 @@ final_area = area_under_airfoil(end);
 %disp(["Final CSA for 1m of chord length is" num2str(final_area)])
 
 % Define a range of chord lengths to calculate the CSA
-%chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
+chord_lengths = [0,1.0,1.5,2.0]; % Example chord lengths in meters
 
 % Calculate CSA for each chord length and display
 for i = 1:length(chord_lengths)
@@ -277,8 +277,8 @@ hold off
 
 
 %plotting area distribution
-area1 = (final_area * chord1.^2) / cos(s);
-area2 = (final_area * chord2.^2);
+area1 = (final_area * chord1.^2) ./ cosd(sweep_angle);
+area2 = (final_area * chord2.^2) ./ cosd(sweep_angle);
 
 figure
 hold on
@@ -288,12 +288,12 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume_available1 = (trapz(span1 , area1));
-volume_available2 = trapz(span2 , area2);
+%volume_available1 = (trapz(span1 , area1));
+%volume_available2 = trapz(span2 , area2);
 
 
 
-total_availablevolume = volume_available1 + volume_available2;
+%total_availablevolume = volume_available1 + volume_available2;
 
 %fuel volume required at 15 degrees density of 804kg/m^3
 
@@ -309,7 +309,7 @@ volume_holdl = volume_hold * 1000;
 
 volume_req = volume_hold * 1.10;
 
-volume_wings = (volume_hold * 0.60) * 2;
+%volume_wings = (volume_hold * 0.60) * 2;
 
 % Fuel tank data (transposed for easier handling in rows)
 %{
@@ -436,10 +436,10 @@ fueltank = [upper_surfacea(15:71 , :) ; flipud(lower_surfacea(15:71 , :)) ; uppe
 
 % Separate upper and lower surfaces
 upper_surface = fueltank(1:53 , :); % Columns 1-46 for upper surface
-upper_surface = fueltank(54:106 , :); % Columns 47-92 for lower surface
+lower_surface = fueltank(54:106 , :); % Columns 47-92 for lower surface
 
 % Calculate thickness between upper and lower surfaces
-thickness = upper_surface(: , 2) - flipud(upper_surface(: , 2));
+thickness = upper_surface(: , 2) - flipud(lower_surface(: , 2));
 
 % Calculate the area by integrating thickness along the chord positions
 Tankarea = trapz(upper_surface(: , 1), thickness);
@@ -455,8 +455,8 @@ spar2 = [upper_surfacea(71:73,:) ; flipud(lower_surfacea(71:73,:)) ; upper_surfa
 
 
 %plotting area distribution
-area3 = Tankarea * chord1.^2;
-area4 = Tankarea * chord2.^2;
+area3 = (Tankarea * chord1.^2) / cosd(sweep_angle);
+area4 = (Tankarea * chord2.^2) / cosd(sweep_angle);
 
 figure
 hold on
@@ -466,8 +466,8 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-volume1 = (trapz(span1 , area3) * 0.95);
-volume2 = trapz(span2 , area4) * 0.95;
+volume1 = (trapz(span1 , area3) * 0.85);
+volume2 = trapz(span2 , area4) * 0.85;
 
 total_tank_volume = volume1 * 2 + volume2 * 2;
 
@@ -679,6 +679,11 @@ thickness = upper_surfacet(:, 2) - upper_surfacet(:, 2);
 
 % Integrate thickness over chord to find cross-sectional area
 cross_sectional_area = trapz(upper_surfacet(:,2), thickness);
+
+%volume finding
+areat = ( cross_sectional_area * chord.^2 ) / quarter_chord_sweep;
+
+
 
 
 

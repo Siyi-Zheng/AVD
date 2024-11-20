@@ -2,12 +2,14 @@ clc
 clear
 
 %Length
-L_plane = 80.6; % length of plane in METRE
+L_plane = 77.8; % length of plane in METRE
 L_ws = 65; % wing span in METRE
+
+
 
 %Weights
 W_o = 390057;        %MTOW in KG
-W_ng = 0.083*W_o;      %Nose gear weight carrying capability
+W_ng = 0.09*W_o;      %Nose gear weight carrying capability
 W_mg = W_o - W_ng;   %Main gear weight carrying capability
 
 MAC = 7.41; %mean aerodynamic chord in METRE
@@ -17,7 +19,7 @@ Wo_lbs = W_o*2.20462; %Wo in lbs (errikos just being extremely annoying with val
 
 %Moments
 x_wing = 37; % distance of wing leading edge in METRE
-x_cg = 37 + 0.4*MAC;                        % distance of cg (estimate)
+x_cg = 39.6;                        % distance of cg (estimate)
 x_mg = 43;                                %x distance of main gears (estimate)
 x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;         %x distance of nose gears
 
@@ -25,7 +27,7 @@ x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;         %x distance of nose gears
 %Main Gear Height
 beta = 15; % tipback angle in degree
 gamma = 15; % rotation clearance angle
-H = tan(deg2rad(gamma))*(L_plane-x_mg-120/39.37); % correction for the rear main gear
+H = tan(deg2rad(gamma))*(L_plane-x_mg-150/39.37); % correction for the rear main gear
 tip_back_angle = rad2deg(tan((x_mg-x_cg)/H)); % between 15 ~ 25 degree
 %check wing tip do not hit the ground at 5 degree roll and AOA 90% Cl_max
 
@@ -40,8 +42,8 @@ a_overturn = rad2deg(atan(H/d)); % should be below 63 degree
 
 % Loading (IN KG)
 % Assume aftmost CG is x_cg
-% Assume foremost CG is 20~25% MAC in front of aftmost CG
-x_cg_foremost = x_cg - 0.20*MAC; % foremost cg location in METRE
+% Assume foremost CG is 8% MAC in front of aftmost CG
+x_cg_foremost = x_cg - 0.*MAC; % foremost cg location in METRE
 W_mg_max = W_o*(x_cg-x_ng)/(x_mg-x_ng) * 1.07; % max static loading on main gear in KG
 W_ng_max = W_o*(x_mg-x_cg_foremost)/(x_mg-x_ng) * 1.07; % max static loading on nose gear in KG
 H_feet = H*3.28084; % METRE to FEET

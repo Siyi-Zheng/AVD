@@ -16,22 +16,13 @@ e = 0.85;                     % Oswald Efficiency
 W = 390000 * g;              % Weight [N]
 S = 482;                     % Wing reference area in square meters
 CD0 = 0.0161;                % Zero-lift drag coefficient
-CDi = 0.012;
 K = 1 / (pi * AR * e);       % Induced drag factor
 T_sl = Ne * 295.8 * 1000;   % Sea-level static thrust [N]
 
 % Define the grid for Mach number and altitude
 mach = linspace(0, 1.2, 50);         % Mach number range
-altitude = linspace(0, 12000, 50);   % Altitude range
+altitude = linspace(0, 15000, 50);   % Altitude range
 [MACH, ALT] = meshgrid(mach, altitude);
-
-% % Atmospheric model
-% sigma_h = exp(-ALT / 7000);                % Simplified density ratio
-% Temp = 288.15 - 0.0065 * ALT;              % Temperature [K]
-% rho = 1.225 * sigma_h;                     % Air density [kg/m^3]
-% a = sqrt(gamma * R * Temp);                % Speed of sound [m/s]
-% V = MACH .* a;                             % True airspeed [m/s]
-% q = 0.5 * rho .* V.^2;                     % Dynamic pressure
 
 % used Internation Standard Atmosphere model from matlab
 [T, a, P, rho] = atmosisa(ALT);
@@ -45,7 +36,8 @@ CL = (W ./ (q * S));                       % Required lift coefficient
 [D, CD] = DragModel(CD0, K, CL, q, S, MACH);
 
 % Thrust Lapse Model
-tau = ThrustLapse(ALT, MACH, BPR); 
+[tau,B1,B2] = ThrustLapse(ALT, MACH, BPR); 
+% tau = ThrustLapseSimple(ALT,0.83);
 T = T_sl * tau;                            % Available thrust [N]
 
 % Specific Excess Power Calculation
@@ -78,6 +70,10 @@ title('Specific Excess Power (Ps) Contour',FontSize=16);
 lgd = legend([h,L1(1),L2(1),L3(1)],'Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
 lgd.FontSize = 14;
 grid on;
+hold off
+
+
+
 
 %% Drag Model Function
 function [D, CD] = DragModel(CD0, K, CL, q, S, MACH)
@@ -96,7 +92,7 @@ function [D, CD] = DragModel(CD0, K, CL, q, S, MACH)
 end
 
 %% Thrust Lapse Function
-function tau = ThrustLapse(h, M, BPR)
+function [tau,B1,B2] = ThrustLapse(h, M, BPR)
     % Thrust lapse for high BPR engines
     K1 = 0.89;
     K2 = -0.014;
@@ -104,7 +100,9 @@ function tau = ThrustLapse(h, M, BPR)
     K4 = 0.005;
 
     % Atmospheric density ratio
-    sigma_h = exp(-h / 7000);
+    % sigma_h = exp(-h / 7000);
+    [~, ~, ~, rho] = atmosisa(h);
+    sigma_h = rho/1.225;
 
     % Altitude and Mach components
     B1 = zeros(size(h));
@@ -116,3 +114,6 @@ function tau = ThrustLapse(h, M, BPR)
     % Thrust lapse ratio
     tau = B1 .* B2;
 end
+
+    
+    

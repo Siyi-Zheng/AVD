@@ -4,7 +4,7 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
-xcg = 39.6645; % aircraft cg
+xcg = 39.62; % aircraft cg
 claw = 6.291; % wing lift curve slope
 hlaw = 4.39; % tailplane lift curve slope
 xacw = 39.6; % aero centre of wing
@@ -22,7 +22,7 @@ hh = 1.55; % vertical position of hstab
 xach = 72.1; % aero centre of hstab
 lh = xach-xacw; % distance between wing c/4 and hstab c/4
 sweep = 26.6; % quarter chord sweep
-sh = 40; % hstab area
+sh = 54; % hstab area
 
 Cmoairf= -0.131; %X-FOIL incompressible airfoil zero lift pitching moment
 compressibility_factor_cruise= 1.350; %compressibility factor at cruise conditon
@@ -48,7 +48,7 @@ xnp = mac .* ((claw .* xacw ./ mac - cmaf + etah .* clah .* ...
     (1 - deda_cruise) .* sh ./ sw .* xach ./ mac) ...
     ./ (claw + etah .* clah .* (1 - deda_cruise) .* sh ./ sw)); % neutral pt
 
-kn = (xnp - xcg) ./ mac % we want this to be ~ -7% (power off)
+kn = (xnp - xcg) ./ mac % we want this to be ~ 7% (power off)
 
 figure 
 plot(xacw, kn)

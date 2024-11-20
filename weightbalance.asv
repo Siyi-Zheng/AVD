@@ -355,9 +355,9 @@ CG_owtank = 42.01; % outer wing tank xcg (m)
 CG_trimtank = 73; % trim tank xcg (m)
 
 W_iwtank = 55.5; % inner wing tank fuel mass (tons)
-W_ftank = 44.2; % fuselage tank fuel mass (tons)
-W_owtank = 76.4; % outer wing tank fuel mass (tons)
-W_trimtank = 7.26; % trim tank fuel mass (tons)
+W_ftank = ; % fuselage tank fuel mass (tons)
+W_owtank = 81.091; % outer wing tank fuel mass (tons)
+W_trimtank = 0; % trim tank fuel mass (tons)
 
 CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
 W_fore = (W_iwtank + W_ftank);

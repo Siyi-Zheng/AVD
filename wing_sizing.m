@@ -3,12 +3,12 @@ clf
 clc
 
 % parameters
-area = 481.77; % m^2
-wing_span = 65; % m
-taper_ratio = 0.25;
-quarter_chord_sweep = 26.6; % degrees
-trailing_edge_kink = 0.3; % fraction of wing span
-area_ratio = 0.09161; % cross-sectional area as a proportion of c^2
+area = 54.02; % m^2
+wing_span = 6.258 * 2; % m
+taper_ratio = 0.4;
+quarter_chord_sweep = 25; % degrees
+trailing_edge_kink = 0; % fraction of wing span
+area_ratio = 0.0823; % cross-sectional area as a proportion of c^2
 
 % simple design
 total_chord = 1 + 1 / taper_ratio;
@@ -29,6 +29,7 @@ plot([0, wing_span / 2], [le_root, le_tip], 'k-', 'LineWidth', 1)
 plot([0, wing_span / 2], [te_root, te_tip], 'k-', 'LineWidth', 1)
 plot([0, 0], [le_root, te_root], 'k-', 'LineWidth', 1)
 plot([wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1)
+axis equal
 
 % wing with trailing edge kink
 kink_span = wing_span / 2 * trailing_edge_kink;

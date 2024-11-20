@@ -5,8 +5,8 @@ close all
 
 mac = 7.4; % aircraft mean aero chord
 xcg = 39.6645; % aircraft cg
-claw = 6.701; % wing lift curve slope
-hlaw= 4.39 ; %tailplane lift curve slope
+claw = 6.291; % wing lift curve slope
+hlaw = 4.39; % tailplane lift curve slope
 xacw = 39.6; % aero centre of wing
 kf = 1.4; % some bullshit constant
 lf = 77.82; % fuselage length
@@ -48,7 +48,7 @@ xnp = mac .* ((claw .* xacw ./ mac - cmaf + etah .* clah .* ...
     (1 - deda_cruise) .* sh ./ sw .* xach ./ mac) ...
     ./ (claw + etah .* clah .* (1 - deda_cruise) .* sh ./ sw)); % neutral pt
 
-kn = (xnp - xcg) ./ mac % we want this to be ~7% (power off)
+kn = (xnp - xcg) ./ mac % we want this to be ~ -7% (power off)
 
 figure 
 plot(xacw, kn)

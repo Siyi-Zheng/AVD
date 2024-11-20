@@ -25,10 +25,13 @@ CLa3 = [];
 M_list1 = [];
 M_list2 = [];
 
-for M = 0:0.01:1.5
+for M = 0:0.01:1.3
 
     beta = (1 - M ^ 2) ^ 0.5;
     eta = Cla / (2 * pi); % remove the beta term as Cla has it already
+    if eta > 0.98
+        eta = 0.98; % correction from Raymer
+    end
     F = 1.07 * (1 + d / b) ^ 2;
 
     CLa_subsonic3 = 2 * pi * AR * S_exp * F * cosd(le_sweep) / (2 + (4 + (AR * beta / eta)...
@@ -55,14 +58,15 @@ figure
 hold on
 plot(M_list2, CLa2,"blue", LineWidth=1.5);
 plot(M_list1, CLa3,"red", LineWidth=1.5);
+xregion(0.85, 1.2)
 xline(0.83, label="Cruise");
 xline(0.23, label="Takeoff");
 xline(0.27, label="Landing");
 ylim([3 10])
 xlabel("M");
-ylabel("CLa")
-% ylim([3 12]);
-legend("Supersonic Theoretical","Subsonic (Raymer)");
+ylabel("C_{L_α}")
+xlim([0 1.3]);
+legend("Supersonic","Subsonic","Transonic Regime");
 grid on
 
 
@@ -303,9 +307,9 @@ CD0_land = CD0_fus_land + CD0_w_land + CD0_h_land + CD0_v_land +...
 
 
 %IMPORTANT VALUES!!!!!
-% CLa = 6.701 FOR THE WING FOR M = 0.83
-% CLa = 5.082 for landing
-% CLa = 5.049 for takeoff
+% CLa = 6.291 for cruise
+% CLa = 4.732 for landing
+% CLa = 4.701 for takeoff
 % CD0 clean = 0.0161
 % CD0 takeoff = 0.1026
 % CD0 landing = 0.1424

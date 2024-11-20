@@ -83,7 +83,7 @@ W_fixed = Wc + Wp;
 
 %Mission weight fractions (MWF)
 
-MWF = MWF_Calculation(sfc_cruise, sfc_loiter, Range_1, Velocity_cruise_1, L_D_cruise_1, Range_2, Velocity_cruise_2, L_D_cruise_2, endurance, L_D_loiter);
+MWF = MWF_Calculation(sfc_cruise, sfc_loiter, Range_1, Velocity_cruise_1, L_D_cruise_1, Range_2, Velocity_cruise_2, L_D_cruise_2, endurance, L_D_loiter)
 
 W9_Wo = prod(MWF);
 Wf_Wo = 1.015 * (1 - W9_Wo);

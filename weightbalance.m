@@ -358,7 +358,7 @@ CG_trimtank = 73; % trim tank xcg (m)
 W_iwtank = 55.5; % inner wing tank fuel mass (tons)
 W_ftank = 44.2; % fuselage tank fuel mass (tons)
 W_owtank = 76.4; % outer wing tank fuel mass (tons)
-W_trimtank = 7.26; % trim tank fuel mass (tons)
+W_trimtank = 4.824; % trim tank fuel mass (tons)
 
 CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
 W_fore = (W_iwtank + W_ftank);
@@ -376,6 +376,9 @@ CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
 CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax...
     + Wluggage * CGluggage) / Wtotal_full;
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
+
+CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
+    / (Wtotal_tons + W_trimtank);
 
 zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax...
     + Wluggage * Zluggage) / Wtotal_full;

@@ -6,10 +6,9 @@ L_plane = 77.8; % length of plane in METRE
 L_ws = 65; % wing span in METRE
 
 
-
 %Weights
 W_o = 390057;        %MTOW in KG
-W_ng = 0.09*W_o;      %Nose gear weight carrying capability
+W_ng = 0.081*W_o;      %Nose gear weight carrying capability
 W_mg = W_o - W_ng;   %Main gear weight carrying capability
 
 MAC = 7.41; %mean aerodynamic chord in METRE
@@ -19,15 +18,16 @@ Wo_lbs = W_o*2.20462; %Wo in lbs (errikos just being extremely annoying with val
 
 %Moments
 x_wing = 37; % distance of wing leading edge in METRE
-x_cg = 39.6;                        % distance of cg (estimate)
-x_mg = 43;                                %x distance of main gears (estimate)
+% x_cg = x_wing + 0.4*MAC; % distance of cg (estimated)
+x_cg = 40.38;                        % distance of aftmost cg (actual)
+x_mg = 43.5;                                %x distance of main gears (actual)
 x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;         %x distance of nose gears
 
 
 %Main Gear Height
 beta = 15; % tipback angle in degree
 gamma = 15; % rotation clearance angle
-H = tan(deg2rad(gamma))*(L_plane-x_mg-150/39.37); % correction for the rear main gear
+H = tan(deg2rad(gamma))*(L_plane-x_mg-100/39.37); % correction for the rear main gear
 tip_back_angle = rad2deg(tan((x_mg-x_cg)/H)); % between 15 ~ 25 degree
 %check wing tip do not hit the ground at 5 degree roll and AOA 90% Cl_max
 
@@ -42,13 +42,15 @@ a_overturn = rad2deg(atan(H/d)); % should be below 63 degree
 
 % Loading (IN KG)
 % Assume aftmost CG is x_cg
-% Assume foremost CG is 8% MAC in front of aftmost CG
-x_cg_foremost = x_cg - 0.*MAC; % foremost cg location in METRE
+% Assume foremost CG is 20% MAC in front of aftmost CG
+% x_cg_foremost = x_cg - 0.2*MAC; % foremost cg location in METRE (estimated)
+x_cg_foremost = 38.13; % foremost cg location in METRE (actual)
 W_mg_max = W_o*(x_cg-x_ng)/(x_mg-x_ng) * 1.07; % max static loading on main gear in KG
 W_ng_max = W_o*(x_mg-x_cg_foremost)/(x_mg-x_ng) * 1.07; % max static loading on nose gear in KG
 H_feet = H*3.28084; % METRE to FEET
-W_ng_braking_lbs = 10*H_feet*Wo_lbs/(32.2*(x_mg-x_ng) * 3.28084) * 1.07; % dynamic braking load in lbs
+W_ng_braking_lbs = 10*H_feet*Wo_lbs/(32.2*(x_mg-x_ng) * 32.1741) * 1.07; % dynamic braking load in lbs
 W_ng_braking = 0.453592*W_ng_braking_lbs; % lbs to KG
+
 
 %Nose Gear: one struct, two wheels
 %Tire Sizing (statistical approach): Nose wheel
@@ -73,6 +75,7 @@ w_tire_m = 20.5;
 d_tire_m = 52;
 
 % Nose Wheel
+%Three-part Name Tire: 52 x 20.5-23
 R_r_n = 21.3; % Rolling Radius in INCH
 w_tire_n = 20.5; % width
 d_tire_n = 52; % diameter
@@ -118,6 +121,4 @@ W_noleo = (W_ng_max+W_ng_braking)*9.81; % Load on nose wheel in Newton
 D_noleo = 0.04*sqrt(W_noleo*0.224809)*0.0254;
 
 
-%ACN - Aircraft Classification Number
-%The follwoing values are generated from the COMFAA software
 

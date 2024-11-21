@@ -15,6 +15,9 @@ V1 = 0  %Inititial velocity (m/s)
 V2 = 1.1 * V_S  %Final velocity for ground roll (m/s)
 L_D = 0.2  %Lift-to-drag ratio
 
+% 4.205 % takeoff
+% 4.233 % landing
+
 % Takeoff Ground Roll Distance Calculation
 K_A = (rho / (2 * W_S)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e));
 K_T = T / W - mu;

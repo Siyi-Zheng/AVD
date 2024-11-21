@@ -339,6 +339,7 @@ Wluggage = 9.42; % tons
 Wtotal_full = Wtotal_tons + Wfuel + Wpax + Wluggage;
 disp(['Total Weight (full): ', num2str(Wtotal_full), ' tons']);
 
+
 % get cg
 CGfuel = CGfs; % m
 CGpax = 40; % m
@@ -347,11 +348,68 @@ Zfuel = Zfs;
 Zpax = 0.5;
 Zluggage = -0.5;
 
-CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_full;
+
+%==================== FUEL TANK DISTRIBUTION ==============================
+CG_iwtank = 36.553; % inner wing tank xcg (m)
+CG_ftank = 33.39; % fuselage tank xcg (m)
+CG_owtank = 42.01; % outer wing tank xcg (m)
+CG_trimtank = 73; % trim tank xcg (m)
+
+W_iwtank = 55.5; % inner wing tank fuel mass (tons)
+W_ftank = 44.2; % fuselage tank fuel mass (tons)
+W_owtank = 76.4; % outer wing tank fuel mass (tons)
+W_trimtank = 4.824; % trim tank fuel mass (tons)
+
+CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
+W_fore = (W_iwtank + W_ftank);
+
+CGfuel = (CG_iwtank * W_iwtank + CG_ftank * W_ftank + CG_owtank *...
+    W_owtank + CG_trimtank * W_trimtank) / (W_iwtank + W_ftank...
+    + W_owtank + W_trimtank);
+
+CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_fore + Wpax + Wluggage);
+
+CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
+
+CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) / Wtotal_full;
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
-zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax + Wluggage * Zluggage) / Wtotal_full;
+CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
+    / (Wtotal_tons + W_trimtank);
+
+zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax...
+    + Wluggage * Zluggage) / Wtotal_full;
 disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
+
+%plotting the CG envelope
+
+W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage;
+CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start;
+disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']);
+
+W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage;
+CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.625*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
+disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
+
+Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage;
+disp(['Total Weight (no fuel): ', num2str(Wtotal_nofuel), ' tons']);
+CGtotal_nofuel = (Wtotal_tons * CGtotal + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_nofuel;
+disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
+
+
+
+
+
+figure
+scatter(CG_cruise_start, W_cruise_start, 'green')
+hold on
+scatter(CG_cruise_end, W_cruise_end, 'blue')
+scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')
+scatter(CGtotal_full, Wtotal_full, 'magenta')
+
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)
 Iyy = Ww * (CGw - CGtotal)^2 + Wht * (CGht - CGtotal)^2 + Wvt * (CGvt - CGtotal)^2 + ...

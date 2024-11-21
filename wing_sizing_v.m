@@ -3,9 +3,9 @@ clf
 clc
 
 % parameters
-area = 27.75 * 2; % m^2
-AR = 3;
-wing_span = (area * AR / 2) ^ 0.5; % m
+area = 29.08 * 2; % m^2
+AR = 1.6;
+wing_span = (area * AR * 2) ^ 0.5; % m
 taper_ratio = 0.4;
 quarter_chord_sweep = 35; % degrees
 
@@ -28,3 +28,4 @@ plot([0, wing_span / 2], [le_root, le_tip], 'k-', 'LineWidth', 1)
 plot([0, wing_span / 2], [te_root, te_tip], 'k-', 'LineWidth', 1)
 plot([0, 0], [le_root, te_root], 'k-', 'LineWidth', 1)
 plot([wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1)
+axis equal

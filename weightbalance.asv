@@ -109,7 +109,7 @@ Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^
 % Comment: Replace variables with actual values as needed.
 
 % engine weight
-CGeng = CGw ;
+CGeng = CGw - 0.7;
 Zeng = -4.5;
 W_engines = Nen * Wen;
 
@@ -199,7 +199,7 @@ Wes = 49.19 * (Nen * Wen / 1000) ^ 0.541;
 % Nt = 0; % Number of fuel tanks
 % Vp = 0; % Self-sealing tank volume (gal)
 % Vi = 0; % Integral fuel tank volume (gal)
-CGfs = 39.45;
+CGfs = 39.5;
 Zfs = -2.01;
 Wfs = 2.405 * Vt ^ 0.606 * Nt ^ 0.5 * (1 + Vp / Vt) / (1 + Vi / Vt);
 % Comment: Fuel system weight; define fuel volumes and tank counts.
@@ -347,10 +347,37 @@ Zfuel = Zfs;
 Zpax = 0.5;
 Zluggage = -0.5;
 
-CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_full;
+
+%==================== FUEL TANK DISTRIBUTION ==============================
+CG_iwtank = 36.553; % inner wing tank xcg (m)
+CG_ftank = 33.39; % fuselage tank xcg (m)
+CG_owtank = 42.01; % outer wing tank xcg (m)
+CG_trimtank = 73; % trim tank xcg (m)
+
+W_iwtank = 55.5; % inner wing tank fuel mass (tons)
+W_ftank = ; % fuselage tank fuel mass (tons)
+W_owtank = 81.091; % outer wing tank fuel mass (tons)
+W_trimtank = 0; % trim tank fuel mass (tons)
+
+CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
+W_fore = (W_iwtank + W_ftank);
+
+CGfuel = (CG_iwtank * W_iwtank + CG_ftank * W_ftank + CG_owtank *...
+    W_owtank + CG_trimtank * W_trimtank) / (W_iwtank + W_ftank...
+    + W_owtank + W_trimtank);
+
+CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_fore + Wpax + Wluggage);
+
+CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
+
+CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) / Wtotal_full;
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
-zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax + Wluggage * Zluggage) / Wtotal_full;
+zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax...
+    + Wluggage * Zluggage) / Wtotal_full;
 disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)

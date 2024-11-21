@@ -258,7 +258,7 @@ gradient1 = (outer_chord - 13.89)/9.75;
 %for outer section
 gradient2 = (3.47 - outer_chord)/(32.45 - 9.75);
 
-span1 = 3:0.01:9.75;
+span1 = 2.55:0.01:9.75;
 span2 = 9.75:0.01:29.45;
 
 c2 = outer_chord - gradient2 * 9.75;
@@ -430,13 +430,13 @@ fueltank = [
     0.150000 , 0.059100]';
 %}
 
-fueltank = [upper_surfacea(15:71 , :) ; flipud(lower_surfacea(15:71 , :)) ; upper_surfacea(15 , :)];
+fueltank = [upper_surfacea(17:71 , :) ; flipud(lower_surfacea(17:71 , :)) ; upper_surfacea(17 , :)];
 %central tank and front tank seperation
 %structural member coordinates
 
 % Separate upper and lower surfaces
-upper_surface = fueltank(1:53 , :); % Columns 1-46 for upper surface
-lower_surface = fueltank(54:106 , :); % Columns 47-92 for lower surface
+upper_surface = fueltank(1:51 , :); % Columns 1-46 for upper surface
+lower_surface = fueltank(52:102 , :); % Columns 47-92 for lower surface
 
 % Calculate thickness between upper and lower surfaces
 thickness = upper_surface(: , 2) - flipud(lower_surface(: , 2));
@@ -449,7 +449,7 @@ Tankarea = trapz(upper_surface(: , 1), thickness);
 
 
 %creating spar 
-spar1 = [upper_surfacea(13:15,:) ; flipud(lower_surfacea(13:15,:)) ; upper_surfacea(13,:)];
+spar1 = [upper_surfacea(15:17,:) ; flipud(lower_surfacea(15:17,:)) ; upper_surfacea(15,:)];
 spar2 = [upper_surfacea(71:73,:) ; flipud(lower_surfacea(71:73,:)) ; upper_surfacea(71,:)];
 
 
@@ -469,7 +469,7 @@ hold off
 volume1 = (trapz(span1 , area3) * 0.85);
 volume2 = trapz(span2 , area4) * 0.85;
 
-total_tank_volume = volume1 * 2 + volume2 * 2;
+total_tank_volume = (volume1 * 2 + volume2 * 2) - 1;
 
 Volumer_needed = volume_req - total_tank_volume;
 
@@ -490,7 +490,7 @@ areac_ratio1 = collector_area * chord1.^2;
 areac_ratio2 = collector_area * chord2.^2;
 
 figure
-hold on
+hold on 
 plot(span1 , areac_ratio1)
 plot(span2 , areac_ratio2)
 hold off
@@ -507,10 +507,11 @@ length2 = (span2(1971) - span2(1195)) * tand(30.15);
 
 difference = Volumer_needed - (collector1 + collector2) * 2;
 
-
+central_tank_length = difference / 8.165;
 
 % Plot the airfoil
 figure
+figure('Position', [100, 100, 1000, 500]); % [x, y, width, height]
 hold on
 
 % Plot the upper and lower surfaces of the airfoil
@@ -518,16 +519,16 @@ plot(upper_surfacea(:, 1), upper_surfacea(:, 2), 'b', 'DisplayName', 'Upper Surf
 plot(lower_surfacea(:, 1), lower_surfacea(:, 2), 'r', 'DisplayName', 'Lower Surface');
 
 % Plot the fuel tank outline
-plot(fueltank(:,1), fueltank(:,2), 'k', 'DisplayName', 'Fuel Tank');
+plot(fueltank(:,1), fueltank(:,2), 'k', 'HandleVisibility', 'off'); % Not in legend
 
 % Fill the area of the fuel tank with transparent black
 x_fill = fueltank(:,1);        % x-coordinates of the fuel tank section
 y_fill = fueltank(:,2);        % y-coordinates of the fuel tank section
-fill(x_fill, y_fill, 'k', 'FaceAlpha', 0.3, 'EdgeColor', 'none'); % Transparent black shading
+fill(x_fill, y_fill, 'k', 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Fuel Tank'); % Transparent black shading
 
 % Plotting spars with gray color
-plot(spar1(:,1), spar1(:,2), 'Color', [0.5, 0.5, 0.5], 'DisplayName', 'Spar');
-plot(spar2(:,1), spar2(:,2), 'Color', [0.5, 0.5, 0.5]);
+plot(spar1(:,1), spar1(:,2), 'Color', [0.5, 0.5, 0.5], 'HandleVisibility', 'off'); % Not in legend
+plot(spar2(:,1), spar2(:,2), 'Color', [0.5, 0.5, 0.5], 'HandleVisibility', 'off'); % Not in legend
 
 % Fill area between spar1 and spar2 with transparent gray
 xs_fill1 = spar1(:,1); % x-coordinates of spar1
@@ -536,32 +537,43 @@ xs_fill2 = spar2(:,1); % x-coordinates of spar2
 ys_fill2 = spar2(:,2); % y-coordinates of spar2
 
 % Combine coordinates to create a closed polygon for filling
-x_fill = [xs_fill1; flipud(xs_fill2)];
-y_fill = [ys_fill1; flipud(ys_fill2)];
+x_fill_spar = [xs_fill1; flipud(xs_fill2)];
+y_fill_spar = [ys_fill1; flipud(ys_fill2)];
 
 % Fill the area between the spars
-fill(x_fill, y_fill, [0.5, 0.5, 0.5], 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+fill(x_fill_spar, y_fill_spar, [0.5, 0.5, 0.5], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Spar Fill');
 
 % Extract x and y coordinates from the collector data
 x_collector = collector(:, 1);  % x-coordinates
 y_collector = collector(:, 2);  % y-coordinates
 
-% Plot upper and lower surfaces (for reference)
-plot(upper_surfacea(:, 1), upper_surfacea(:, 2), 'b', 'DisplayName', 'Upper Surface');
-plot(lower_surfacea(:, 1), lower_surfacea(:, 2), 'r', 'DisplayName', 'Lower Surface');
-
 % Fill the collector area in blue with transparency
-fill(x_collector, y_collector, 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+fill(x_collector, y_collector, 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Collector Tank');
 
 % Additional plot settings
-xlabel('Chord Position (x/c)');
-ylabel('Thickness (y/c)');
-title('Wing Cross Section with Fuel Tank Integration');
+xlabel('Chord Position (x/c)', 'Interpreter','latex');
+ylabel('Thickness (y/c)', 'Interpreter','latex');
+%title('Wing Cross Section with Fuel Tank Integration');
+
+% Maintain equal scaling and set axis limits
+axis equal;
+xlim([-0.1, 1.1]);
+%ylim([-0.5, 0.5]);
+
 legend;
 axis equal
-
 hold off
 
+% Additional plot settings
+xlabel('Chord Position (x/c)', 'Interpreter','latex');
+ylabel('Thickness (y/c)', 'Interpreter','latex');
+%title('Wing Cross Section with Fuel Tank Integration');
+legend('Interpreter','latex');
+axis equal
+hold off
+
+
+%TAILPLANE TANK SIZING
 
 
 % Airfoil data (with y-coordinates inverted)

@@ -20,6 +20,7 @@ le_root = root_chord / 4;
 te_root = -3 * root_chord / 4;
 
 
+
 % wing with trailing edge kink
 kink_span = wing_span / 2 * trailing_edge_kink;
 % recalculate the wing iteratively
@@ -43,59 +44,104 @@ te_tip = qcy - 3 * tip_chord2 / 4;
 le_root = root_chord2 / 4;
 te_root = -3 * root_chord2 / 4;
 
+le_tip = le_root - ( 9.75/cosd(30.16) + 23.1) * sind(30.16);
+
+te_angle = acosd(18824.625/19978.13);
+
+length = ((wing_span/2) - 9.75 - 18.824625);
+length1 = 18.82625 + length;
+
+te_tip = te_root - sind(te_angle) * length1;
+
+
 grad_le = (le_tip-le_root)/((wing_span)/2);
 grad_te = (te_tip-te_root)/(((wing_span)/2)-kink_span);
 
-x_r = 0:0.01:(wing_span/2);
-x_l = -x_r;
+x_te = 0:0.01:(wing_span/2);
+x_le = 0:0.01:((9.75/cosd(30.16) + 23.1) * cosd(30.16));
 
-y_le = x_r * grad_le + le_root;
-y_te = (x_r(1:find(x_r == 9.75)) * 0) + te_root;
+y_le = x_le * grad_le + le_root;
+y_te = (x_te(1:find(x_te == 9.75)) * 0) + te_root;
 c = te_root - grad_te * kink_span;
-y_te = ([y_te , (x_r(find(x_r == 9.76):end)) * grad_te + c]);
+y_te = ([y_te , (x_te(find(x_te == 9.76):end)) * grad_te + c]);
 
-y_le_box = 
 
+index_box = 256;
+y_lebox = y_le;
+y_tebox = y_te;
+y_lebox(1:index_box) = y_lebox(index_box);
+y_tebox(1:index_box) = y_tebox(index_box);
+
+
+%%
 %adding central box
 x_box = -2.55:0.01:2.55;
-y_lebox = (x_box * 0) + 2.55 * grad_le + le_root;
-y_tebox = (x_box * 0) + te_root;
+y_leboxa = (x_box * 0) + 2.55 * grad_le + le_root;
+y_teboxa = (x_box * 0) + te_root;
 
 
-
-
+%%
 %adding spars
 %le_spar @ 12% chord
-chord = y_le - y_te;
-front_spar = y_le - 0.12 * chord;
-rear_spar = y_le - 0.7 * chord;
+chord = y_lebox - y_tebox(1:2973);
+front_spar = y_lebox - 0.12 * chord;
+rear_spar = y_lebox - 0.7 * chord;
 
+%%
+%adding le raked wingtip
+x_vals = [x_le(end) , 31  , 32  , x_te(end) ];
+y_vals = [ y_lebox(end) , -13.5  , -16  , y_tebox(end)];
+
+% Define a finer set of x-values for smooth evaluation
+x_fine = x_le(end):0.01:x_te(end); 
+
+end_gradients = [grad_le , -10];
+
+% Fit a cubic spline to the control points
+spline_fit = spline(x_vals, y_vals);
+
+% Evaluate the spline at the finer x-values
+y_fine = ppval(spline_fit, x_fine);
+
+%%
+%Flaps
+
+
+
+
+%%
+% PLOTTING
 
 figure
 hold on
 
-%plotting wing
-plot(x_r , y_le , 'k-' , LineWidth=1.5)
-plot(x_r , y_te , 'k-' , LineWidth=1.5)
-plot(x_l , y_le , 'k-' , LineWidth=1.5)
-plot(x_l , y_te , 'k-' ,  LineWidth=1.5)
-plot([-wing_span / 2, -wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1.5)
-plot([wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1.5)
+% Plotting wing
+plot(x_le, y_le, 'k-', 'LineWidth', 1.5, 'DisplayName', 'Wing Planform'); % Included in legend
+plot(x_te, y_te, 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off'); % Excluded from legend
+plot(-x_le, y_le, 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot(-x_te, y_te, 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot(x_fine, y_fine , 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off')
+plot(-x_fine, y_fine , 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off')
+%plot([-wing_span / 2, -wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+%plot([wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
 
-%plotting wing box
-plot(x_box , y_lebox , 'Color' , [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5)
-plot(x_box , y_tebox , 'Color' , [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5)
-plot([-2.55 , -2.55] , [y_lebox(1) , y_tebox(1)] , 'Color' , [0.9290 0.6940 0.1250] , 'LineStyle', '--', 'LineWidth', 1.5)
-plot([2.55 , 2.55] , [y_lebox(end) , y_tebox(end)] , 'Color' , [0.9290 0.6940 0.1250] , 'LineStyle', '--', 'LineWidth', 1.5)
 
-%plotting spars
-plot(x_r , front_spar , 'r-' , LineWidth=1.5)
-plot(x_r , rear_spar , 'r-' , LineWidth=1.5)
-plot(-x_r , front_spar , 'r-' , LineWidth=1.5)
-plot(-x_r , rear_spar , 'r-' , LineWidth=1.5)
+% Plotting wing box
+plot(x_box, y_leboxa, 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'DisplayName', 'WingBox'); % Included in legend
+plot(x_box, y_teboxa, 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot([-2.55, -2.55], [y_leboxa(1), y_teboxa(1)], 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot([2.55, 2.55], [y_leboxa(end), y_teboxa(end)], 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+
+% Plotting spars
+plot(x_le, front_spar, 'r-', 'LineWidth', 1.5, 'DisplayName', 'Spar'); % Included in legend
+plot(x_le, rear_spar, 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot(-x_le, front_spar, 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+plot(-x_le, rear_spar, 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+
 
 grid on
 axis equal
+legend;
 hold off
 
 

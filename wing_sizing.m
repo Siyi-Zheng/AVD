@@ -3,12 +3,12 @@ clf
 clc
 
 % parameters
-area = 54.02; % m^2
-wing_span = 6.258 * 2; % m
-taper_ratio = 0.4;
-quarter_chord_sweep = 25; % degrees
-trailing_edge_kink = 0; % fraction of wing span
-area_ratio = 0.0823; % cross-sectional area as a proportion of c^2
+area = 482; % m^2
+wing_span = 65; % m
+taper_ratio = 0.25;
+quarter_chord_sweep = 26.6; % degrees
+trailing_edge_kink = 0.3; % fraction of wing span
+area_ratio = 0.0939; % cross-sectional area as a proportion of c^2
 
 % simple design
 total_chord = 1 + 1 / taper_ratio;

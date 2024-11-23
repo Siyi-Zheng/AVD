@@ -96,8 +96,11 @@ K_A_landing = (rho / (2 * W_S)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e))
 K_T_landing = (-0.4 * T) / W_landing - mu
 S_B = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing + K_A_landing * V2^2) / (K_T_landing + K_A_landing * V1^2))
 
+K_T_landing_no_TR = (0.1 * T) / W_landing - mu % No thrust reversers contribute to the deceleration
+S_B_no_TR = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing_no_TR + K_A_landing * V2^2) / (K_T_landing_no_TR + K_A_landing * V1^2));
 %Total Landing Distance
 S_landing_total = 1.666 * (S_a + S_F + S_FR + S_B)
+S_landing_total_no_TR = 1.666 * (S_a + S_F + S_FR + S_B_no_TR);
 
 % Display Results
 fprintf('Takeoff Ground Roll Distance (S_g): %.2f m\n', S_g);
@@ -111,4 +114,5 @@ fprintf('Landing Flare Distance (S_F): %.2f m\n', S_F);
 fprintf('Landing Free Roll Distance (S_FR): %.2f m\n', S_FR);
 fprintf('Landing Braking Distance (S_B): %.2f m\n', S_B);
 fprintf('Total Landing Distance: %.2f m\n', S_landing_total);
+fprintf('Total Landing Distance Without Thrust Reversers: %.2f m\n', S_landing_total_no_TR);
 

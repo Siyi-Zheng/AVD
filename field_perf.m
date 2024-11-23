@@ -1,7 +1,6 @@
 % Constants and Aircraft Parameters
 rho = 1.225  %Air density at sea level (kg/m^3)
 S_ref = 482;
-W_S = W/S_ref;  %Wing loading (N/m^2)
 mu = 0.03  %Rolling friction coefficient
 CL = 2.15  %Lift coefficient
 CD_0 = 0.1026  %Zero-lift drag coefficient
@@ -14,9 +13,7 @@ W_landing = 0.85 * W  %Landing weight (N), 85% of MTOW
 V1 = 0  %Inititial velocity (m/s)
 V2 = 1.1 * V_S  %Final velocity for ground roll (m/s)
 L_D = 0.2  %Lift-to-drag ratio
-
-% 4.205 % takeoff
-% 4.233 % landing
+W_S = W/S_ref;  %Wing loading (N/m^2)
 
 % Takeoff Ground Roll Distance Calculation
 K_A = (rho / (2 * W_S)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e));
@@ -77,7 +74,7 @@ h_OBS_landing = 15.24  %Obstacle height for landing (m)
 CD_0 = 0.1424  %Zero-lift drag coefficient during landing
 V_S_landing = sqrt(W_landing/(rho*S_ref*CL_max_landing))  %Adjusted stall speed for landing weight
 V_a = 1.3 * V_S_landing  %Approach speed (m/s)
-gamma_a = deg2rad(2)  %Approach angle (radians)
+gamma_a = deg2rad(3)  %Approach angle (radians)
 V_F = 1.23 * V_S_landing  %Final approach speed (m/s)
 R = (V_F^2) / ((n - 1) * 9.81)  %Radius for flare phase (m)
 h_f = R * (1 - cos(gamma_a))  %Flare height (m)
@@ -92,6 +89,8 @@ S_FR = t_FR * V_TD
 mu = 0.4  %Friction coefficient for braking
 V1 = V_TD
 V2 = 0
+% Braking Distance Without Thrust Reversers
+
 K_A_landing = (rho / (2 * W_S)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e))
 K_T_landing = (-0.4 * T) / W_landing - mu
 S_B = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing + K_A_landing * V2^2) / (K_T_landing + K_A_landing * V1^2))
@@ -115,4 +114,5 @@ fprintf('Landing Free Roll Distance (S_FR): %.2f m\n', S_FR);
 fprintf('Landing Braking Distance (S_B): %.2f m\n', S_B);
 fprintf('Total Landing Distance: %.2f m\n', S_landing_total);
 fprintf('Total Landing Distance Without Thrust Reversers: %.2f m\n', S_landing_total_no_TR);
+
 

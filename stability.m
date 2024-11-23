@@ -90,14 +90,14 @@ Thrust = q * S_w * Cd;
 
 figure; % create plot of CL vs CMcg
 
-for ih = -9.5
+for ih = -3:1:15
     % convert to radians
     ih = ih * pi / 180;
 
     temp_list_cl = []; % stores values for plotting
     temp_list_cmcg = []; % stores values for plotting
 
-    for alpha = 1
+    for alpha = -5:1:20
     % i know this isnt best practice but i dont want to convert all variables to arrays
     % convert to radians
     alpha = alpha * pi / 180;
@@ -105,7 +105,7 @@ for ih = -9.5
         % get coefficients
         Clw = claw * (alpha + iw - alpha_0_w);
         C_L_h = clah * ((alpha + iw - alpha_0_w) * (1 - deda_cruise)...
-            + (ih - iw) - alpha_0_h - alpha_0_w);
+            + (ih - iw) - (alpha_0_h - alpha_0_w));
         C_L = Clw + etah * sh / sw * C_L_h;
         Cmcg = -Clw * ((xacw - xcg) / mac) + CMow + cmaf * alpha - etah * C_L_h...
             * (sh / S_w) * ((xach - xcg) / mac) + hh * Thrust / (q * S_w * mac);

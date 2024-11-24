@@ -102,7 +102,7 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 
 
 % Equation for Wing Weight (Ww)
-CGw = 37.5; % Wing CG location (m)
+CGw = 39; % Wing CG location (m)
 Zw = -1.83;
 Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
@@ -361,7 +361,7 @@ CG_trimtank = 73; % trim tank xcg (m)
 W_iwtank = 55.5; % inner wing tank fuel mass (tons)
 W_ftank = 44.2; % fuselage tank fuel mass (tons)
 W_owtank = 76.4; % outer wing tank fuel mass (tons)
-W_trimtank = 4.824; % trim tank fuel mass (tons)
+W_trimtank = 7.3; % trim tank fuel mass (tons)
 
 CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
 W_fore = (W_iwtank + W_ftank);

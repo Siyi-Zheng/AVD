@@ -66,8 +66,8 @@ L3 = plot(max_mach * ones(size(ALT)), ALT * 3.2808, 'b--', 'LineWidth', 1.5, 'Di
 % Labels and legend
 xlabel('Mach Number',FontSize=14);
 ylabel('Altitude (ft)',FontSize=14);
-title('Specific Excess Power (Ps) Contour',FontSize=16);
-lgd = legend([h,L1(1),L2(1),L3(1)],'Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
+
+lgd = legend([h,L1(1),L2(1),L3(1)],'P_s Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
 lgd.FontSize = 14;
 grid on;
 hold off
@@ -82,8 +82,21 @@ function [D, CD] = DragModel(CD0, K, CL, q, S, MACH)
 
     % Wave drag starts beyond Mach 0.75
     CDw = zeros(size(MACH));
-    CDw(MACH > 0.75) = 0.002 * (MACH(MACH > 0.75) - 0.75).^2;
 
+    % wave drag params
+    l = 77.6;
+    Ko = 1.5; % for an airliner
+    Kf = 1.5;
+    A = 8.77;
+    S = 482;
+    Bstar = 6.34 * 0.785;
+    H = 6.34;
+    Ap = 4;
+    d = 1.13 * (Bstar * H - Ap) ^ 0.5;
+    % equation
+    CDw = Ko * (l/d) ^ (-2) * (9.4 * Kf / ((l/d)^2 * (S/l^2)) +...
+        1.2 * (Kf*S/(A*l^2)) ^ 0.5 * (0.14/0.05)) * (1 + 0.0034 * (3-MACH).^3.5);
+    
     % Total drag coefficient
     CD = CD0 + CDi + CDw;
 

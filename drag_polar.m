@@ -55,7 +55,7 @@ xlabel('Angle of attack (deg)')
 ylabel('Lift coefficient')
 grid on
 set(gca, 'FontSize', 12)
-legend(["NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (cruise)", "NASA SC(2)-0614 (cruise)"], "Location", "northwest")
+legend(["NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (cruise)", "NASA SC(2)-0714 (cruise)"], "Location", "northwest")
 
 % plot the cd vs alpha
 figure(2)
@@ -68,7 +68,7 @@ xlabel('Angle of attack (deg)')
 ylabel('Drag coefficient')
 grid on
 set(gca, 'FontSize', 12)
-legend(["NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (cruise)", "NASA SC(2)-0614 (cruise)"], "Location", "northwest")
+legend(["NASA SC(2)-0614 (landing)", "NASA SC(2)-0714 (landing)", "NASA SC(2)-0614 (cruise)", "NASA SC(2)-0714 (cruise)"], "Location", "northwest")
 
 % plot cl/cd vs alpha
 figure(3)

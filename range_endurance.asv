@@ -1,0 +1,10 @@
+clc
+clear
+
+% we have to keep mwf same as before
+MWF = [0.9700    0.9850    0.6225    0.9900    0.9850    0.9873    0.9844    0.9900    0.9950]; 
+% get (L/D)_max from updated aero calcs
+L_D_max = 19.22; % i think this was right???
+
+
+% get 

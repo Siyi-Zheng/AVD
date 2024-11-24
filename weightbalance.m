@@ -1,12 +1,13 @@
 clc
 clear
+close all
 
 % Weight & Balance Estimation for Transport Aircraft
 
 % Variable Definitions:
 A = 8.77; %- Wing aspect ratio (unitless)
 Ah = 5.8; %- Horizontal tailplane aspect ratio (unitless)
-Av = 5.8; %- Vertical tailplane aspect ratio (unitless)
+Av = 2*1.6; %- Vertical tailplane aspect ratio (unitless)
 Afc = 3887.9244; %- Cargo hold floor area (ft^2), set to 0 initially, replace with actual value
 Bw = 213.2; %- Wing span (ft), set to 0 initially, replace with actual value
 Bh = 51; % - Horizontal tailplane span (ft)
@@ -335,7 +336,7 @@ ZCGtotal = (Ww * Zw + Wht * Zht + Wvt * Zvt + Wfus * Zfus + Wmlg * Zmlg + ...
 disp(['Total z_cg (empty): ', num2str(ZCGtotal), ' m']);
 
 % add fuel, pax, luggage
-Wfuel = 170; % tons
+Wfuel = 176; % tons
 Wpax = 38.7; % tons
 Wluggage = 9.42; % tons
 
@@ -361,7 +362,7 @@ CG_trimtank = 73; % trim tank xcg (m)
 W_iwtank = 55.5; % inner wing tank fuel mass (tons)
 W_ftank = 44.2; % fuselage tank fuel mass (tons)
 W_owtank = 76.4; % outer wing tank fuel mass (tons)
-W_trimtank = 4.824; % trim tank fuel mass (tons)
+W_trimtank = 3.1; % trim tank fuel mass (tons)
 
 CG_fore = (CG_iwtank * W_iwtank + CG_ftank * W_ftank) / (W_iwtank + W_ftank);
 W_fore = (W_iwtank + W_ftank);
@@ -371,29 +372,29 @@ CGfuel = (CG_iwtank * W_iwtank + CG_ftank * W_ftank + CG_owtank *...
     + W_owtank + W_trimtank);
 
 CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
-    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_fore + Wpax + Wluggage);
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_fore + Wpax + Wluggage)
 
 CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
-    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
+    * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage)
 
-CGtotal_full = (Wtotal_tons * CGtotal + Wfuel * CGfuel + Wpax * CGpax...
-    + Wluggage * CGluggage) / Wtotal_full;
+CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) * CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) / (Wtotal_full + W_trimtank);
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
 CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
     / (Wtotal_tons + W_trimtank);
 
 zCGtotal_full = (Wtotal_tons * ZCGtotal + Wfuel * Zfuel + Wpax * Zpax...
-    + Wluggage * Zluggage) / Wtotal_full;
+    + Wluggage * Zluggage) / (Wtotal_full + W_trimtank);
 disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 
 %plotting the CG envelope
 
-W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage;
+W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage + W_trimtank;
 CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start;
 disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']);
 
-W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage;
+W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage+ W_trimtank ;
 CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.625*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
 disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
  
@@ -402,9 +403,10 @@ disp(['Total Weight (no fuel): ', num2str(Wtotal_nofuel), ' tons']);
 CGtotal_nofuel = (Wtotal_tons * CGtotal + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_nofuel;
 disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
 
-
-
-
+% figure
+% plot(W_trimtank, abs(CGfuel-CGtotal_nofuel), LineWidth=2)
+% xlabel('trim tank mass (Kg)')
+% ylabel('difference between cg with no fuel and cg full')
 
 figure
 scatter(CG_cruise_start, W_cruise_start, 'green')

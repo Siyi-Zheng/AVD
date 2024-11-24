@@ -220,7 +220,7 @@ plot(x_te(1:3101), front_spar(1:3101), 'r-', 'LineWidth', 1.5, 'DisplayName', 'S
 plot(x_te(1:3217), rear_spar(1:3217), 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
 plot(-x_te(1:3101), front_spar(1:3101), 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
 plot(-x_te(1:3217), rear_spar(1:3217), 'r-', 'LineWidth', 1.5, 'HandleVisibility', 'off');
-plot([-9.75 , 9.75] , [rear_spar(976) , rear_spar(976)] , 'r-', 'LineWidth', 1, 'HandleVisibility', 'off');
+plot([-9.75 , 9.75] , [rear_spar(976) , rear_spar(976)] , 'r-', 'LineWidth', 1, 'DisplayName' , 'Secondary Spar');
 
 % Plotting heavy ribs
 plot(rib_1(1,:) , rib_1(2,:) , 'g-' , 'LineWidth', 1.5 , 'DisplayName', 'Heavy Ribs')

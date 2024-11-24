@@ -15,7 +15,7 @@ AR = 8.77;                    % Aspect Ratio
 e = 0.85;                     % Oswald Efficiency
 W = 390000 * g;              % Weight [N]
 S = 482;                     % Wing reference area in square meters
-CD0 = 0.0161;                % Zero-lift drag coefficient
+CD0 = 0.0162;                % Zero-lift drag coefficient
 K = 1 / (pi * AR * e);       % Induced drag factor
 T_sl = Ne * 295.8 * 1000;   % Sea-level static thrust [N]
 
@@ -33,7 +33,7 @@ q = 0.5 * rho .* V.^2;
 CL = (W ./ (q * S));                       % Required lift coefficient
 
 % Drag Model
-[D, CD] = DragModel(CD0, K, CL, q, S, MACH);
+[D, CD, CDw] = DragModel(CD0, K, CL, q, S, MACH);
 
 % Thrust Lapse Model
 [tau,B1,B2] = ThrustLapse(ALT, MACH, BPR); 
@@ -76,27 +76,17 @@ hold off
 
 
 %% Drag Model Function
-function [D, CD] = DragModel(CD0, K, CL, q, S, MACH)
+function [D, CD, CDw] = DragModel(CD0, K, CL, q, S, MACH)
     % Induced drag
     CDi = K * CL.^2;
 
     % Wave drag starts beyond Mach 0.75
     CDw = zeros(size(MACH));
 
-    % wave drag params
-    l = 77.6;
-    Ko = 1.5; % for an airliner
-    Kf = 1.5;
-    A = 8.77;
-    S = 482;
-    Bstar = 6.34 * 0.785;
-    H = 6.34;
-    Ap = 4;
-    d = 1.13 * (Bstar * H - Ap) ^ 0.5;
-    % equation
-    CDw = Ko * (l/d) ^ (-2) * (9.4 * Kf / ((l/d)^2 * (S/l^2)) +...
-        1.2 * (Kf*S/(A*l^2)) ^ 0.5 * (0.14/0.05)) * (1 + 0.0034 * (3-MACH).^3.5);
-    
+    % wave drag
+    M_crit = 0.733; % critical mach number
+    CDw = 20 * (max(0, MACH - M_crit)) .^ 4;
+     
     % Total drag coefficient
     CD = CD0 + CDi + CDw;
 

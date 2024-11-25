@@ -32,7 +32,7 @@ endurance_loiter = (1/sfc_loiter) * L_D_loiter * log(1/mwf_loiter);
 
 % max fuel, zero payload
 W_max = 390000;
-W_empty = 138313; % tons - 138383 for low-mass version, 165880 if we are going for the 390 tonnes
+W_empty = 138313; % tons
 W_fuel_cruise = W_max * prod(MWF(1:2)) * (1 - MWF(3));
 W_post_cruise = W_empty / prod(MWF(4:end));
 W_pre_cruise = W_post_cruise + W_fuel_cruise;
@@ -48,9 +48,9 @@ range_maxfuel = max(range_cruise1, V_cruise1 * (1/sfc_cruise) * L_D_cruise * ...
 
 % range plot
 figure;
-plot([0 range_maxfuel], [W_payload W_payload] / 1000, "k")
+plot([0 range_maxfuel], [W_payload W_payload], "k")
 hold on
-plot([range_maxfuel range_fuelonly], [W_payload 0]/1000, "k")
+plot([range_maxfuel range_fuelonly], [W_payload 0], "k")
 xline(7500, "--")
 xlabel("Cruise Range (nmi)")
 ylabel("Payload mass (tonnes)")

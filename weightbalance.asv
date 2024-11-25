@@ -103,7 +103,7 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 
 
 % Equation for Wing Weight (Ww)
-CGw = 41.5; % Wing CG location (m)
+CGw = 42.2; % Wing CG location (m)
 Zw = -1.83;
 Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight

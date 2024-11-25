@@ -31,8 +31,8 @@ endurance_loiter = (1/sfc_loiter) * L_D_loiter * log(1/mwf_loiter);
 % do the payload graph thing
 
 % max fuel, zero payload
-W_max = 390000;
-W_empty = 138313; % tons - 138383 for low-mass version, 165880 if we are going for the 390 tonnes
+W_max = 353385;
+W_empty = 142971; % kg
 W_fuel_cruise = W_max * prod(MWF(1:2)) * (1 - MWF(3));
 W_post_cruise = W_empty / prod(MWF(4:end));
 W_pre_cruise = W_post_cruise + W_fuel_cruise;
@@ -54,4 +54,5 @@ plot([range_maxfuel range_fuelonly], [W_payload 0]/1000, "k")
 xline(7500, "--")
 xlabel("Cruise Range (nmi)")
 ylabel("Payload mass (tonnes)")
+legend("Aircraft Cruise Range Envelope", "", "Cruise Range Requirement")
 grid on

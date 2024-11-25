@@ -4,9 +4,9 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
-xcg = 38.7282; % aircraft cg
+xcg = 38.12; % aircraft cg
 claw = 5.581; % wing lift curve slope
-xacw = 37.5; % aero centre of wing
+xacw = 41.5; % aero centre of wing
 kf = 1.4; % some bullshit constant
 lf = 77.82; % fuselage length
 wf = 6.34; % fuselage width

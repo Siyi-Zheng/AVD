@@ -1,18 +1,18 @@
 % Constants and Aircraft Parameters
-rho = 1.225  %Air density at sea level (kg/m^3)
+rho = 1.225;  %Air density at sea level (kg/m^3)
 S_ref = 482;
-mu = 0.03  %Rolling friction coefficient
-CL = 2.15  %Lift coefficient
-CD_0 = 0.1026  %Zero-lift drag coefficient
-AR = 8.77  %Aspect ratio
-e = 0.95  %Oswald efficiency factor
-T = 1123e3  %Thrust (N)
-V_S = 70.621  %Stall speed (m/s)
-W = 390000*9.81  %Aircraft weight (N)
-W_landing = 0.85 * W  %Landing weight (N), 85% of MTOW
-V1 = 0  %Inititial velocity (m/s)
-V2 = 1.1 * V_S  %Final velocity for ground roll (m/s)
-L_D = 0.2  %Lift-to-drag ratio
+mu = 0.03;  %Rolling friction coefficient
+CL = 2.15;  %Lift coefficient
+CD_0 = 0.1026;  %Zero-lift drag coefficient
+AR = 8.77;  %Aspect ratio
+e = 0.85;  %Oswald efficiency factor
+T = 1123e3;  %Thrust (N)
+V_S = 70.621;  %Stall speed (m/s)
+W = 390000*9.81;  %Aircraft weight (N)
+W_landing = 0.85 * W;  %Landing weight (N), 85% of MTOW
+V1 = 0;  %Inititial velocity (m/s)
+V2 = 1.1 * V_S;  %Final velocity for ground roll (m/s)
+L_D = 17;  %Lift-to-drag ratio
 W_S = W/S_ref;  %Wing loading (N/m^2)
 
 % Takeoff Ground Roll Distance Calculation
@@ -69,36 +69,39 @@ G = gamma_CL - gamma_min;
 BFL = 0.863 / (1 + 2.3 * G) * (W_S / (rho * 9.81 * CL_climb + h_OBS) * (1 / ((T_dash / W) - U) + 2.7)) + 655 / sqrt(sigma);
 
 %Landing Parameters with Updated Obstacle Height (50 ft = 15.24 m)
-CL_max_landing = 2.85 
-h_OBS_landing = 15.24  %Obstacle height for landing (m)
-CD_0 = 0.1424  %Zero-lift drag coefficient during landing
-V_S_landing = sqrt(W_landing/(rho*S_ref*CL_max_landing))  %Adjusted stall speed for landing weight
-V_a = 1.3 * V_S_landing  %Approach speed (m/s)
-gamma_a = deg2rad(3)  %Approach angle (radians)
-V_F = 1.23 * V_S_landing  %Final approach speed (m/s)
-R = (V_F^2) / ((n - 1) * 9.81)  %Radius for flare phase (m)
-h_f = R * (1 - cos(gamma_a))  %Flare height (m)
+CL_max_landing = 2.85; 
+h_OBS_landing = 15.24;  %Obstacle height for landing (m)
+CD_0 = 0.1424 + 0.05;  %Zero-lift drag coefficient during landing with spoilers
+V_S_landing = sqrt(W_landing/(rho*S_ref*CL_max_landing));  %Adjusted stall speed for landing weight
+V_a = 1.3 * V_S_landing;  %Approach speed (m/s)
+gamma_a = deg2rad(3);  %Approach angle (radians)
+V_F = 1.23 * V_S_landing;  %Final approach speed (m/s)
+R = (V_F^2) / ((n - 1) * 9.81);  %Radius for flare phase (m)
+h_f = R * (1 - cos(gamma_a));  %Flare height (m)
 
-S_a = (h_OBS_landing - h_f) / tan(gamma_a)
-S_F = R * sin(gamma_a)
+S_a = (h_OBS_landing - h_f) / tan(gamma_a);
+S_F = R * sin(gamma_a);
 
 %Free Roll and Braking Distance
-V_TD = 1.15 * V_S %V_S_landing  # Touchdown speed (m/s)
-t_FR = 2  %Free roll time (s)
-S_FR = t_FR * V_TD
-mu = 0.4  %Friction coefficient for braking
-V1 = V_TD
-V2 = 0
+V_TD = 1.15 * V_S; %V_S_landing  # Touchdown speed (m/s)
+t_FR = 2;  %Free roll time (s)
+S_FR = t_FR * V_TD;
+mu = 0.4;  %Friction coefficient for braking
+V1 = V_TD;
+V2 = 0;
+W_S_landing = W_landing / S_ref; % wing loading at landing
+
 % Braking Distance Without Thrust Reversers
+CL_req = W_S_landing / (0.5 * rho * V_TD^2); % make CL low enough so the plane doesn't take off
+CL = 0;
+K_A_landing = (rho / (2 * W_S_landing)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e));
+K_T_landing = (-0.4 * T) / W_landing - mu;
+S_B = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing + K_A_landing * V2^2) / (K_T_landing + K_A_landing * V1^2));
 
-K_A_landing = (rho / (2 * W_S)) * (mu * CL - CD_0 - (CL^2) / (pi * AR * e))
-K_T_landing = (-0.4 * T) / W_landing - mu
-S_B = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing + K_A_landing * V2^2) / (K_T_landing + K_A_landing * V1^2))
-
-K_T_landing_no_TR = (0.1 * T) / W_landing - mu % No thrust reversers contribute to the deceleration
+K_T_landing_no_TR = (0.1 * T) / W_landing - mu; % No thrust reversers contribute to the deceleration
 S_B_no_TR = (1 / (2 * 9.81 * K_A_landing)) * log((K_T_landing_no_TR + K_A_landing * V2^2) / (K_T_landing_no_TR + K_A_landing * V1^2));
 %Total Landing Distance
-S_landing_total = 1.666 * (S_a + S_F + S_FR + S_B)
+S_landing_total = 1.666 * (S_a + S_F + S_FR + S_B);
 S_landing_total_no_TR = 1.666 * (S_a + S_F + S_FR + S_B_no_TR);
 
 % Display Results
@@ -112,6 +115,7 @@ fprintf('Landing Approach Distance (S_a): %.2f m\n', S_a);
 fprintf('Landing Flare Distance (S_F): %.2f m\n', S_F);
 fprintf('Landing Free Roll Distance (S_FR): %.2f m\n', S_FR);
 fprintf('Landing Braking Distance (S_B): %.2f m\n', S_B);
+fprintf('Landing Braking Distance - no TR (S_B_no_TR): %.2f m\n', S_B_no_TR);
 fprintf('Total Landing Distance: %.2f m\n', S_landing_total);
 fprintf('Total Landing Distance Without Thrust Reversers: %.2f m\n', S_landing_total_no_TR);
 

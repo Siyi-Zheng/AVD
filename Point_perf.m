@@ -15,7 +15,7 @@ AR = 8.77;                    % Aspect Ratio
 e = 0.85;                     % Oswald Efficiency
 W = 390000 * g;              % Weight [N]
 S = 482;                     % Wing reference area in square meters
-CD0 = 0.0161;                % Zero-lift drag coefficient
+CD0 = 0.0162;                % Zero-lift drag coefficient
 K = 1 / (pi * AR * e);       % Induced drag factor
 T_sl = Ne * 295.8 * 1000;   % Sea-level static thrust [N]
 
@@ -33,7 +33,7 @@ q = 0.5 * rho .* V.^2;
 CL = (W ./ (q * S));                       % Required lift coefficient
 
 % Drag Model
-[D, CD] = DragModel(CD0, K, CL, q, S, MACH);
+[D, CD, CDw] = DragModel(CD0, K, CL, q, S, MACH);
 
 % Thrust Lapse Model
 [tau,B1,B2] = ThrustLapse(ALT, MACH, BPR); 
@@ -66,8 +66,8 @@ L3 = plot(max_mach * ones(size(ALT)), ALT * 3.2808, 'b--', 'LineWidth', 1.5, 'Di
 % Labels and legend
 xlabel('Mach Number',FontSize=14);
 ylabel('Altitude (ft)',FontSize=14);
-title('Specific Excess Power (Ps) Contour',FontSize=16);
-lgd = legend([h,L1(1),L2(1),L3(1)],'Ps Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
+
+lgd = legend([h,L1(1),L2(1),L3(1)],'P_s Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
 lgd.FontSize = 14;
 grid on;
 hold off
@@ -76,14 +76,17 @@ hold off
 
 
 %% Drag Model Function
-function [D, CD] = DragModel(CD0, K, CL, q, S, MACH)
+function [D, CD, CDw] = DragModel(CD0, K, CL, q, S, MACH)
     % Induced drag
     CDi = K * CL.^2;
 
     % Wave drag starts beyond Mach 0.75
     CDw = zeros(size(MACH));
-    CDw(MACH > 0.75) = 0.002 * (MACH(MACH > 0.75) - 0.75).^2;
 
+    % wave drag
+    M_crit = 0.733; % critical mach number
+    CDw = 20 * (max(0, MACH - M_crit)) .^ 4;
+     
     % Total drag coefficient
     CD = CD0 + CDi + CDw;
 

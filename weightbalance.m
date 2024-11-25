@@ -138,7 +138,7 @@ Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * 
 CGvt = 71.1;
 Zvt = 4.64;
 Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
-    Kz ^ 0.875 * Av ^ 0.35 * Lvt ^ -0.5 * cos(Lambda_vt) * (tc_rootv) ^ -0.5;
+    Kz ^ 0.875 * Av ^ 0.35 / (Lvt ^ 0.5 * cos(Lambda_vt) * (tc_rootv) ^ 0.5);
 % Comment: Replace variables for accurate vertical tail weight estimation.
 
 % Continue defining

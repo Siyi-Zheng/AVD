@@ -347,7 +347,7 @@ disp(['Total Weight (full): ', num2str(Wtotal_full), ' tons']);
 % get cg
 CGfuel = CGfs; % m
 CGpax = 40; % m
-CGluggage = 40; % m
+CGluggage = 37; % m
 Zfuel = Zfs;
 Zpax = 0.5;
 Zluggage = -0.5;
@@ -407,6 +407,8 @@ disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
 % plot(W_trimtank, abs(CGfuel-CGtotal_nofuel), LineWidth=2)
 % xlabel('trim tank mass (Kg)')
 % ylabel('difference between cg with no fuel and cg full')
+
+
 
 figure
 scatter(CG_cruise_start, W_cruise_start, 'green')

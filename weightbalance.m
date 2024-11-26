@@ -5,6 +5,7 @@ close all
 % Weight & Balance Estimation for Transport Aircraft
 
 % Variable Definitions:
+mac=7.4;
 A = 8.77; %- Wing aspect ratio (unitless)
 Ah = 5.8; %- Horizontal tailplane aspect ratio (unitless)
 Av = 2*1.6; %- Vertical tailplane aspect ratio (unitless)
@@ -103,7 +104,11 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 
 
 % Equation for Wing Weight (Ww)
+<<<<<<< Updated upstream
 CGw = 41.5; % Wing CG location (m)
+=======
+CGw = 37.5; % Wing CG location (m)
+>>>>>>> Stashed changes
 Zw = -1.83;
 Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
@@ -377,8 +382,8 @@ CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
 CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
     * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
 
-CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) * CGfuel + Wpax * CGpax...
-    + Wluggage * CGluggage) / (Wtotal_full + W_trimtank);
+CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) .* CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) ./ (Wtotal_full + W_trimtank);
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
 CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
@@ -391,17 +396,28 @@ disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 %plotting the CG envelope
 
 W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage + W_trimtank;
-CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start;
-disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']);
+CG_cruise_start= (Wtotal_tons * CGtotal + (0.97*0.985*Wfuel + W_trimtank) * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start;
+disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']); %assuming symmetric fuel burn
+
+W_cruise_start_fore= Wtotal_tons + 0.97*0.985*W_owtank + Wpax + Wluggage + W_trimtank + W_fore;
+CG_cruise_start_fore= (Wtotal_tons * CGtotal + (0.97*0.985*W_owtank + W_trimtank + W_fore) * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start_fore;
+disp(['Total CG (cruise start fore): ', num2str(CG_cruise_start_fore), ' m']); %assuming symmetric fuel burn
 
 W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage+ W_trimtank ;
-CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.625*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
+CG_cruise_end= (Wtotal_tons * CGtotal + (0.97*0.985*0.625*Wfuel + W_trimtank) * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
 disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
+
+W_cruise_end_fore= Wtotal_tons + 0.97*0.985*0.6225*W_owtank + Wpax + Wluggage+ W_trimtank +W_fore ;
+CG_cruise_end_fore= (Wtotal_tons * CGtotal + (0.97*0.985*0.625*W_owtank + W_trimtank +W_fore) * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end_fore;
+disp(['Total CG (cruise end fore): ', num2str(CG_cruise_end_fore), ' m']);
  
 Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage;
 disp(['Total Weight (no fuel): ', num2str(Wtotal_nofuel), ' tons']);
 CGtotal_nofuel = (Wtotal_tons * CGtotal + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_nofuel;
 disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
+
+W_fuel_nopass= Wtotal_tons + Wfuel + W_trimtank;
+CG_fuel_nopass = (Wtotal_tons * CGtotal + (Wfuel + W_trimtank) * CGfuel) / W_fuel_nopass;
 
 % figure
 % plot(W_trimtank, abs(CGfuel-CGtotal_nofuel), LineWidth=2)
@@ -411,11 +427,21 @@ disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
 
 
 figure
-scatter(CG_cruise_start, W_cruise_start, 'green')
+% scatter(((CGtotal-LE_mac)/mac)*100, Wtotal_tons,'cyan') %empty weight
 hold on
-scatter(CG_cruise_end, W_cruise_end, 'blue')
-scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')
-scatter(CGtotal_full, Wtotal_full, 'magenta')
+% scatter(((CGtotal_full-LE_mac)/mac)*100, Wtotal_full+ W_trimtank, 'blue') %max payload+ fuel
+% scatter(((CGtotal_nofuel-LE_mac)/mac)*100, Wtotal_nofuel, 'red') %payload+ no fuel
+% scatter(((CG_fuel_nopass-LE_mac)/mac)*100, W_fuel_nopass, 'magenta') 
+xline(((CG_fuelled_aft-LE_mac)/mac)*100)
+xline(((CG_fuelled_front-LE_mac)/mac)*100)
+scatter(((CG_cruise_start-LE_mac)/mac)*100, W_cruise_start)
+scatter(((CG_cruise_start_fore-LE_mac)/mac)*100, W_cruise_start_fore)
+scatter(((CG_cruise_end-LE_mac)/mac)*100, W_cruise_end)
+yline(Wtotal_full+ W_trimtank)
+yline(Wtotal_tons)
+text(mean(xlim),Wtotal_full+W_trimtank+10,'MTOW')
+text(mean(xlim),Wtotal_tons+10,'We')
+hold off
 
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)

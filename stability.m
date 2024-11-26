@@ -4,7 +4,11 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
+<<<<<<< Updated upstream
 xcg = 38.12; % aircraft cg
+=======
+xcg = 38.57; % aircraft cg
+>>>>>>> Stashed changes
 claw = 5.581; % wing lift curve slope
 xacw = 41.5; % aero centre of wing
 kf = 1.4; % some bullshit constant
@@ -21,7 +25,7 @@ hh = 1.55; % vertical position of hstab
 xach = 74.1; % aero centre of hstab
 lh = xach - xacw; % distance between wing c/4 and hstab c/4
 sweep = 26.6; % quarter chord sweep
-sh = 94; % hstab area
+sh = 80; % hstab area
 
 Cmoairf = -0.131; %X-FOIL incompressible airfoil zero lift pitching moment
 compressibility_factor_cruise = 1.350; %compressibility factor at cruise conditon

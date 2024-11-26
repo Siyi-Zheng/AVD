@@ -103,9 +103,9 @@ Kws = 0.75 * ((1 + 2 * lambda) / (1 + lambda)) * Bw * tan(Lambda) / L; % - Wing 
 
 
 % Equation for Wing Weight (Ww)
-CGw = 41.5; % Wing CG location (m)
+CGw = 35; % Wing CG location (m)
 Zw = -1.83;
-Ww = (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
+Ww = 1.05 * (0.78 * 0.0051 * (Wdg * Nz) ^ 0.557 * Sw ^ 0.649 * A ^ 0.5 * (1 + lambda) ^ 0.1 * ...
     Scsw ^ 0.1 )/ (cos(Lambda) * (tc_root) ^ 0.4); % Wing Weight
 % Comment: Replace variables with actual values as needed.
 
@@ -124,7 +124,7 @@ W_engines = Nen * Wen;
 % Lambda_ht = 0; % Horizontal tail quarter-chord sweep (radians)
 CGht = 72.1;
 Zht = 1.55;
-Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
+Wht = 1.05 * 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * ...
     Ah ^ 0.166 * (1 + Se / Sht) ^ 0.1 / ((1 + Fw / Bh) ^ 0.25 * Lht * cos(Lambda_ht));
 % Comment: Replace with actual values for Wht calculation.
 
@@ -137,7 +137,7 @@ Wht = 0.75 * 0.0379 * Kuht * Wdg ^ 0.639 * Nz ^ 0.1 * Sht ^ 0.75 * Ky ^ 0.704 * 
 % tc_rootv = 0; % Vertical tail root thickness-to-chord ratio
 CGvt = 71.1;
 Zvt = 4.64;
-Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
+Wvt = 1.05 * 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 * ...
     Kz ^ 0.875 * Av ^ 0.35 / (Lvt ^ 0.5 * cos(Lambda_vt) * (tc_rootv) ^ 0.5);
 % Comment: Replace variables for accurate vertical tail weight estimation.
 
@@ -149,7 +149,7 @@ Wvt = 0.75 * 0.0026 * (1 + HtHv) ^ 0.225 * Wdg ^ 0.556 * Nz ^ 0.536 * Svt ^ 0.5 
 % L_D = 0; % Lift-to-drag ratio, typically 10-20 for transport aircraft
 CGfus = L * 0.435 / 3.281;
 Zfus = 0;
-Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
+Wfus = 1.05 * 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * ...
     (1 + Kws) ^ 0.04 * (L/D) ^ 0.1;
 % Comment: Replace variables with actual values for fuselage weight.
 
@@ -160,7 +160,7 @@ Wfus = 0.85 * 0.3280 * Kdoor * KLg * (Wdg * Nz) ^ 0.5 * L ^ 0.25 * Sf ^ 0.302 * 
 % Vs = 0; % Landing stall speed (ft/s)
 CGmlg = 43;
 Zmlg = -6.33;
-Wmlg = 0.88 * 0.0106 * Kmp * Wl ^ 0.888 * Nl ^ 0.25 * Lm ^ 0.4 *Nmw^0.321 * Vs ^ 0.1 / (Nmss ^ 0.5);
+Wmlg = 1.05 * 0.88 * 0.0106 * Kmp * Wl ^ 0.888 * Nl ^ 0.25 * Lm ^ 0.4 *Nmw^0.321 * Vs ^ 0.1 / (Nmss ^ 0.5);
 % Comment: Replace values for main landing gear weight.
 
 % 6. Nose Landing Gear Weight (Wnlg)
@@ -168,7 +168,7 @@ Wmlg = 0.88 * 0.0106 * Kmp * Wl ^ 0.888 * Nl ^ 0.25 * Lm ^ 0.4 *Nmw^0.321 * Vs ^
 % Nnw = 0; % Number of nose wheels
 CGnlg = 7;
 Znlg = -6.33;
-Wnlg = 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
+Wnlg = 1.05 * 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
 % Comment: Replace variables with actual values for nose landing gear weight.
 
 % 7. Nacelle Weight (Winl)
@@ -178,7 +178,7 @@ Wnlg = 0.88 * 0.032 * Knp * Wl ^ 0.646 * Nl ^ 0.2 * Ln ^ 0.5 * Nnw ^ 0.45;
 % Sn = 0; % Nacelle wetted area (ft^2)
 CGinl = CGw - 1.4;
 Zinl = Zeng;
-Winl = 0.85 * 0.6724 * Kng * NLt ^ 0.1 * Nw ^ 0.294 * Nz ^ 0.119 * Wenc ^ 0.611 *Nen^0.984* Sn ^ 0.224;
+Winl = 1.05 * 0.85 * 0.6724 * Kng * NLt ^ 0.1 * Nw ^ 0.294 * Nz ^ 0.119 * Wenc ^ 0.611 *Nen^0.984* Sn ^ 0.224;
 % Comment: Replace values for nacelle weight.
 
 % 8. Engine Controls Weight (Wec)
@@ -308,7 +308,7 @@ disp(['Military Handling Gear Weight (Whg_military): ', num2str(Whg_military*0.4
 disp(['Engine Weight (W_engines): ', num2str(W_engines*0.453592)]);
 
 % get total weight
-Wtotal = (Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl) * 1.05 + Wec + Wes + Wfs + ...
+Wtotal = Ww + Wht + Wvt + Wfus + Wmlg + Wnlg + Winl + Wec + Wes + Wfs + ...
     Wfc + WAPUinst + Winstr + Whydr + Wel + Wav + Wfurn + Wac + Wai + ...
     Whg_civilian + Whg_military + W_engines;
 
@@ -346,17 +346,17 @@ disp(['Total Weight (full): ', num2str(Wtotal_full), ' tons']);
 
 % get cg
 CGfuel = CGfs; % m
-CGpax = 40; % m
-CGluggage = 40; % m
+CGpax = CGfus; % m
+CGluggage = CGfus; % m
 Zfuel = Zfs;
 Zpax = 0.5;
 Zluggage = -0.5;
 
 
 %==================== FUEL TANK DISTRIBUTION ==============================
-CG_iwtank = 36.553; % inner wing tank xcg (m)
-CG_ftank = 33.39; % fuselage tank xcg (m)
-CG_owtank = 42.01; % outer wing tank xcg (m)
+CG_iwtank = CGw - 39.6 + 36.553; % inner wing tank xcg (m)
+CG_ftank = CGw - 39.6 + 33.39 + 5; % fuselage tank xcg (m)
+CG_owtank = CGw - 39.6 + 42.01; % outer wing tank xcg (m)
 CG_trimtank = 73; % trim tank xcg (m)
 
 W_iwtank = 55.5; % inner wing tank fuel mass (tons)
@@ -390,12 +390,14 @@ disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 
 %plotting the CG envelope
 
-W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage + W_trimtank;
-CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start;
+W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage;
+CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax...
+    * CGpax + Wluggage * CGluggage) / W_cruise_start;
 disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']);
 
-W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage+ W_trimtank ;
-CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.625*Wfuel * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
+W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage;
+CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.6225*Wfuel * CGfuel...
+    + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
 disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
  
 Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage;
@@ -414,6 +416,7 @@ hold on
 scatter(CG_cruise_end, W_cruise_end, 'blue')
 scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')
 scatter(CGtotal_full, Wtotal_full, 'magenta')
+legend("Cruise Start", "Cruise End", "0% Fuel", "100% Fuel")
 
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)

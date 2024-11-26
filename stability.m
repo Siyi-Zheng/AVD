@@ -4,9 +4,9 @@ close all
 % longitudinal static stability
 
 mac = 7.4; % aircraft mean aero chord
-xcg = 38.12; % aircraft cg
+xcg = 34.79; % aircraft cg
 claw = 5.581; % wing lift curve slope
-xacw = 41.5; % aero centre of wing
+xacw = 35; % aero centre of wing
 kf = 1.4; % some bullshit constant
 lf = 77.82; % fuselage length
 wf = 6.34; % fuselage width
@@ -21,7 +21,7 @@ hh = 1.55; % vertical position of hstab
 xach = 74.1; % aero centre of hstab
 lh = xach - xacw; % distance between wing c/4 and hstab c/4
 sweep = 26.6; % quarter chord sweep
-sh = 94; % hstab area
+sh = 50; % hstab area
 
 Cmoairf = -0.131; %X-FOIL incompressible airfoil zero lift pitching moment
 compressibility_factor_cruise = 1.350; %compressibility factor at cruise conditon
@@ -90,14 +90,14 @@ Thrust = q * S_w * Cd;
 
 figure; % create plot of CL vs CMcg
 
-for ih = -3:1:15
+for ih = -3
     % convert to radians
     ih = ih * pi / 180;
 
     temp_list_cl = []; % stores values for plotting
     temp_list_cmcg = []; % stores values for plotting
 
-    for alpha = -5:1:20
+    for alpha = 1.5
     % i know this isnt best practice but i dont want to convert all variables to arrays
     % convert to radians
     alpha = alpha * pi / 180;
@@ -119,6 +119,8 @@ for ih = -3:1:15
     plot(temp_list_cl, temp_list_cmcg, '-x', color="black");
     hold on;
 end
-
-% trimmed state (cruise) = ih = -9.5 (!!!), alpha = 1. In this case, CLh =
-% -0.2405, CLw = 0.5650, CL = 0.5344
+grid on
+xline(0.53, "--")
+yline(0, "--")
+xlabel("C_L")
+ylabel("C_{M_{cg}}")

@@ -5,6 +5,7 @@ close all
 % Weight & Balance Estimation for Transport Aircraft
 
 % Variable Definitions:
+mac=7.4;
 A = 8.77; %- Wing aspect ratio (unitless)
 Ah = 5.8; %- Horizontal tailplane aspect ratio (unitless)
 Av = 2*1.6; %- Vertical tailplane aspect ratio (unitless)
@@ -377,8 +378,8 @@ CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
 CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
     * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
 
-CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) * CGfuel + Wpax * CGpax...
-    + Wluggage * CGluggage) / (Wtotal_full + W_trimtank);
+CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) .* CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) ./ (Wtotal_full + W_trimtank);
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
 CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
@@ -399,19 +400,28 @@ W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage;
 CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.6225*Wfuel * CGfuel...
     + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
 disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
+
+W_cruise_end_fore= Wtotal_tons + 0.97*0.985*0.6225*W_owtank + Wpax + Wluggage+ W_trimtank +W_fore ;
+CG_cruise_end_fore= (Wtotal_tons * CGtotal + (0.97*0.985*0.625*W_owtank + W_trimtank +W_fore) * CGfuel + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end_fore;
+disp(['Total CG (cruise end fore): ', num2str(CG_cruise_end_fore), ' m']);
  
 Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage;
 disp(['Total Weight (no fuel): ', num2str(Wtotal_nofuel), ' tons']);
 CGtotal_nofuel = (Wtotal_tons * CGtotal + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_nofuel;
 disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
 
+W_fuel_nopass= Wtotal_tons + Wfuel + W_trimtank;
+CG_fuel_nopass = (Wtotal_tons * CGtotal + (Wfuel + W_trimtank) * CGfuel) / W_fuel_nopass;
+
 % figure
 % plot(W_trimtank, abs(CGfuel-CGtotal_nofuel), LineWidth=2)
 % xlabel('trim tank mass (Kg)')
 % ylabel('difference between cg with no fuel and cg full')
 
+
+
 figure
-scatter(CG_cruise_start, W_cruise_start, 'green')
+% scatter(((CGtotal-LE_mac)/mac)*100, Wtotal_tons,'cyan') %empty weight
 hold on
 scatter(CG_cruise_end, W_cruise_end, 'blue')
 scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')

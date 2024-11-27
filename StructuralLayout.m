@@ -310,9 +310,13 @@ te_root = -3 * root_chord / 4;
 figure
 clf
 hold on
-plot([0, wing_span / 2], [0, qcy], 'r--', 'LineWidth', 1)
 plot([0, wing_span / 2], [le_root, le_tip], 'k-', 'LineWidth', 1)
 plot([0, wing_span / 2], [te_root, te_tip], 'k-', 'LineWidth', 1)
-plot([0, 0], [le_root, te_root], 'k-', 'LineWidth', 1)
 plot([wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1)
+plot(-[0, wing_span / 2], [0, qcy], 'r--', 'LineWidth', 1)
+plot(-[0, wing_span / 2], [le_root, le_tip], 'k-', 'LineWidth', 1)
+plot(-[0, wing_span / 2], [te_root, te_tip], 'k-', 'LineWidth', 1)
+plot(-[wing_span / 2, wing_span / 2], [le_tip, te_tip], 'k-', 'LineWidth', 1)
 axis equal
+
+

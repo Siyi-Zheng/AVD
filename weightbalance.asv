@@ -470,8 +470,8 @@ marker_size = 100;
 line_width = 2;
 
 % Plot scatter points with unique bright colors
-cruise_end_cg =[((CG_cruise_end_aft_nopax-LE_mac)/mac)*100,((CG_cruise_end_fore_nopax-LE_mac)/mac)*100,((CG_cruise_end_fore-LE_mac)/mac)*100, ((CG_cruise_end-LE_mac)/mac)*100, ((CG_cruise_end_aft-LE_mac)/mac)*100, ((CG_cruise_end_aft_nopax-LE_mac)/mac)*100];
-weights_cruise_end = [ W_cruise_end_aft_nopax,W_cruise_end_fore_nopax,W_cruise_end_fore, W_cruise_end,   W_cruise_end_aft,  W_cruise_end_aft_nopax];
+cruise_end_cg =[(CG_cruise_end-LE_mac)/mac)*100, (CG_cruise_end_fore-LE_mac)/mac)*100,((CG_cruise_end_fore_nopax-LE_mac)/mac)*100,((CG_cruise_end_aft-LE_mac)/mac)*100, ((CG_cruise_end_aft_nopax-LE_mac)/mac)*100]
+
 
 
 
@@ -481,7 +481,7 @@ scatter(((CG_fuel_nopass-LE_mac)/mac)*100, W_fuel_nopass, marker_size, 'g', 'x',
 scatter(((CGtotal_full-LE_mac)/mac)*100, Wtotal_full, marker_size, "black", 'x', 'LineWidth', line_width)
 xline(((CG_fuelled_aft-LE_mac)/mac)*100, '--', 'Aft CG Limit'); % Aft CG limit
 xline(((CG_fuelled_front-LE_mac)/mac)*100, '--', 'Front CG Limit'); % Front CG limit
-fill(cruise_end_cg, weights_cruise_end, 'cyan')
+plot()
 scatter(((CG_cruise_start-LE_mac)/mac)*100, W_cruise_start, marker_size, 'b', 'x', 'LineWidth', line_width); % Cruise start
 scatter(((CG_cruise_start_fore-LE_mac)/mac)*100, W_cruise_start_fore, marker_size, 'c', 'x', 'LineWidth', line_width); % Cruise start forward
 scatter(((CG_cruise_start_fore_nopax-LE_mac)/mac)*100, W_cruise_start_fore_nopax, marker_size, 'm', 'x', 'LineWidth', line_width); % Cruise start forward, no pax
@@ -499,7 +499,7 @@ yline(Wtotal_full + W_trimtank, '--k', 'MTOW'); % Maximum takeoff weight
 yline(Wtotal_tons, '--k', 'Empty Weight'); % Empty weight
 
 % Add legend
-legend({'Empty Weight', 'Fuel (No Passengers)', 'Full CG','Aft CG Limit', 'Front CG Limit','', ...
+legend({'Empty Weight', 'Fuel (No Passengers)', 'Full CG','Aft CG Limit', 'Front CG Limit', ...
     'Cruise Start', 'Cruise Start Forward', 'Cruise Start Forward (No Pax)', ...
     'Cruise Start Aft', 'Cruise Start Aft (No Pax)', 'Cruise End', ...
     'Cruise End Forward', 'Cruise End Forward (No Pax)', 'Cruise End Aft', ...

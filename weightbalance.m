@@ -26,8 +26,8 @@ Kr = 1; %      - Engine factor, 1.133 for reciprocating engines, 1.0 otherwise
 Ktp = 1; %- Turboprop factor, 0.793 for turboprop, 1.0 otherwise
 Kuht = 1; %- Factor for all-moving tail, 1.143 for all-moving, 1.0 otherwise
 L = 246.063; %- Fuselage structural length (ft), to be assigned
-La = 250; %       - Electrical routing distance; generators to avionics to cockpit (ft)
-Lec = 800; %        - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
+La = 404; %       - Electrical routing distance; generators to avionics to cockpit (ft)
+Lec = 266; %        - Engine controls routing distance; engine to cockpit - total if multi-engine (ft)
 Lf = 264.4357; %- Total fuselage length (ft)
 Lht = 106.6; %    - Length from wing aerodynamic center to horizontal tail aerodynamic center (ft)
 Lm = 160; %         - Main landing gear length (inches)
@@ -525,7 +525,8 @@ Iyy = Ww * (CGw - CGtotal)^2 + Wht * (CGht - CGtotal)^2 + Wvt * (CGvt - CGtotal)
     Wav * (CGav - CGtotal)^2 + Wfurn * (CGfurn - CGtotal)^2 + Wac * (CGac - CGtotal)^2 + ...
     Wai * (CGai - CGtotal)^2 + Whg_civilian * (CGwhg - CGtotal)^2 + Whg_military * (CGmil - CGtotal)^2 + ...
     W_engines * (CGeng - CGtotal)^2 + Wfuel * (CGfuel - CGtotal_full)^2 + ...
-    Wpax * (CGpax - CGtotal_full)^2 + Wluggage * (CGluggage - CGtotal_full)^2;
+    Wpax * (CGpax - CGtotal_full)^2 + Wluggage * (CGluggage - CGtotal_full)^2 + ...
+    (1/(12 * 3.208^2)) * Wfus * (1.5 * D^2 + L^2);
 
 % convert from lb*m^2 to kg*m^2
 Iyy = Iyy * 0.453592;

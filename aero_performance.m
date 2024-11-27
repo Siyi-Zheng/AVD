@@ -158,13 +158,13 @@ CD_flaps_land = 0.0024 * flap_extent * 40; % 40deg for landing
 % CDi
 % we need to finish stability to get all these values i think
 
-CL_cruise = 0.53;
+CL_cruise = 2.85;
 AR_h = 5.88;
 e = 0.85; %oswald efficiency factor
 K = 1 / (pi * AR * e);
 K_h = 1 / (pi * AR_h * e);
 eta_h = 0.9; % tailplane efficiency
-CL_h = 0; % we need stability analysis to get this one
+CL_h = -0.27; % we need stability analysis to get this one
 CDi = K * CL_cruise ^ 2 + eta_h * K_h * CL_h ^ 2;
 
 % also get the change in CDi from flaps

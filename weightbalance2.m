@@ -5,7 +5,6 @@ close all
 % Weight & Balance Estimation for Transport Aircraft
 
 % Variable Definitions:
-mac=7.4;
 A = 8.77; %- Wing aspect ratio (unitless)
 Ah = 5.8; %- Horizontal tailplane aspect ratio (unitless)
 Av = 2*1.6; %- Vertical tailplane aspect ratio (unitless)
@@ -378,8 +377,8 @@ CG_fuelled_front = (Wtotal_tons * CGtotal + W_fore * CG_fore + Wpax...
 CG_fuelled_aft = (Wtotal_tons * CGtotal + W_owtank * CG_owtank + Wpax...
     * CGpax + Wluggage * CGluggage) / (Wtotal_tons + W_owtank + Wpax + Wluggage);
 
-CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) .* CGfuel + Wpax * CGpax...
-    + Wluggage * CGluggage) ./ (Wtotal_full + W_trimtank);
+CGtotal_full = (Wtotal_tons * CGtotal + (Wfuel+W_trimtank) * CGfuel + Wpax * CGpax...
+    + Wluggage * CGluggage) / (Wtotal_full + W_trimtank);
 disp(['Total CG (full): ', num2str(CGtotal_full), ' m']);
 
 CGempty_trimtank = (Wtotal_tons * CGtotal + W_trimtank * CG_ftank)...
@@ -391,129 +390,30 @@ disp(['Total z_cg (full): ', num2str(zCGtotal_full), ' m']);
 
 %plotting the CG envelope
 
-%%cruise start
 W_cruise_start= Wtotal_tons + 0.97*0.985*Wfuel + Wpax + Wluggage;
 CG_cruise_start= (Wtotal_tons * CGtotal + 0.97*0.985*Wfuel * CGfuel + Wpax...
     * CGpax + Wluggage * CGluggage) / W_cruise_start;
-disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']); %operational region
+disp(['Total CG (cruise start): ', num2str(CG_cruise_start), ' m']);
 
-%%with passengers
-W_owtank_remaining=  W_owtank - (Wfuel-( 0.97*0.985* Wfuel));
-W_cruise_start_fore= Wtotal_tons + W_owtank_remaining + Wpax + Wluggage + W_trimtank + W_fore;
-CG_cruise_start_fore= (Wtotal_tons * CGtotal + (W_owtank_remaining * CG_owtank) + W_iwtank * CG_iwtank +(W_ftank * CG_ftank) + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start_fore;
-disp(['Total CG (cruise start fore): ', num2str(CG_cruise_start_fore), ' m']); %assuming asymmetric fuel burn
-
-W_iwtank_remaining= W_iwtank - (Wfuel-(0.97*0.985* Wfuel));
-W_cruise_start_aft = Wtotal_tons + Wpax + Wluggage + W_trimtank + W_iwtank_remaining + W_owtank + W_ftank;
-CG_cruise_start_aft= (Wtotal_tons * CGtotal + W_iwtank_remaining*CG_iwtank + W_owtank * CG_owtank + W_ftank * CG_ftank + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_start_aft;
-disp(['Total CG (cruise start aft): ', num2str(CG_cruise_start_aft), ' m']); %assuming asymmetric fuel burn
-
-%%without passengers
-W_owtank_remaining=  W_owtank - (Wfuel-( 0.97*0.985* Wfuel));
-W_cruise_start_fore_nopax= Wtotal_tons + W_owtank_remaining + W_trimtank + W_fore;
-CG_cruise_start_fore_nopax= (Wtotal_tons * CGtotal + (W_owtank_remaining * CG_owtank) + W_iwtank * CG_iwtank +(W_ftank * CG_ftank) )/ W_cruise_start_fore_nopax;
-disp(['Total CG (cruise start fore_nopax): ', num2str(CG_cruise_start_fore_nopax), ' m']); %assuming asymmetric fuel burn
-
-W_iwtank_remaining= W_iwtank - (Wfuel-(0.97*0.985* Wfuel));
-W_cruise_start_aft_nopax = Wtotal_tons + W_trimtank + W_iwtank_remaining + W_owtank + W_ftank;
-CG_cruise_start_aft_nopax= (Wtotal_tons * CGtotal + W_iwtank_remaining*CG_iwtank + W_owtank * CG_owtank + W_ftank * CG_ftank) / W_cruise_start_aft_nopax;
-disp(['Total CG (cruise start aft_nopax): ', num2str(CG_cruise_start_aft_nopax), ' m']); %assuming asymmetric fuel burn
-
-
-%%End of cruise
 W_cruise_end= Wtotal_tons + 0.97*0.985*0.6225*Wfuel + Wpax + Wluggage;
 CG_cruise_end= (Wtotal_tons * CGtotal + 0.97*0.985*0.6225*Wfuel * CGfuel...
     + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end;
 disp(['Total CG (cruise end): ', num2str(CG_cruise_end), ' m']);
-
-%%with passengers
-W_owtank_leftend= W_owtank - (Wfuel-(0.97*0.985*0.6225*Wfuel)); %all outerwing used up
-W_cruise_end_fore= Wtotal_tons + W_owtank_leftend + Wpax + Wluggage+ W_trimtank +W_fore ;
-CG_cruise_end_fore= (Wtotal_tons * CGtotal + W_owtank_leftend*CG_owtank + W_iwtank*CG_iwtank + W_ftank*CG_ftank + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end_fore;
-disp(['Total CG (cruise end fore): ', num2str(CG_cruise_end_fore), ' m']);
-
-W_iwtank_leftend= 0;
-W_ftank_leftend = abs(W_iwtank - (Wfuel-(0.97*0.985*0.6225* Wfuel))) ;
-W_cruise_end_aft = Wtotal_tons + Wpax + Wluggage + W_trimtank + W_iwtank_leftend + W_owtank + W_ftank_leftend;
-CG_cruise_end_aft= (Wtotal_tons * CGtotal + W_iwtank_leftend*CG_iwtank + W_owtank * CG_owtank + W_ftank_leftend * CG_ftank + Wpax * CGpax + Wluggage * CGluggage) / W_cruise_end_aft;
-disp(['Total CG (cruise end aft): ', num2str(CG_cruise_end_aft), ' m']); %assuming asymmetric fuel burn
-
-%%without passengers
-W_owtank_leftend_nopax= W_owtank - (Wfuel-(0.97*0.985*0.6225*Wfuel)); %all outerwing used up
-W_cruise_end_fore_nopax= Wtotal_tons + W_owtank_leftend_nopax + W_trimtank +W_fore ;
-CG_cruise_end_fore_nopax= (Wtotal_tons * CGtotal + W_owtank_leftend*CG_owtank + W_iwtank*CG_iwtank + W_ftank*CG_ftank) / W_cruise_end_fore_nopax;
-disp(['Total CG (cruise end fore no pax): ', num2str(CG_cruise_end_fore_nopax), ' m']);
-
-W_iwtank_leftend_nopax= 0;
-W_ftank_leftend_nopax= abs(W_iwtank - (Wfuel-(0.97*0.985*0.6225* Wfuel))) ;
-W_cruise_end_aft_nopax = Wtotal_tons + W_trimtank + W_iwtank_leftend_nopax + W_owtank + W_ftank_leftend_nopax;
-CG_cruise_end_aft_nopax= (Wtotal_tons * CGtotal + W_iwtank_leftend_nopax*CG_iwtank + W_owtank * CG_owtank + W_ftank_leftend_nopax * CG_ftank) / W_cruise_end_aft_nopax;
-disp(['Total CG (cruise end aft): ', num2str(CG_cruise_end_aft_nopax), ' m']); %assuming asymmetric fuel burn
-
-Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage; 
+ 
+Wtotal_nofuel= Wtotal_tons + Wpax + Wluggage;
 disp(['Total Weight (no fuel): ', num2str(Wtotal_nofuel), ' tons']);
 CGtotal_nofuel = (Wtotal_tons * CGtotal + Wpax * CGpax + Wluggage * CGluggage) / Wtotal_nofuel;
 disp(['Total CG (no fuel): ', num2str(CGtotal_nofuel), ' m']);
-
-W_fuel_nopass= Wtotal_tons + Wfuel + W_trimtank;
-CG_fuel_nopass = (Wtotal_tons * CGtotal + (Wfuel + W_trimtank) * CGfuel) / W_fuel_nopass;
 
 % figure
 % plot(W_trimtank, abs(CGfuel-CGtotal_nofuel), LineWidth=2)
 % xlabel('trim tank mass (Kg)')
 % ylabel('difference between cg with no fuel and cg full')
 
-LE_mac = CGw - (1/4)*mac;
 figure
-% Set marker size
-marker_size = 100;
-line_width = 2;
-
-% Plot scatter points with unique bright colors
-cruise_end_cg =[((CG_cruise_end_aft_nopax-LE_mac)/mac)*100,((CG_cruise_end_fore_nopax-LE_mac)/mac)*100,((CG_cruise_end_fore-LE_mac)/mac)*100, ((CG_cruise_end-LE_mac)/mac)*100, ((CG_cruise_end_aft-LE_mac)/mac)*100, ((CG_cruise_end_aft_nopax-LE_mac)/mac)*100];
-weights_cruise_end = [ W_cruise_end_aft_nopax,W_cruise_end_fore_nopax,W_cruise_end_fore, W_cruise_end,   W_cruise_end_aft,  W_cruise_end_aft_nopax];
-
-
-
-scatter(((CGtotal-LE_mac)/mac)*100, Wtotal_tons, marker_size, 'r', 'x', 'LineWidth', line_width); % Empty weight
 hold on
-scatter(((CG_fuel_nopass-LE_mac)/mac)*100, W_fuel_nopass, marker_size, 'g', 'x', 'LineWidth', line_width); % Fuel, no passengers
-scatter(((CGtotal_full-LE_mac)/mac)*100, Wtotal_full, marker_size, "black", 'x', 'LineWidth', line_width)
-xline(((CG_fuelled_aft-LE_mac)/mac)*100, '--', 'Aft CG Limit'); % Aft CG limit
-xline(((CG_fuelled_front-LE_mac)/mac)*100, '--', 'Front CG Limit'); % Front CG limit
-fill(cruise_end_cg, weights_cruise_end, 'cyan')
-scatter(((CG_cruise_start-LE_mac)/mac)*100, W_cruise_start, marker_size, 'b', 'x', 'LineWidth', line_width); % Cruise start
-scatter(((CG_cruise_start_fore-LE_mac)/mac)*100, W_cruise_start_fore, marker_size, 'c', 'x', 'LineWidth', line_width); % Cruise start forward
-scatter(((CG_cruise_start_fore_nopax-LE_mac)/mac)*100, W_cruise_start_fore_nopax, marker_size, 'm', 'x', 'LineWidth', line_width); % Cruise start forward, no pax
-scatter(((CG_cruise_start_aft-LE_mac)/mac)*100, W_cruise_start_aft, marker_size, 'y', 'x', 'LineWidth', line_width); % Cruise start aft
-scatter(((CG_cruise_start_aft_nopax-LE_mac)/mac)*100, W_cruise_start_aft_nopax, marker_size, [0.5, 0.2, 0.8], 'x', 'LineWidth', line_width); % Cruise start aft, no pax
-scatter(((CG_cruise_end-LE_mac)/mac)*100, W_cruise_end, marker_size, [0.2, 0.7, 0.3], 'x', 'LineWidth', line_width); % Cruise end
-scatter(((CG_cruise_end_fore-LE_mac)/mac)*100, W_cruise_end_fore, marker_size, [0.9, 0.4, 0.1], 'x', 'LineWidth', line_width); % Cruise end forward
-scatter(((CG_cruise_end_fore_nopax-LE_mac)/mac)*100, W_cruise_end_fore_nopax, marker_size, [0.3, 0.6, 0.9], 'x', 'LineWidth', line_width); % Cruise end forward, no pax
-scatter(((CG_cruise_end_aft-LE_mac)/mac)*100, W_cruise_end_aft, marker_size, [0.7, 0.2, 0.1], 'x', 'LineWidth', line_width); % Cruise end aft
-scatter(((CG_cruise_end_aft_nopax-LE_mac)/mac)*100, W_cruise_end_aft_nopax, marker_size, [0.4, 0.8, 0.2], 'x', 'LineWidth', line_width); % Cruise end aft, no pax
-
-
-% Add weight lines
-yline(Wtotal_full + W_trimtank, '--k', 'MTOW'); % Maximum takeoff weight
-yline(Wtotal_tons, '--k', 'Empty Weight'); % Empty weight
-
-% Add legend
-legend({'Empty Weight', 'Fuel (No Passengers)', 'Full CG','Aft CG Limit', 'Front CG Limit','', ...
-    'Cruise Start', 'Cruise Start Forward', 'Cruise Start Forward (No Pax)', ...
-    'Cruise Start Aft', 'Cruise Start Aft (No Pax)', 'Cruise End', ...
-    'Cruise End Forward', 'Cruise End Forward (No Pax)', 'Cruise End Aft', ...
-    'Cruise End Aft (No Pax)', 'MTOW', 'Empty Weight'}, ...
-    'Location', 'bestoutside');
-
-
-% figure
-% % scatter(((CGtotal-LE_mac)/mac)*100, Wtotal_tons,'cyan') %empty weight
-% hold on
-% scatter(CG_cruise_end, W_cruise_end, 'blue')
-% scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')
-% scatter(CGtotal_full, Wtotal_full, 'magenta')
-% legend("Cruise Start", "Cruise End", "0% Fuel", "100% Fuel")
+scatter(CGtotal_nofuel, Wtotal_nofuel, 'red')
+scatter(CGtotal_full, Wtotal_full, 'magenta')
 
 
 % get Iyy using sum(Iyy) = sum(m * (x - x_cg)^2)

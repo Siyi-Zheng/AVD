@@ -13,9 +13,9 @@ Ne = 4;                      % Number of engines
 BPR = 7.4;                   % Bypass Ratio
 AR = 8.77;                    % Aspect Ratio
 e = 0.85;                     % Oswald Efficiency
-W = 390000 * g;              % Weight [N]
+W = 353385 * g;              % Weight [N]
 S = 482;                     % Wing reference area in square meters
-CD0 = 0.0162;                % Zero-lift drag coefficient
+CD0 = 0.0161;                % Zero-lift drag coefficient
 K = 1 / (pi * AR * e);       % Induced drag factor
 T_sl = Ne * 295.8 * 1000;   % Sea-level static thrust [N]
 
@@ -64,11 +64,10 @@ max_mach = 0.85;                              % Max Mach number
 L3 = plot(max_mach * ones(size(ALT)), ALT * 3.2808, 'b--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
 
 % Labels and legend
-xlabel('Mach Number',FontSize=14);
-ylabel('Altitude (ft)',FontSize=14);
+xlabel('Mach Number');
+ylabel('Altitude (ft)');
 
 lgd = legend([h,L1(1),L2(1),L3(1)],'P_s Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
-lgd.FontSize = 14;
 grid on;
 hold off
 

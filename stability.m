@@ -35,7 +35,7 @@ density_takeoff= 1.225 ;
 takeoff_velocity = 0.23 * 343; 
 cruise_velocity = 254;
 S_w = sw; % why the fuck did you do define S_w as 440 and sw as 482 lol
-Cd_cruise = 0.0161 + 0.012 + 0.003; %cd at cruise conditions of aircraft
+Cd_cruise = 0.0162 + 0.012 + 0.003; %cd at cruise conditions of aircraft
 Cd_landing = 0.351 + 0.1026;
 Cd_takeoff = 0.246 + 0.1424;
 alpha_0_w = -4.8 * pi / 180; %X-foil
@@ -157,12 +157,12 @@ xlabel("C_L")
 ylabel("C_{M_{cg}}")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%takeoff
-
+W_takeoff = 354000 * 9.81;
 CMow_takeoff = (Cmoairf * (AR * cosd(sweep) ^ 2 / (AR + 2 * cosd(sweep))) -0.01...
     * w_twist) * compressibility_factor_takeoff; %steady level flight
 q_takeoff = density_takeoff * takeoff_velocity ^ 2 * 0.5;
 Thrust_takeoff = q_takeoff * S_w * Cd_takeoff;
-
+Cl_takeoff = W_takeoff / (q_takeoff * S_w);
 figure; % create plot of CL vs CMcg
 
 % elevator characteristics
@@ -199,17 +199,18 @@ for ih = -3:1:15
     hold on;
 end
 grid on
-xline(0.53, "--")
+xline(Cl_takeoff, "--")
 yline(0, "--")
 xlabel("C_L")
 ylabel("C_{M_{cg}}")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%landing
-
+W_landing = 0.85 * W_takeoff;
 CMow_landing = (Cmoairf * (AR * cosd(sweep) ^ 2 / (AR + 2 * cosd(sweep))) -0.01...
     * w_twist) * compressibility_factor_landing; %steady level flight
 q_landing = density_landing * landing_velocity ^ 2 * 0.5;
 Thrust_landing = q_landing * S_w * Cd_landing;
+Cl_landing = W_landing / (q_landing * S_w);
 
 figure; % create plot of CL vs CMcg
 
@@ -247,7 +248,7 @@ for ih = -3:1:15
     hold on;
 end
 grid on
-xline(0.53, "--")
+xline(Cl_landing, "--")
 yline(0, "--")
 xlabel("C_L")
 ylabel("C_{M_{cg}}")

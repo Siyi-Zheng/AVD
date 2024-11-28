@@ -41,7 +41,7 @@ CL = (W ./ (q * S));                       % Required lift coefficient
 T = T_sl * tau;                            % Available thrust [N]
 
 % Specific Excess Power Calculation
-Ps = (T - D) .* V / W;                     % Specific excess power
+Ps = ((T - D) .* V / W);                     % Specific excess power
 
 % Plotting Ps Contours
 figure;
@@ -50,24 +50,23 @@ clabel(c, h, 'LabelSpacing', 300);
 hold on;
 
 % Add stall speed line
-CL_max = 1.4;                                % Max lift coefficient
+CL_max = 1.72;                                % Max lift coefficient
 stall_speed = sqrt((2 * W) ./ (rho .* S .* CL_max));
 stall_mach = stall_speed ./ a;
-L1 = plot(stall_mach, ALT * 3.2808, 'k--', 'LineWidth', 1.5, 'DisplayName', 'Stall Speed');
+L1 = plot(stall_mach, ALT * 3.2808, 'k--', 'LineWidth', 1, 'DisplayName', 'Stall Speed');
 
-% Add cruise Mach line
-cruise_mach = 0.83;                           % Cruise Mach number
-L2 = plot(cruise_mach * ones(size(ALT)), ALT * 3.2808, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Cruise Mach');
 
-% Add max Mach number line
-max_mach = 0.85;                              % Max Mach number
-L3 = plot(max_mach * ones(size(ALT)), ALT * 3.2808, 'b--', 'LineWidth', 1.5, 'DisplayName', 'Max Mach Requirement');
+% Add service ceiling line
+yline(35000, "k--", label="Cruise Altitude")
+yline(45000, "k--", label="Required Absolute Ceiling")
+xline(0.85, "k--", label="Max. Mach Number")
+xline(0.83, "k--", label="Cruise Mach Number")
 
 % Labels and legend
 xlabel('Mach Number');
 ylabel('Altitude (ft)');
 
-lgd = legend([h,L1(1),L2(1),L3(1)],'P_s Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
+lgd = legend([h,L1(1)],'P_s Contours', 'Stall Speed', 'Cruise Mach', 'Max Mach Requirement', 'Location', 'best');
 grid on;
 hold off
 

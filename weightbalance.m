@@ -579,6 +579,8 @@ yline(Wtotal_full + W_trimtank, '--k', 'MTOW', 'LabelHorizontalAlignment','cente
 yline(Wtotal_tons, '--k', 'Empty Weight','LabelHorizontalAlignment','center', LineWidth=1.5); % Empty weight
 
 xline(((CGtotal_full-LE_mac)/mac)*100, '--m', 'Operational condtions',LineWidth=1.5)
+xline(((33.9- LE_mac)/mac)*100, '-r', 'Forward cg limit', LineWidth=2)
+xline(((35.32- LE_mac)/mac)*100, '-r', 'Aft cg limit', LineWidth=2)
 
 % Add legend
 legend({
@@ -593,7 +595,7 @@ legend({
     'Landing', 'CG envelope'...
     'MTOW (Max Takeoff Weight)', ...
     'Empty Weight', ...
-    'Operational conditions'}, ...
+    'Operational conditions', 'Forward cg limit', 'Aft cg limit'}, ...
     'Location', 'bestoutside');
 grid on
 ylabel('Mass (tonnes)')

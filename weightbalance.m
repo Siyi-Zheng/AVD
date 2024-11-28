@@ -496,7 +496,7 @@ CG_fuel_nopass = (Wtotal_tons * CGtotal + (Wfuel + W_trimtank) * CGfuel) / W_fue
 % xlabel('trim tank mass (Kg)')
 % ylabel('difference between cg with no fuel and cg full')
 
-LE_mac = CGw - (1/4)*mac;
+LE_mac = CGw - (1/4)*mac
 figure
 % Set marker size
 marker_size = 100;
@@ -630,20 +630,85 @@ disp(['Iyy: ', num2str(Iyy), ' kg*m^2']);
 %%takeoff
 %with passesngers
 
-takeoff_fore = ((CGtotal_full-LE_mac)/mac)*100
-cruise_start_fore_pax = ((CG_cruise_start_fore-LE_mac)/mac)*100
-cruise_start_aft_pax= ((CG_cruise_start_aft-LE_mac)/mac)*100
-cruise_end_fore_pax = ((CG_cruise_end_fore-LE_mac)/mac)*100
-cruise_end_aft_pax = ((CG_cruise_end_aft-LE_mac)/mac)*100
-landing_fore = ((CG_landing_fore-LE_mac)/mac)*100
-landing_aft= ((CG_landing_aft-LE_mac)/mac)*100
+takeoff_fore = ((CGtotal_full-LE_mac)/mac)*100;
+cruise_start_fore_pax = ((CG_cruise_start_fore-LE_mac)/mac)*100;
+cruise_start_aft_pax= ((CG_cruise_start_aft-LE_mac)/mac)*100;
+cruise_end_fore_pax = ((CG_cruise_end_fore-LE_mac)/mac)*100;
+cruise_end_aft_pax = ((CG_cruise_end_aft-LE_mac)/mac)*100;
+landing_fore = ((CG_landing_fore-LE_mac)/mac)*100;
+landing_aft= ((CG_landing_aft-LE_mac)/mac)*100;
 
 %without passengers
 
-takeoff_fore_nopax = ((CG_fuel_nopass-LE_mac)/mac)*100
-cruise_start_fore_nopax = ((CG_cruise_start_fore_nopax-LE_mac)/mac)*100
-cruise_start_aft_nopax= ((CG_cruise_start_aft_nopax-LE_mac)/mac)*100
-cruise_end_fore_nopax = ((CG_cruise_end_fore_nopax-LE_mac)/mac)*100
-cruise_end_aft_nopax = ((CG_cruise_end_aft_nopax-LE_mac)/mac)*100
-landing_fore_nopax = ((CG_landing_fore_nopax-LE_mac)/mac)*100
-landing_aft_nopax= ((CG_landing_aft_nopax-LE_mac)/mac)*100
+takeoff_fore_nopax = ((CG_fuel_nopass-LE_mac)/mac)*100;
+cruise_start_fore_nopax = ((CG_cruise_start_fore_nopax-LE_mac)/mac)*100;
+cruise_start_aft_nopax= ((CG_cruise_start_aft_nopax-LE_mac)/mac)*100;
+cruise_end_fore_nopax = ((CG_cruise_end_fore_nopax-LE_mac)/mac)*100;
+cruise_end_aft_nopax = ((CG_cruise_end_aft_nopax-LE_mac)/mac)*100;
+landing_fore_nopax = ((CG_landing_fore_nopax-LE_mac)/mac)*100;
+landing_aft_nopax= ((CG_landing_aft_nopax-LE_mac)/mac)*100;
+
+%% 
+% % Constants and aircraft configuration
+% empty_weight_CG = CGtotal; % CG position of the empty aircraft (meters)
+% empty_weight = Wtotal_tons; % Empty operating weight of the aircraft (tons)
+% 
+% % Fuel tank properties
+% tank_data = {
+%     % Tank Name      Position_CG (m)   Max_Fuel_Weight (tons)
+%     'Owtank     ',   CG_owtank,        W_owtank; 
+%     'Innerwing',   CG_iwtank,            W_iwtank; 
+%     'Center Tank',   CG_ftank,             W_ftank ; 
+% };
+% 
+% % Extract data for calculations
+% tank_positions = cell2mat(tank_data(:, 2)); % Tank CG positions
+% tank_capacities = cell2mat(tank_data(:, 3)); % Tank max fuel weights
+% total_fuel_capacity = sum(tank_capacities)*0.97*0.985; % Total fuel capacity
+% 
+% % Initialize outputs for foremost and aftmost CG calculations
+% foremost_CG = []; % Forward CG limit
+% aftmost_CG = []; % Aft CG limit
+% 
+% % Loop through symmetric fuel burn scenarios
+% fuel_burn_percentages = linspace(0, 1, 50); % From full fuel (0%) to empty (100%)
+% for i = 1:length(fuel_burn_percentages)
+%     fuel_fraction = 1 - fuel_burn_percentages(i); % Remaining fuel fraction
+% 
+%     % Symmetric fuel burn: Reduce fuel evenly across all tanks
+%     fuel_weights = fuel_fraction * tank_capacities;
+% 
+%     % Calculate total weight and CG
+%     total_weight = empty_weight + sum(fuel_weights); % Aircraft weight (tons)
+%     weighted_CG = (empty_weight_CG * empty_weight + sum(fuel_weights .* tank_positions)) / total_weight; % CG position (meters)
+% 
+%     % Append CG for current fuel distribution
+%     foremost_CG = [foremost_CG, weighted_CG]; % Foremost CG progression
+%     aftmost_CG = [aftmost_CG, weighted_CG]; % Aftmost CG progression
+% end
+% 
+% % Find extreme CG positions
+% foremost_CG_position = min(foremost_CG); % Foremost CG (smallest CG value)
+% aftmost_CG_position = max(aftmost_CG); % Aftmost CG (largest CG value)
+% 
+% % Convert CG positions to % MAC
+% foremost_CG_percent_MAC = ((foremost_CG_position - LE_mac) / mac) * 100;
+% aftmost_CG_percent_MAC = ((aftmost_CG_position - LE_mac) /mac) * 100;
+% 
+% % Display results
+% disp(['Foremost CG: ', num2str(foremost_CG_percent_MAC), '% MAC']);
+% disp(['Aftmost CG: ', num2str(aftmost_CG_percent_MAC), '% MAC']);
+% 
+% % Plot CG variation over fuel burn
+% figure;
+% plot(fuel_burn_percentages * 100, ((foremost_CG - LE_mac) / mac) * 100, 'b', 'LineWidth', 2);
+% hold on;
+% plot(fuel_burn_percentages * 100, ((aftmost_CG - LE_mac) / mac) * 100, 'r', 'LineWidth', 2);
+% xlabel('Fuel Burn Percentage (%)');
+% ylabel('CG Position (% MAC)');
+% title('CG Position vs. Fuel Burn');
+% legend('Foremost CG', 'Aftmost CG');
+% grid on;
+% hold off;
+% 
+% 

@@ -505,9 +505,26 @@ length1 = (span1(676) - span1(240)) * tand(30.15);
 length2 = (span2(1971) - span2(1195)) * tand(30.15);
 
 
-difference = Volumer_needed - (collector1 + collector2) * 2;
+difference = Volumer_needed;
+
 
 central_tank_length = difference / 8.165;
+
+% Define the extents for slats and flaps (in x/c)
+slat_start = 0.0; % Start of slat (leading edge)
+slat_end = 0.115;  % End of slat (15% chord)
+flap_start = 0.75; % Start of flap (75% chord)
+flap_end = 1.0;   % End of flap (trailing edge)
+
+% Interpolate y-coordinates for the slats (upper and lower surfaces)
+slat_x = linspace(slat_start, slat_end, 50); % x-coordinates for slat
+slat_y_upper = interp1(upper_surfacea(:,1), upper_surfacea(:,2), slat_x, 'linear');
+slat_y_lower = interp1(lower_surfacea(:,1), lower_surfacea(:,2), slat_x, 'linear');
+
+% Interpolate y-coordinates for the flaps (upper and lower surfaces)
+flap_x = linspace(flap_start, flap_end, 50); % x-coordinates for flap
+flap_y_upper = interp1(upper_surfacea(:,1), upper_surfacea(:,2), flap_x, 'linear');
+flap_y_lower = interp1(lower_surfacea(:,1), lower_surfacea(:,2), flap_x, 'linear');
 
 % Plot the airfoil
 figure
@@ -543,12 +560,13 @@ y_fill_spar = [ys_fill1; flipud(ys_fill2)];
 % Fill the area between the spars
 fill(x_fill_spar, y_fill_spar, [0.5, 0.5, 0.5], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Spar Fill');
 
-% Extract x and y coordinates from the collector data
-x_collector = collector(:, 1);  % x-coordinates
-y_collector = collector(:, 2);  % y-coordinates
+% Plot slats
+fill([slat_x, fliplr(slat_x)], [slat_y_upper, fliplr(slat_y_lower)], 'g', ...
+    'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Slats');
 
-% Fill the collector area in blue with transparency
-fill(x_collector, y_collector, 'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Collector Tank');
+% Plot flaps
+fill([flap_x, fliplr(flap_x)], [flap_y_upper, fliplr(flap_y_lower)], 'c', ...
+    'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Flaps');
 
 % Additional plot settings
 xlabel('Chord Position (x/c)', 'Interpreter','latex');
@@ -710,7 +728,10 @@ title("Area vs Span")
 hold off
 
 
-
+figure
+hold on
+plot(upper_surface(:,1) , upper_surface(:,2))
+hold off
 
 
 

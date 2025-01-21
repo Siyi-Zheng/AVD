@@ -1,0 +1,29 @@
+clear all
+clc
+
+% symmetric loading
+rho = 1.227; % sea level density (kg/m^3)
+wing_loading = 353385 / 482 * 9.81; % wing loading (kg/m^2)
+n_max = 2.5; % max. load factor
+n_min = -1.0; % min. load factor
+v_max = 200; % max. speed (m/s) --- how do i get this properly???
+CL_max = 2.85; % with flaps
+CL_min = -1.5; % idk what this actually is
+v_list = 0:1:v_max+10; % for plotting the envelope
+v_stall = 
+
+% aero loads
+n_max_aero = rho * CL_max / (2 * wing_loading) * v_list .^ 2;
+n_min_aero = rho * CL_min / (2 * wing_loading) * v_list .^ 2;
+
+% plotting
+plot(v_list, n_max_aero, color="black")
+hold on
+plot(v_list, n_min_aero, color="black")
+yline(n_max, color="black")
+yline(n_min, color="black")
+xline(v_max, color="black")
+xlim([min(v_list) max(v_list)])
+xlabel("V_{EAS} (m/s)")
+ylabel("Load factor")
+grid on

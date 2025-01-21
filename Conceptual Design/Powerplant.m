@@ -6,7 +6,7 @@ clc
 
 % Manufacturer Engine data
 mdot = 2297; % takeoff mass flow rate in lbs/sec
-D_fan = 104.7; % fan diamter in inches
+D_fan = 104.7*1.061; % fan diamter in inches
 L_engine = 169.7; % inches
 fprintf("Fan diamter: %.3fm \n",D_fan*0.0254)
 W = 6147.1;
@@ -97,3 +97,4 @@ D_nozzle = sqrt(0.75)*D_th; % factor 0.5-0.7 raymer, 0.5-0.75 cambridge book
 % distance from fan to fan case 34.4cm
 
 
+%  W_nacelle = 0.6724*1.07*naclle length * nacelle width * ultimate load factor

@@ -21,9 +21,6 @@ v_stall = sqrt(2 * wing_loading / (rho * CL_max));
 n_max_aero = rho * CL_max / (2 * wing_loading) * v_list .^ 2;
 n_min_aero = rho * CL_min / (2 * wing_loading) * v_list .^ 2;
 
-% V_b
-v_b_d = v_stall * (1 + (rho * 20 * v_stall * Cla) / (2 * wing_loading)) ^ 0.5;
-
 % gust loads
 mu = 2 * wing_loading / (rho * 9.81 * mac * Cla);
 U_de_c = 15.2; % gust speed (m/s) at cruise

@@ -13,12 +13,13 @@ v_d = v_c * (0.9 / 0.83); % dive speed (m/s) using FAR 25
 CL_max = 1.72;
 CL_max_flaps = 2.85;
 CL_min = -1; % idk what this is actually
-v_list = linspace(0, v_d+10, 100); % for plotting the envelope
+v_list = linspace(0, v_d+20, 100); % for plotting the envelope
 v_stall = sqrt(2 * wing_loading / (rho * CL_max));
 v_stall_flaps = sqrt(2 * wing_loading / (rho * CL_max_flaps));
 v_stop_flaps = sqrt(4 * wing_loading / (rho * CL_max_flaps));
 v_flaps = 1.6 * v_stall_flaps;
 v_list_flaps = linspace(0, v_stop_flaps, 100);
+v_a = v_stall * sqrt(2.5);
 
 % aero loads
 n_max_aero = rho * CL_max / (2 * wing_loading) * v_list .^ 2;
@@ -46,15 +47,16 @@ hold on
 plot(v_list, n_min_aero, color="black", linestyle="--")
 yline(n_max, color="black", linestyle="--")
 yline(n_min, color="black", linestyle="--")
-xline(v_c, color="black", linestyle="--")
-xline(v_d, color="black", linestyle="--")
-xline(v_stall, color="black", linestyle="--")
+xline(v_a, color="black", linestyle="--", label="V_A")
+xline(v_c, color="black", linestyle="--", label="V_C")
+xline(v_d, color="black", linestyle="--", label="V_D")
+xline(v_stall, color="black", linestyle="--", label="V_{S1}")
 
 % gust loads
-plot(v_list, n_max_gust_c, color="black", linestyle="--")
-plot(v_list, n_min_gust_c, color="black", linestyle="--")
-plot(v_list, n_max_gust_d, color="black", linestyle="--")
-plot(v_list, n_min_gust_d, color="black", linestyle="--")
+plot(v_list, n_max_gust_c, color="black", linestyle=":")
+plot(v_list, n_min_gust_c, color="black", linestyle=":")
+plot(v_list, n_max_gust_d, color="black", linestyle=":")
+plot(v_list, n_min_gust_d, color="black", linestyle=":")
 
 % final envelope
 plot(v_list_flaps, n_max_flaps, color="black", linewidth=2)
@@ -75,7 +77,7 @@ plot(v_aero_list2, n_aero_list2, color="black", linewidth=2)
 
 % formatting
 xlim([min(v_list) max(v_list)])
-ylim([-1.5 3])
+ylim([-1.5 3.5])
 xlabel("V_{EAS} (m/s)")
 ylabel("Load factor")
 grid on

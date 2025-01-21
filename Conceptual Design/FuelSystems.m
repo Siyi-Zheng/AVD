@@ -467,9 +467,9 @@ hold off
 
 %volume calculations
 volume1 = (trapz(span1 , area3) * 0.85);
-volume2 = trapz(span2 , area4) * 0.85;
+volume2 = (trapz(span2 , area4) * 0.85);
 
-total_tank_volume = (volume1 * 2 + volume2 * 2) - 1;
+total_tank_volume = (volume1 * 2 + volume2 * 2) - 13;
 
 Volumer_needed = volume_req - total_tank_volume;
 
@@ -510,25 +510,81 @@ difference = Volumer_needed;
 
 central_tank_length = difference / 8.165;
 
-% Define the extents for slats and flaps (in x/c)
-slat_start = 0.0; % Start of slat (leading edge)
-slat_end = 0.115;  % End of slat (15% chord)
-flap_start = 0.75; % Start of flap (75% chord)
-flap_end = 1.0;   % End of flap (trailing edge)
+%%
 
-% Interpolate y-coordinates for the slats (upper and lower surfaces)
-slat_x = linspace(slat_start, slat_end, 50); % x-coordinates for slat
-slat_y_upper = interp1(upper_surfacea(:,1), upper_surfacea(:,2), slat_x, 'linear');
-slat_y_lower = interp1(lower_surfacea(:,1), lower_surfacea(:,2), slat_x, 'linear');
+x_slat = [0.0345,0.0325,0.0321,0.0343,0.039,0.0439,0.0675,0.075,0.1069];
+y_slat = [-0.0368,-0.0283,-0.0185,-0.0008,0.0113,0.0225,0.0385,0.0425,0.0536];
 
-% Interpolate y-coordinates for the flaps (upper and lower surfaces)
-flap_x = linspace(flap_start, flap_end, 50); % x-coordinates for flap
-flap_y_upper = interp1(upper_surfacea(:,1), upper_surfacea(:,2), flap_x, 'linear');
-flap_y_lower = interp1(lower_surfacea(:,1), lower_surfacea(:,2), flap_x, 'linear');
+%{
+%slat calculation
+% Given points
+x = [0.1069, 0.0345, 0.0321]; % x-coordinates
+y = [0.036, -0.0368, -0.0361]; % y-coordinates
+
+% Construct the matrix system Ax = b
+A = [sqrt(x(1)), x(1), 1;
+     sqrt(x(2)), x(2), 1;
+     sqrt(x(3)), x(3), 1];
+
+b = [y(1); y(2); y(3)];
+
+% Solve for coefficients [a; b; c]
+coefficients = A\b;
+
+% Extract coefficients
+a = coefficients(1);
+b = coefficients(2);
+c = coefficients(3);
+
+disp(['a = ', num2str(a), ', b = ', num2str(b), ', c = ', num2str(c)]);
+
+% Generate x values for plotting
+x_plot = linspace(min(x), max(x), 100);
+
+% Compute the corresponding y values
+y_plot = a * sqrt(x_plot) + b * x_plot + c;
+
+% Define the endpoints of the line
+x1 = 0.1069; y1 = 0.0536; % First endpoint
+x2 = 0.0345; y2 = -0.0361; % Second endpoint
+
+% Define the points to reflect
+points = [x_plot' , y_plot']; % Example points (x, y) as rows
+
+% Line equation coefficients
+a = y2 - y1;
+b = x1 - x2;
+c = x2 * y1 - x1 * y2;
+
+% Initialize matrix for reflected points
+reflected_points = zeros(size(points));
+
+% Reflect each point
+for i = 1:size(points, 1)
+    x = points(i, 1);
+    y = points(i, 2);
+    x_reflected = x - 2 * a * (a * x + b * y + c) / (a^2 + b^2);
+    y_reflected = y - 2 * b * (a * x + b * y + c) / (a^2 + b^2);
+    reflected_points(i, :) = [x_reflected, y_reflected];
+end
+
+x_slat = reflected_points(:,1);
+y_slat = reflected_points(:,2);
+
+%}
+
+%%
+%coordinates for flaps
+x_flap = [0.2512,0.2501,0.2474,0.2424,0.2367,0.2297,0.2217,0.2146,0.209,0.2003,0.1892,0.1815,0.1759];
+y_flap = [-0.021,-0.0108,-0.0015,0.0072,0.01320,0.0181,0.0219,0.0244,0.026,0.0279,0.0298,0.0307,0.0327];
+
+x_flap = 1 - x_flap;
+%%
+%plotting
 
 % Plot the airfoil
 figure
-figure('Position', [100, 100, 1000, 500]); % [x, y, width, height]
+figure('Position', [100, 100, 1000, 370]); % [x, y, width, height]
 hold on
 
 % Plot the upper and lower surfaces of the airfoil
@@ -560,17 +616,15 @@ y_fill_spar = [ys_fill1; flipud(ys_fill2)];
 % Fill the area between the spars
 fill(x_fill_spar, y_fill_spar, [0.5, 0.5, 0.5], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', 'Spar Fill');
 
-% Plot slats
-fill([slat_x, fliplr(slat_x)], [slat_y_upper, fliplr(slat_y_lower)], 'g', ...
-    'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Slats');
+%plot slats
+plot(x_slat , y_slat, 'k-', 'LineWidth', 1 , 'DisplayName','Slat'); % Curve
 
-% Plot flaps
-fill([flap_x, fliplr(flap_x)], [flap_y_upper, fliplr(flap_y_lower)], 'c', ...
-    'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Flaps');
+%plotting flaps
+plot(x_flap, y_flap , 'k-' , 'LineWidth', 1 , 'DisplayName','Flap') %curve for flap
 
 % Additional plot settings
-xlabel('Chord Position (x/c)', 'Interpreter','latex');
-ylabel('Thickness (y/c)', 'Interpreter','latex');
+xlabel('Chord Position (x/c)');
+ylabel('Thickness (y/c)');
 %title('Wing Cross Section with Fuel Tank Integration');
 
 % Maintain equal scaling and set axis limits
@@ -583,10 +637,10 @@ axis equal
 hold off
 
 % Additional plot settings
-xlabel('Chord Position (x/c)', 'Interpreter','latex');
-ylabel('Thickness (y/c)', 'Interpreter','latex');
+xlabel('Chord Position (x/c)');
+ylabel('Thickness (y/c)');
 %title('Wing Cross Section with Fuel Tank Integration');
-legend('Interpreter','latex');
+legend;
 axis equal
 hold off
 
@@ -683,7 +737,7 @@ hold off;
 % parameters
 area = 40.28 * 2; % m^2
 AR = 5.8;
-wing_span = (area * AR / 2) ^ 0.5; % m
+wing_span = (area * AR / 2) ^ 0.5; %m
 taper_ratio = 0.4;
 quarter_chord_sweep = 35; % degrees
 

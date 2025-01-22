@@ -8,6 +8,7 @@ close all
 %Spars at 0.15 & 0.75.
 fspar_pos = 0.15;
 rspar_pos = 0.7;
+spar_height = (0.074221+0.062372)/2;
 fuselage_diam = 6.34;
 
 NACA = [1.000  -.0104
@@ -182,7 +183,7 @@ hold off
 %Secton Wing Loads
 %L0 uses Empty Fuel Weight as the Worst Case:
 
-L0 = (4*2.5*9.81*353000)/(pi*semispan*2);
+L0 = (4*3.75*9.81*353000)/(pi*semispan*2);
 
 for i = 1:length(yspan)
     if yspan(i) >= 0 %fuselage_diam/2
@@ -206,7 +207,7 @@ S2 = S1*(lambda)^2;
 WingBox_Volume = 1/3*(S1+S2+(S1*S2)^(1/2))*semispan;
 
 Area_Span = (S1*(lambda^2-2*lambda+1)).*(yspan./semispan).^2 + (S1*(-2+2*lambda)).*(yspan./semispan) + S1;
-WingW_Span = ((Wing_Weight*2.5)/WingBox_Volume).*Area_Span;
+WingW_Span = ((Wing_Weight*3.75)/WingBox_Volume).*Area_Span;
 Gear_Load_Span = zeros([1,length(yspan)]);
 FuelW_Span = zeros([1,length(yspan)]);
 
@@ -218,11 +219,30 @@ end
 
 %ADD IN LANDING GEAR WEIGHT
 for i = 1:length(yspan)
-    if yspan(i) < 1.8
-        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*2.5/(1.8);
-        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/1.8;
+    if yspan(i) < 5.6
+        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*3.75/(5.6);
+        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/5.6;
     end
 end
+
+% ADD ENGINE WEIGHT TO THE SPANWISE DISTRIBUTION
+engine_mass = 6550; % Mass of one engine in kilograms
+engine_load = engine_mass * 9.81; % Weight of one engine in Newtons
+engine_positions = [9.75, 21.1]; % Spanwise positions of the engines in meters
+
+for i = 1:length(yspan)
+    % Check if within the 1-meter influence region (0.5 m on each side) of the first engine
+    if yspan(i) >= engine_positions(1) - 0.5 && yspan(i) <= engine_positions(1) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+    % Check if within the 1-meter influence region (0.5 m on each side) of the second engine
+    if yspan(i) >= engine_positions(2) - 0.5 && yspan(i) <= engine_positions(2) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+end
+
 
 
 Landing_Spanwise_Lift = Spanwise_Lift.*0.85;
@@ -263,9 +283,9 @@ MLW_GearShear = cumtrapz(flip(yspan),flip(Gear_Load_Span));
 
 for i = 1:n
     if yspan(i) <= 1.8
-        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*2.5;
-        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*2.5;
-        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*2.5;
+        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*3.75;
+        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*3.75;
+        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*3.75;
     end
 end
 plot(flip(yspan),-MTOW_LShear,'b')

@@ -183,7 +183,7 @@ hold off
 %Secton Wing Loads
 %L0 uses Empty Fuel Weight as the Worst Case:
 
-L0 = (4*2.5*9.81*353000)/(pi*semispan*2);
+L0 = (4*3.75*9.81*353000)/(pi*semispan*2);
 
 for i = 1:length(yspan)
     if yspan(i) >= 0 %fuselage_diam/2
@@ -206,10 +206,50 @@ S1 = wing_root*(rspar_pos-fspar_pos)*spar_height*wing_root;
 S2 = S1*(lambda)^2;
 WingBox_Volume = 1/3*(S1+S2+(S1*S2)^(1/2))*semispan;
 
-Area_Span = (S1*(lambda^2-2*lambda+1)).*(yspan./semispan).^2 + (S1*(-2+2*lambda)).*(yspan./semispan) + S1;
-WingW_Span = ((Wing_Weight*2.5)/WingBox_Volume).*Area_Span;
-Gear_Load_Span = zeros([1,length(yspan)]);
-FuelW_Span = zeros([1,length(yspan)]);
+% Calculating chord distribution using updated parameters
+b = semispan * tand(sweep); % Leading-edge sweep for semispan
+a = b - wing_root * lambda / 4; % Adjusted for taper ratio and quarter-chord location
+
+% Calculate the sweep angle
+aa = (a + wing_root * lambda) / semispan; 
+sweep_angle = atand(aa);
+
+% Chord distribution
+outer_chord = wing_root - (9.75 * tand(sweep_angle)); % Outer chord calculation
+gradient1 = (outer_chord - wing_root) / 9.75;
+gradient2 = (wing_root * lambda - outer_chord) / (semispan - 9.75);
+
+% Span segments for inner and outer sections
+span1 = linspace(0, 9.75, 100); % First section
+span2 = linspace(9.75, semispan, 100); % Second section
+
+% Chord lengths for each section
+chord1 = gradient1 * span1 + wing_root; % Inner section chord
+chord2 = gradient2 * span2 + outer_chord - gradient2 * 9.75; % Outer section chord
+
+% Total spanwise chord array
+chord_total = [chord1, chord2];
+
+% Recalculate area distribution using chord lengths and geometry
+Area_Span = chord_total .* spar_height .* chord_total; % Cross-sectional area at each spanwise position
+
+% Normalizing and correcting the area distribution for taper
+Area_Span = (S1 * (lambda^2 - 2 * lambda + 1)) .* (yspan ./ semispan).^2 + ...
+            (S1 * (-2 + 2 * lambda)) .* (yspan ./ semispan) + S1;
+
+% Wing weight span distribution based on the calculated areas
+WingW_Span = ((Wing_Weight * 2.5) / WingBox_Volume) .* Area_Span;
+
+% Gear and fuel load spans re-initialized
+Gear_Load_Span = zeros([1, length(yspan)]);
+FuelW_Span = zeros([1, length(yspan)]);
+
+% Calculate fuel load span for the inner 90% of the semispan
+for i = 1:length(yspan)
+    if yspan(i) <= 0.9 * semispan
+        FuelW_Span(i) = ((Wing_MaxFuel * 2.5) / (0.9 * WingBox_Volume)) * Area_Span(i);
+    end
+end
 
 for i = 1:length(yspan)
     if yspan(i) <= 0.9*semispan
@@ -220,7 +260,7 @@ end
 %ADD IN LANDING GEAR WEIGHT
 for i = 1:length(yspan)
     if yspan(i) < 1.8
-        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*2.5/(1.8);
+        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*3.75/(1.8);
         Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/1.8;
     end
 end
@@ -264,9 +304,9 @@ MLW_GearShear = cumtrapz(flip(yspan),flip(Gear_Load_Span));
 
 for i = 1:n
     if yspan(i) <= 1.8
-        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*2.5;
-        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*2.5;
-        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*2.5;
+        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*3.75;
+        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*3.75;
+        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*3.75;
     end
 end
 plot(flip(yspan),-MTOW_LShear,'b')

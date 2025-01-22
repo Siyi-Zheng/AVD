@@ -9,7 +9,7 @@ L_ws = 65; % wing span in METRE
 %Weights
 W_o = 390057;        %MTOW in KG
 % W_o = 353000;
-W_ng = 0.05*W_o;      % minimum Nose gear weight carrying capability
+W_ng = 0.088*W_o;      % minimum Nose gear weight carrying capability
 
 % check that this ratio is alright for formost and aftmost CG
 
@@ -22,23 +22,23 @@ Wo_lbs = W_o*2.20462; %Wo in lbs (errikos just being extremely annoying with val
 
 %Moments
 x_wing = 37; % distance of wing leading edge in METRE
-% x_cg = x_wing + 0.4*MAC; % distance of cg (estimated)
-x_cg = 35.58;                        % distance of aftmost cg (actual)
-x_mg = 37;                                %x distance of main gears (actual)
+x_cg = x_wing + 0.4*MAC; % distance of cg (estimated)
+% x_cg = 35.58;                        % distance of aftmost cg (actual)
+x_mg = 43;                                %x distance of main gears (actual)
 x_ng = (W_o*x_cg - W_mg*x_mg)/W_ng;         %x distance of nose gears
 % Assume foremost CG is 20% MAC in front of aftmost CG
-% x_cg_foremost = x_cg - 0.2*MAC; % foremost cg location in METRE (estimated)
-x_cg_foremost = 34.1295; % foremost cg location in METRE (actual)
+x_cg_foremost = x_cg - 0.2*MAC; % foremost cg location in METRE (estimated)
+% x_cg_foremost = 34.04; % foremost cg location in METRE (actual)
 ng_perc_max = (x_mg-x_cg_foremost)/(x_mg-x_ng) % max percentage loading of nose gear
 
 % fuselage radius 3.1m
-L_sep = 2; % in meters
+L_sep = 1; % in meters
 
 %Main Gear Height
 beta = 15; % tipback angle in degree
 gamma = 12; % rotation clearance angle
 H = tan(deg2rad(gamma))*(L_plane-x_mg-L_sep); % correction for the rear main gear
-tip_back_angle = rad2deg(tan((x_mg-x_cg+L_sep)/H)); % between 15 ~ 25 degree
+tip_back_angle = rad2deg(tan((x_mg-x_cg)/H)); % between 15 ~ 25 degree
 %check wing tip do not hit the ground at 5 degree roll and AOA 90% Cl_max
 
 
@@ -83,9 +83,9 @@ d_tire_m = 52;
 
 % Nose Wheel
 %Three-part Name Tire: 52 x 20.5-23
-R_r_n = 19.2; % Rolling Radius in INCH
-w_tire_n = 18.0; % width
-d_tire_n = 46.9; % diameter
+R_r_n = 21.3; % Rolling Radius in INCH
+w_tire_n = 20.5; % width
+d_tire_n = 52; % diameter
 
 
 %Tire Pressure
@@ -116,7 +116,7 @@ S_T = D_mw/2 - R_r_m; % stroke of tire (radius - rolling radius)
 S_T = S_T*0.0254; % INCH to metre
 S_main = (V_vertical)^2 / (2*9.81*n*N_gear) - n_tire/n * S_T; % should be around 25-30cm
 % Nose
-S_T = D_nw/2 - R_r_n; % stroke of tire (radius - rolling radius)
+S_T = D_nw/2 - R_r_m; % stroke of tire (radius - rolling radius)
 S_T = S_T*0.0254; % INCH to metre
 S_nose = (V_vertical)^2 / (2*9.81*n*N_gear) - n_tire/n * S_T; % should be around 25-30cm
 

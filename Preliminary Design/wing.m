@@ -206,50 +206,10 @@ S1 = wing_root*(rspar_pos-fspar_pos)*spar_height*wing_root;
 S2 = S1*(lambda)^2;
 WingBox_Volume = 1/3*(S1+S2+(S1*S2)^(1/2))*semispan;
 
-% Calculating chord distribution using updated parameters
-b = semispan * tand(sweep); % Leading-edge sweep for semispan
-a = b - wing_root * lambda / 4; % Adjusted for taper ratio and quarter-chord location
-
-% Calculate the sweep angle
-aa = (a + wing_root * lambda) / semispan; 
-sweep_angle = atand(aa);
-
-% Chord distribution
-outer_chord = wing_root - (9.75 * tand(sweep_angle)); % Outer chord calculation
-gradient1 = (outer_chord - wing_root) / 9.75;
-gradient2 = (wing_root * lambda - outer_chord) / (semispan - 9.75);
-
-% Span segments for inner and outer sections
-span1 = linspace(0, 9.75, 100); % First section
-span2 = linspace(9.75, semispan, 100); % Second section
-
-% Chord lengths for each section
-chord1 = gradient1 * span1 + wing_root; % Inner section chord
-chord2 = gradient2 * span2 + outer_chord - gradient2 * 9.75; % Outer section chord
-
-% Total spanwise chord array
-chord_total = [chord1, chord2];
-
-% Recalculate area distribution using chord lengths and geometry
-Area_Span = chord_total .* spar_height .* chord_total; % Cross-sectional area at each spanwise position
-
-% Normalizing and correcting the area distribution for taper
-Area_Span = (S1 * (lambda^2 - 2 * lambda + 1)) .* (yspan ./ semispan).^2 + ...
-            (S1 * (-2 + 2 * lambda)) .* (yspan ./ semispan) + S1;
-
-% Wing weight span distribution based on the calculated areas
-WingW_Span = ((Wing_Weight * 2.5) / WingBox_Volume) .* Area_Span;
-
-% Gear and fuel load spans re-initialized
-Gear_Load_Span = zeros([1, length(yspan)]);
-FuelW_Span = zeros([1, length(yspan)]);
-
-% Calculate fuel load span for the inner 90% of the semispan
-for i = 1:length(yspan)
-    if yspan(i) <= 0.9 * semispan
-        FuelW_Span(i) = ((Wing_MaxFuel * 2.5) / (0.9 * WingBox_Volume)) * Area_Span(i);
-    end
-end
+Area_Span = (S1*(lambda^2-2*lambda+1)).*(yspan./semispan).^2 + (S1*(-2+2*lambda)).*(yspan./semispan) + S1;
+WingW_Span = ((Wing_Weight*3.75)/WingBox_Volume).*Area_Span;
+Gear_Load_Span = zeros([1,length(yspan)]);
+FuelW_Span = zeros([1,length(yspan)]);
 
 for i = 1:length(yspan)
     if yspan(i) <= 0.9*semispan
@@ -259,11 +219,30 @@ end
 
 %ADD IN LANDING GEAR WEIGHT
 for i = 1:length(yspan)
-    if yspan(i) < 1.8
-        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*3.75/(1.8);
-        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/1.8;
+    if yspan(i) < 5.6
+        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*3.75/(5.6);
+        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/5.6;
     end
 end
+
+% ADD ENGINE WEIGHT TO THE SPANWISE DISTRIBUTION
+engine_mass = 6550; % Mass of one engine in kilograms
+engine_load = engine_mass * 9.81; % Weight of one engine in Newtons
+engine_positions = [9.75, 21.1]; % Spanwise positions of the engines in meters
+
+for i = 1:length(yspan)
+    % Check if within the 1-meter influence region (0.5 m on each side) of the first engine
+    if yspan(i) >= engine_positions(1) - 0.5 && yspan(i) <= engine_positions(1) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+    % Check if within the 1-meter influence region (0.5 m on each side) of the second engine
+    if yspan(i) >= engine_positions(2) - 0.5 && yspan(i) <= engine_positions(2) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+end
+
 
 
 Landing_Spanwise_Lift = Spanwise_Lift.*0.85;

@@ -75,7 +75,7 @@ area_aerofoil = 0.0939*chord.^2;
 %CASE 1 - symmetric flight at ultimate load factor evaluated at manoeuvre
 %(speed = V_A)
 v_a = 130.537;                  %Manouvre speed
-n = 2.5;                        %corresponding load factor from V/N diagram
+n = 3.75;                        %corresponding load factor from V/N diagram
 L = n*W*g;                      %overall lift
 C_l = (2*n*W_S)/(rho*v_a^2);    %lift coeff. This is computed to be 1.8749
 
@@ -110,9 +110,14 @@ total_weight = dW_wing + dW_fuel;                       %add both the loads due 
 total_weight(660) = total_weight(660) + l_engine;       %add weight of engine
 total_weight(1798) = total_weight(1798) + l_engine;     %add weight of engine
 total_weight(273) = total_weight(273) + l_mg;           %add weight of main landing gear
+total_weight = total_weight*100;
 
 figure(1)
-plot(span,total_weight/0.01);
+plot(span,total_weight);
+title("Weight distribution along the span due to inertia loads");
+xlabel("span (m)");
+ylabel("Weight distribution (N)");
+grid on
 
 
 %CALCULATING SHEAR
@@ -122,6 +127,10 @@ dL = L0*sqrt(1-(span/32.5).^2);     %elliptic lift distribution
 
 figure(2)
 plot(span,dL);
+title("Lift distribution");
+xlabel("span (m)");
+ylabel("Lift (N)");
+grid on
 
 for i = 1:length(span)
     temp = dD(i:length(span));
@@ -140,6 +149,10 @@ shear_total = sqrt(shear_x.^2 + shear_z.^2);
 
 figure(3)
 plot(span,shear_total);
+title("shear distribution");
+xlabel("span (m)");
+ylabel("shear (N/m)");
+grid on
 
 %CALCULATING BENDING MOMENT
 for i = 1:length(span)
@@ -154,14 +167,35 @@ end
 
 figure(4)
 plot(span,M_x);
+title("x bending moment distribution");
+xlabel("span (m)");
+ylabel("bending moment (Nm)");
+grid on
 
 figure(5)
 plot(span,M_z);
+title("z bending moment distribution");
+xlabel("span (m)");
+ylabel("bending moment (Nm)");
+grid on
 
 
 %CALCULATING TORQUE
-dM_y = -dL
+%dM_y = -dL.*0.25.*chord + dD.*0.07.*chord + total_weight.*cg.*chord + 
 
+figure(6)
+plot(span,shear_z);
+title("shear_z distribution");
+xlabel("span (m)");
+ylabel("shear (N/m)");
+grid on
+
+figure(7)
+plot(span,shear_x);
+title("shear_x distribution");
+xlabel("span (m)");
+ylabel("shear (N/m)");
+grid on
 
 
 

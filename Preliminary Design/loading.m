@@ -8,7 +8,7 @@ Cla = 6.29; % lift curve slope (1/rad)
 wing_loading = 353385 / 482 * 9.81; % wing loading (kg/m^2)
 n_max = 2.5; % max. load factor
 n_min = -1.0; % min. load factor
-v_c = 245; % cruise speed (m/s EAS)
+v_c = 137; % cruise speed (m/s EAS)
 v_d = v_c / 0.8; % dive speed (m/s) using FAR 25
 CL_max = 1.72;
 CL_max_flaps = 2.85;
@@ -42,42 +42,43 @@ n_min_gust_d = 1 - (rho * U_d * v_list * Cla / (2 * wing_loading));
 
 % plotting
 % aero loads
-plot(v_list, n_max_aero, color="black", linestyle="--")
+plot(v_list*1.944, n_max_aero, color="black", linestyle="--")
 hold on
-plot(v_list, n_min_aero, color="black", linestyle="--")
+plot(v_list*1.944, n_min_aero, color="black", linestyle="--")
 yline(n_max, color="black", linestyle="--")
 yline(n_min, color="black", linestyle="--")
-xline(v_a, color="black", linestyle="--", label="V_A")
-xline(v_c, color="black", linestyle="--", label="V_C")
-xline(v_d, color="black", linestyle="--", label="V_D")
-xline(v_stall, color="black", linestyle="--", label="V_{S1}")
+xline(v_a*1.944, color="black", linestyle="--")
+xline(v_c*1.944, color="black", linestyle="--")
+xline(v_d*1.944, color="black", linestyle="--")
+xline(v_stall*1.944, color="black", linestyle="--")
+xline(v_stall_flaps*1.944, color="black", linestyle="--")
 
 % gust loads
-plot(v_list, n_max_gust_c, color="black", linestyle=":")
-plot(v_list, n_min_gust_c, color="black", linestyle=":")
-plot(v_list, n_max_gust_d, color="black", linestyle=":")
-plot(v_list, n_min_gust_d, color="black", linestyle=":")
+plot(v_list*1.944, n_max_gust_c, color="black", linestyle=":")
+plot(v_list*1.944, n_min_gust_c, color="black", linestyle=":")
+plot(v_list*1.944, n_max_gust_d, color="black", linestyle=":")
+plot(v_list*1.944, n_min_gust_d, color="black", linestyle=":")
 
 % final envelope
-plot(v_list_flaps, n_max_flaps, color="black", linewidth=2)
-plot([v_stop_flaps v_flaps], [2 2], color="black", linewidth=2)
+plot(v_list_flaps*1.944, n_max_flaps, color="black", linewidth=2)
+plot([v_stop_flaps*1.944 v_flaps*1.944], [2 2], color="black", linewidth=2)
 n_flaps_max = rho * CL_max / (2 * wing_loading) * v_flaps .^ 2;
-plot([v_flaps v_flaps], [n_flaps_max 2], color="black", linewidth=2)
+plot([v_flaps*1.944 v_flaps*1.944], [n_flaps_max 2], color="black", linewidth=2)
 v_aero_str = sqrt(5 * wing_loading / (rho * CL_max));
 v_aero_str2 = sqrt(-2 * wing_loading / (rho * CL_min));
 v_aero_list = linspace(v_flaps, v_aero_str, 100);
 n_aero_list = rho * CL_max / (2 * wing_loading) * v_aero_list .^ 2;
-plot(v_aero_list, n_aero_list, color="black", linewidth=2)
-plot([v_aero_str v_d], [2.5 2.5], color="black", linewidth=2)
-plot([v_d v_d], [2.5 -1], color="black", linewidth=2)
-plot([v_aero_str2 v_d], [-1 -1], color="black", linewidth=2)
+plot(v_aero_list*1.944, n_aero_list, color="black", linewidth=2)
+plot([v_aero_str*1.944 v_d*1.944], [2.5 2.5], color="black", linewidth=2)
+plot([v_d*1.944 v_d*1.944], [2.5 -1], color="black", linewidth=2)
+plot([v_aero_str2*1.944 v_d*1.944], [-1 -1], color="black", linewidth=2)
 v_aero_list2 = linspace(0, v_aero_str2, 100);
 n_aero_list2 = rho * CL_min / (2 * wing_loading) * v_aero_list2 .^ 2;
-plot(v_aero_list2, n_aero_list2, color="black", linewidth=2)
+plot(v_aero_list2*1.944, n_aero_list2, color="black", linewidth=2)
 
 % formatting
-xlim([min(v_list) max(v_list)])
+xlim([min(v_list)*1.944 max(v_list)*1.944])
 ylim([-1.5 3.5])
-xlabel("V_{EAS} (m/s)")
+xlabel("Airspeed (KEAS)")
 ylabel("Load factor")
 grid on

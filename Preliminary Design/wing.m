@@ -183,7 +183,7 @@ hold off
 %Secton Wing Loads
 %L0 uses Empty Fuel Weight as the Worst Case:
 
-L0 = (2*2.5*9.81*162976)/(pi*semispan*2);
+L0 = (4*3.75*9.81*353000)/(pi*semispan*2);
 
 for i = 1:length(yspan)
     if yspan(i) >= 0 %fuselage_diam/2
@@ -219,11 +219,30 @@ end
 
 %ADD IN LANDING GEAR WEIGHT
 for i = 1:length(yspan)
-    if yspan(i) < 1.8
-        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*2.5/(1.8);
-        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/1.8;
+    if yspan(i) < 5.6
+        WingW_Span(i) = WingW_Span(i) + Wing_LandingG*3.75/(5.6);
+        Gear_Load_Span(i) = Gear_Load_Span(i) + Landing_GearLoad/5.6;
     end
 end
+
+% ADD ENGINE WEIGHT TO THE SPANWISE DISTRIBUTION
+engine_mass = 6550; % Mass of one engine in kilograms
+engine_load = engine_mass * 9.81; % Weight of one engine in Newtons
+engine_positions = [9.75, 21.1]; % Spanwise positions of the engines in meters
+
+for i = 1:length(yspan)
+    % Check if within the 1-meter influence region (0.5 m on each side) of the first engine
+    if yspan(i) >= engine_positions(1) - 0.5 && yspan(i) <= engine_positions(1) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+    % Check if within the 1-meter influence region (0.5 m on each side) of the second engine
+    if yspan(i) >= engine_positions(2) - 0.5 && yspan(i) <= engine_positions(2) + 0.5
+        WingW_Span(i) = WingW_Span(i) + engine_load * 3.75 / 1.0; % Distribute over 1 meter
+        Gear_Load_Span(i) = Gear_Load_Span(i) + engine_load / 1.0; % Distribute over 1 meter
+    end
+end
+
 
 
 Landing_Spanwise_Lift = Spanwise_Lift.*0.85;
@@ -240,7 +259,7 @@ legend('Lift Force MTOW','Lift Force MLW','Lift Force EFW','Wing Sectional Weigh
 xlabel('Spanwise Position (m)')
 ylabel('Sectional Load (N/m)')
 grid 
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -264,9 +283,9 @@ MLW_GearShear = cumtrapz(flip(yspan),flip(Gear_Load_Span));
 
 for i = 1:n
     if yspan(i) <= 1.8
-        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*2.5;
-        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*2.5;
-        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*2.5;
+        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*3.75;
+        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*3.75;
+        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*3.75;
     end
 end
 plot(flip(yspan),-MTOW_LShear,'b')
@@ -288,7 +307,7 @@ grid on
 legend('LC 1: MTOW','LC 1: EFW','LC 3: EFW',Location='northeast')
 ylabel('Shear Force (N)')
 xlabel('Spanwise Position (m)')
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -311,7 +330,7 @@ ylabel('Bending Moment (Nm)')
 legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
 set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
 grid on
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -362,7 +381,7 @@ grid on
 legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
 xlabel('Spanwise Position (m)')
 ylabel('Torque (Nm)')
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');

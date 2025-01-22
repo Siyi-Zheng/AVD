@@ -8,7 +8,6 @@ close all
 %Spars at 0.15 & 0.75.
 fspar_pos = 0.15;
 rspar_pos = 0.7;
-spar_height = (0.074221+0.062372)/2;
 fuselage_diam = 6.34;
 
 NACA = [1.000  -.0104
@@ -183,7 +182,7 @@ hold off
 %Secton Wing Loads
 %L0 uses Empty Fuel Weight as the Worst Case:
 
-L0 = (2*2.5*9.81*162976)/(pi*semispan*2);
+L0 = (4*2.5*9.81*353000)/(pi*semispan*2);
 
 for i = 1:length(yspan)
     if yspan(i) >= 0 %fuselage_diam/2
@@ -207,7 +206,7 @@ S2 = S1*(lambda)^2;
 WingBox_Volume = 1/3*(S1+S2+(S1*S2)^(1/2))*semispan;
 
 Area_Span = (S1*(lambda^2-2*lambda+1)).*(yspan./semispan).^2 + (S1*(-2+2*lambda)).*(yspan./semispan) + S1;
-WingW_Span = ((Wing_Weight*3.75)/WingBox_Volume).*Area_Span;
+WingW_Span = ((Wing_Weight*2.5)/WingBox_Volume).*Area_Span;
 Gear_Load_Span = zeros([1,length(yspan)]);
 FuelW_Span = zeros([1,length(yspan)]);
 
@@ -240,7 +239,7 @@ legend('Lift Force MTOW','Lift Force MLW','Lift Force EFW','Wing Sectional Weigh
 xlabel('Spanwise Position (m)')
 ylabel('Sectional Load (N/m)')
 grid 
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -288,7 +287,7 @@ grid on
 legend('LC 1: MTOW','LC 1: EFW','LC 3: EFW',Location='northeast')
 ylabel('Shear Force (N)')
 xlabel('Spanwise Position (m)')
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -311,7 +310,7 @@ ylabel('Bending Moment (Nm)')
 legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
 set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
 grid on
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
@@ -362,7 +361,7 @@ grid on
 legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
 xlabel('Spanwise Position (m)')
 ylabel('Torque (Nm)')
-xlim([0,13])
+xlim([0,33])
 set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
 set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
 xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');

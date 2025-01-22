@@ -194,7 +194,7 @@ for i = 1:length(yspan)
 end
 
 %Weight of ONE Wing in N
-Wing_Weight = 9.81*4968/2;
+Wing_Weight = 9.81*27100/2;
 %Weight of ONE Wing fuel in N
 Wing_MaxFuel = 9.81*(0.413*(162976-27100))/2;
 %Weight of ONE landing gear in N

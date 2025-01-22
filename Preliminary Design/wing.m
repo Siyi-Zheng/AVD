@@ -8,6 +8,7 @@ close all
 %Spars at 0.15 & 0.75.
 fspar_pos = 0.15;
 rspar_pos = 0.7;
+spar_height = (0.074221+0.062372)/2;
 fuselage_diam = 6.34;
 
 NACA = [1.000  -.0104

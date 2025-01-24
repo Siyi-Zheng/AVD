@@ -74,15 +74,21 @@ area_aerofoil = 0.0939*chord.^2;
 
 %CASE 1 - symmetric flight at ultimate load factor evaluated at manoeuvre
 %(speed = V_A)
-v_a = 130.537;                  %Manouvre speed
+v_a = 171.25;                  %Manouvre speed
 n = 3.75;                        %corresponding load factor from V/N diagram
 L = n*W*g;                      %overall lift
 C_l = (2*n*W_S)/(rho*v_a^2);    %lift coeff. This is computed to be 1.8749
 
 alpha = 15;     %AoA in degrees taken from polars
-C_d = 0.43;     % drag coeff taken from polars
+C_d = 0.022;     % drag coeff taken from polars
 
 D = 0.5*rho*v_a^2*S*C_d;    %overall drag
+
+%THIS IS ONLY FOR CASE 3, COMMENT OUT OTHERWISE
+% L = 0;
+% D = 0;
+% C_l = 0;
+% C_d = 0;
 
 %aerodynamics (assuming an elliptic lift distribution)
 L0 = L/(32.5*pi*0.5 - 6.34);
@@ -107,15 +113,16 @@ dW_fuel = dmass_fuel*g;         %weight of fuel in each section
 
 %add all of the weights to get the total weight experienced at each section
 total_weight = dW_wing + dW_fuel;                       %add both the loads due to the wing and the fuel
-total_weight(660) = total_weight(660) + l_engine;       %add weight of engine
-total_weight(1798) = total_weight(1798) + l_engine;     %add weight of engine
-total_weight(273) = total_weight(273) + l_mg;           %add weight of main landing gear
+total_weight(623:698) = total_weight(623:698) + l_engine/75;       %add weight of engine
+total_weight(1761:1836) = total_weight(1761:1836) + l_engine/75;     %add weight of engine
+total_weight(249:297) = total_weight(273) + l_mg/48;           %add weight of main landing gear
 total_weight = total_weight*100;
+%total_weight(249:297) = total_weight(249:297) - 3.4278e6/48;       %THIS IS ONLY FOR CASE 3 COMMENT OUT OTHERWISE
 
 figure(1)
-plot(span,total_weight);
-title("Weight distribution along the span due to inertia loads");
-xlabel("span (m)");
+plot(span,total_weight,"b",LineWidth=1.5);
+%title("Weight distribution along the span due to inertia loads");
+xlabel("Span (m)");
 ylabel("Weight distribution (N)");
 grid on
 
@@ -198,6 +205,17 @@ ylabel("shear (N/m)");
 grid on
 
 
+
+figure(8)
+plot(span,dL-total_weight,"b",LineWidth=1.5);
+hold on
+plot(span,dL,"r");
+plot(span,-total_weight);
+legend("Load distribution","Lift distribution","Weight distribution");
+%title("Weight distribution along the span due to inertia loads");
+xlabel("Span (m)");
+ylabel("Weight distribution (N/m)");
+grid on
 
 
 

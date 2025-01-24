@@ -164,6 +164,7 @@ qchord_x = interp(qchord_x,n/100);
 
 %Wing Plots
 % - Right Wing
+figure(1)
 plot(xleading,yleading,'k',LineWidth=1)
 hold on
 plot(xtip,ytip,'k',LineWidth=1)
@@ -247,6 +248,7 @@ end
 
 Landing_Spanwise_Lift = Spanwise_Lift.*0.85;
 LandingW_Span = -WingW_Span-(0.85.*FuelW_Span-0.15*WingW_Span);
+figure(2)
 plot(yspan-1.305,Spanwise_Lift,'b')
 hold on
 plot(yspan-1.305,Landing_Spanwise_Lift,'b:')
@@ -288,6 +290,7 @@ for i = 1:n
         MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*3.75;
     end
 end
+figure
 plot(flip(yspan),-MTOW_LShear,'b')
 hold on
 plot(flip(yspan),-MLW_LShear,'b:')
@@ -321,6 +324,7 @@ MTOW_BM = flip(cumtrapz((yspan),-(MTOW_LShear+MTOW_WShear)));
 EFW_BM = flip(cumtrapz((yspan),-(EFW_LShear+EFW_WShear)));
 MLW_BM = flip(cumtrapz((yspan),-(MLW_LShear+MLW_WShear+MLW_GearShear)));
 set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
+figure
 plot(yspan-1.305,MTOW_BM,'b')
 hold on
 plot(yspan-1.305,EFW_BM,'r')
@@ -373,6 +377,7 @@ Torque_landing(n) = 0;
 % Torque_EW = Torque_EW - M0_cruise;
 % Torque_landing = Torque_landing - M0_landing;
 set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
+figure
 plot(yspan-1.305,Torque_MTOW,'b')
 hold on
 plot(yspan-1.305,Torque_EW,'r')

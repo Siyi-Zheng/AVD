@@ -218,6 +218,39 @@ for i = 1:length(yspan)
     end
 end
 
+% Flight speeds for load cases
+VA = 250; % Maneuver speed (m/s)
+VD = 320; % Dive speed (m/s)
+
+% Symmetric Flight Lift Distribution
+L0_VA = (4 * 3.75 * 9.81 * 353000) / (pi * semispan * 2); % Ultimate load factor at VA
+L0_VD = (4 * 3.0 * 9.81 * 353000) / (pi * semispan * 2); % Reduced load factor at VD
+
+Spanwise_Lift_VA = zeros(size(yspan));
+Spanwise_Lift_VD = zeros(size(yspan));
+for i = 1:length(yspan)
+    Spanwise_Lift_VA(i) = L0_VA * sqrt(1 - (yspan(i) / semispan)^2);
+    Spanwise_Lift_VD(i) = L0_VD * sqrt(1 - (yspan(i) / semispan)^2);
+end
+
+% One Engine Inoperative (OEI) Load
+engine_thrust = 150000; % Thrust of one engine in Newtons
+engine_offset = 10; % Distance from CG to engine in meters
+vertical_stab_offset = 30; % Distance from CG to vertical stabilizer aerodynamic center in meters
+
+yaw_moment = engine_thrust * engine_offset; % Yawing moment due to OEI
+stab_force = yaw_moment / vertical_stab_offset; % Horizontal stabilizer force
+
+% Apply stabilizer force as a horizontal load
+OEI_Load = zeros(size(yspan));
+stab_position = semispan + 5; % Approximate spanwise location of the tailplane
+for i = 1:length(yspan)
+    if abs(yspan(i) - stab_position) <= 1 % Apply load over a 2-meter span
+        OEI_Load(i) = stab_force / 2; % Uniform distribution over 2 meters
+    end
+end
+
+
 %ADD IN LANDING GEAR WEIGHT
 for i = 1:length(yspan)
     if yspan(i) < 5.6
@@ -251,13 +284,16 @@ LandingW_Span = -WingW_Span-(0.85.*FuelW_Span-0.15*WingW_Span);
 figure(2)
 plot(yspan-1.305,Spanwise_Lift,'b')
 hold on
+plot(yspan, Spanwise_Lift_VA, 'b', 'LineWidth', 1.5);
+plot(yspan, Spanwise_Lift_VD, 'r', 'LineWidth', 1.5);
+plot(yspan, OEI_Load, 'g', 'LineWidth', 1.5);
 plot(yspan-1.305,Landing_Spanwise_Lift,'b:')
 plot(yspan-1.305,Spanwise_Lift.*(24368/48725),'b--')
 plot(yspan-1.305,-WingW_Span-FuelW_Span,'r')
 plot(yspan-1.305,LandingW_Span,'r:')
 plot(yspan-1.305,-WingW_Span,'r--')
 plot(yspan-1.305,Gear_Load_Span,'g:',LineWidth=1)
-legend('Lift Force MTOW','Lift Force MLW','Lift Force EFW','Wing Sectional Weight MTOW','Wing Sectional Weight MLW','Wing Sectional Weight EFW','Landing Gear Load')
+legend('Lift Force MTOW','Symmetric Flight - VA', 'Symmetric Flight - VD', 'OEI Load''Lift Force MLW','Lift Force EFW','Wing Sectional Weight MTOW','Wing Sectional Weight MLW','Wing Sectional Weight EFW','Landing Gear Load')
 xlabel('Spanwise Position (m)')
 ylabel('Sectional Load (N/m)')
 grid 

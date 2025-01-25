@@ -164,6 +164,7 @@ qchord_x = interp(qchord_x,n/100);
 
 %Wing Plots
 % - Right Wing
+figure(1)
 plot(xleading,yleading,'k',LineWidth=1)
 hold on
 plot(xtip,ytip,'k',LineWidth=1)
@@ -280,6 +281,7 @@ end
 
 Landing_Spanwise_Lift = Spanwise_Lift.*0.85;
 LandingW_Span = -WingW_Span-(0.85.*FuelW_Span-0.15*WingW_Span);
+figure(2)
 plot(yspan-1.305,Spanwise_Lift,'b')
 hold on
 plot(yspan, Spanwise_Lift_VA, 'b', 'LineWidth', 1.5);
@@ -304,3 +306,127 @@ lg = legend;
 set(lg, 'Interpreter','latex');
 hold off
 
+
+%Derivation of Shear Force Diagrams
+
+MTOW_LShear = cumtrapz(flip(yspan),flip(Spanwise_Lift));
+EFW_LShear = cumtrapz(flip(yspan),flip(Spanwise_Lift.*(27100/162976)));
+
+MTOW_WShear = cumtrapz(flip(yspan),flip(-WingW_Span-FuelW_Span));
+EFW_WShear = cumtrapz(flip(yspan),flip(-WingW_Span));
+
+MLW_LShear = cumtrapz(flip(yspan),flip(Landing_Spanwise_Lift));
+MLW_WShear = cumtrapz(flip(yspan),flip(LandingW_Span));
+MLW_GearShear = cumtrapz(flip(yspan),flip(Gear_Load_Span));
+
+for i = 1:n
+    if yspan(i) <= 1.8
+        MTOW_WShear(n-i) = MTOW_WShear(n-i) + Wing_LandingG*3.75;
+        EFW_WShear(n-i) = EFW_WShear(n-i) + Wing_LandingG*3.75;
+        MLW_WShear(n-1) = MLW_WShear(n-i) + Wing_LandingG*3.75;
+    end
+end
+figure
+plot(flip(yspan),-MTOW_LShear,'b')
+hold on
+plot(flip(yspan),-MLW_LShear,'b:')
+plot(flip(yspan),-EFW_LShear,'b--')
+plot(flip(yspan),-MTOW_WShear,'r')
+plot(flip(yspan),-MLW_WShear,'r:')
+plot(flip(yspan),-EFW_WShear,'r--')
+plot(flip(yspan),-MLW_GearShear,'g:')
+legend('Lift Shear MTOW (N)','Lift Shear MLW (N)','Lift Shear EFW (N)','Wing Weight Shear MTOW (N)','Wing Weight Shear MLW (N)','Wing Weight Shear EFW (N)','Gear Load Shear',Location='northeast')
+title('Load Case 1 MTOW vs. EFW Shear Diagrams')
+hold off
+plot(flip(yspan)-1.305,-(MTOW_LShear+MTOW_WShear),'b')
+hold on
+plot(flip(yspan)-1.305,-(EFW_LShear+EFW_WShear),'r')
+plot(flip(yspan)-1.305,-(MLW_LShear+MLW_WShear+MLW_GearShear),'g')
+grid on
+legend('LC 1: MTOW','LC 1: EFW','LC 3: EFW',Location='northeast')
+ylabel('Shear Force (N)')
+xlabel('Spanwise Position (m)')
+xlim([0,33])
+set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
+set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
+xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
+ylabel(get(get(gca,'YLabel'),'String'),'Interpreter','latex');
+lg = legend;
+set(lg, 'Interpreter','latex');
+hold off
+
+%Bending Moments
+MTOW_BM = flip(cumtrapz((yspan),-(MTOW_LShear+MTOW_WShear)));
+EFW_BM = flip(cumtrapz((yspan),-(EFW_LShear+EFW_WShear)));
+MLW_BM = flip(cumtrapz((yspan),-(MLW_LShear+MLW_WShear+MLW_GearShear)));
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
+figure
+plot(yspan-1.305,MTOW_BM,'b')
+hold on
+plot(yspan-1.305,EFW_BM,'r')
+plot(yspan-1.305,MLW_BM,'g')
+xlabel('Span Position (m)')
+ylabel('Bending Moment (Nm)')
+legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
+grid on
+xlim([0,33])
+set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
+set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
+xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
+ylabel(get(get(gca,'YLabel'),'String'),'Interpreter','latex');
+lg = legend;
+set(lg, 'Interpreter','latex');
+hold off
+
+%Torque 
+chord_x = (wing_root*(lambda-1))/(semispan).*yspan + wing_root;
+CM_EW = spar_COM_x.*0.8 + skin_COM_x.*0.2;
+CM_MTOW = (CM_EW.*Wing_Weight + fuel_COM_x.*(Wing_MaxFuel-Wing_Weight))/(Wing_MaxFuel);
+
+
+M0_cruise = (1/2*(0.287)*(0.81*295)^2).*(chord_x.^2).*(-0.081);
+M0_landing = (1/2*(1.23)*(91.8*1.15)^2).*(chord_x.^2).*(-0.081);
+
+%Torque_EW = (Spanwise_Lift.*(24368/48725)).*(-qchord_x+flexural_axis_x) + WingW_Span.*(-CM_EW+flexural_axis_x)-M0_cruise;
+%Torque_MTOW = ().*((Spanwise_Lift).*(-qchord_x+flexural_axis_x) + (WingW_Span+FuelW_Span).*(-CM_MTOW+flexural_axis_x))-M0_cruise;
+%Torque_landing= (Spanwise_Lift.*0.85).*(-qchord_x+flexural_axis_x) + (LandingW_Span).*(-CM_MTOW+flexural_axis_x)-M0_cruise;
+
+for i = 1:n-1
+    Torque_MTOW_calc(i) = (Spanwise_Lift(i))*(-qchord_x(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i))+(WingW_Span(i)+FuelW_Span(i))*(-CM_MTOW(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i))-M0_cruise(i)*(yspan(i+1)-yspan(i));
+    Torque_EW_calc(i) = (Spanwise_Lift(i)*(24368/48725)).*(-qchord_x(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i)) + WingW_Span(i)*(-CM_EW(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i))-M0_cruise(i)*(yspan(i+1)-yspan(i));
+    Torque_landing_calc(i) =  (Spanwise_Lift(i)*0.85)*(-qchord_x(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i))+(LandingW_Span(i))*(-CM_MTOW(i)+flexural_axis_x(i))*(yspan(i+1)-yspan(i))-(rspar_x(i)-flexural_axis_x(i))*(Gear_Load_Span(i))*(yspan(i+1)-yspan(i))-M0_landing(i)*(yspan(i+1)-yspan(i));
+end
+for i = 1:n-1
+    temp = Torque_MTOW_calc(i:n-1); 
+    temp2 = Torque_EW_calc(i:n-1);
+    temp3 = Torque_landing_calc(i:n-1);
+    Torque_MTOW(i) = sum(temp);
+    Torque_EW(i) = sum(temp2);
+    Torque_landing(i) = sum(temp3);
+end
+
+Torque_MTOW(n) = 0;
+Torque_EW(n) = 0;
+Torque_landing(n) = 0;
+% Torque_MTOW = Torque_MTOW - M0_cruise;
+% Torque_EW = Torque_EW - M0_cruise;
+% Torque_landing = Torque_landing - M0_landing;
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',12,'FontWeight','Bold', 'LineWidth',1.5);
+figure
+plot(yspan-1.305,Torque_MTOW,'b')
+hold on
+plot(yspan-1.305,Torque_EW,'r')
+plot(yspan-1.305,Torque_landing,'g')
+grid on
+legend('LC 1: MTOW','LC 1: EFW','LC 3: MLW')
+xlabel('Spanwise Position (m)')
+ylabel('Torque (Nm)')
+xlim([0,33])
+set(findobj(gcf, 'type', 'axes'),'FontSize', 13, 'FontWeight', 'Bold', 'LineWidth', 1);
+set(findobj(gcf, 'type', 'line'), 'LineWidth', 1.5);
+xlabel(get(get(gca,'XLabel'),'String'),'Interpreter','latex');
+ylabel(get(get(gca,'YLabel'),'String'),'Interpreter','latex');
+lg = legend;
+set(lg, 'Interpreter','latex');
+hold off

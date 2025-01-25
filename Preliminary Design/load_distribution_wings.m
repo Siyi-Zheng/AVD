@@ -11,6 +11,9 @@ a = b - 3.47/4;
 
 aa = (a + 3.47)/32.45;
 
+%CMo for airfoil
+Cmoairf = -0.131;
+
 %sweep_angle = atand(aa);
 sweep_angle = atand(aa);
 
@@ -92,7 +95,6 @@ D = 0.5*rho*v_a^2*S*C_d;    %overall drag
 
 %aerodynamics (assuming an elliptic lift distribution)
 L0 = L/(32.5*pi*0.5 - 6.34);
-
 
 %load on each section of the wing due to the wing's weight
 dy = 0.01;                              %spacing between each section
@@ -188,7 +190,14 @@ grid on
 
 
 %CALCULATING TORQUE
-%dM_y = -dL.*0.25.*chord + dD.*0.07.*chord + total_weight.*cg.*chord + 
+M_torque = zeros(length(span));
+for i=1:length(span)
+    x_f(i) = 0.25 * chord(i);
+    z_f = 0.07; % depends how we define the axis
+    x_cg= cg; 
+    dM(i) = -dL(i)* x_f(i) + dD(i) * z_f + total_weight(i) *x_cg + Cmoairf * 3.75;
+    M_torque(i)= sum(dM) ;
+end
 
 figure(6)
 plot(span,shear_z);
@@ -216,6 +225,9 @@ legend("Load distribution","Lift distribution","Weight distribution");
 xlabel("Span (m)");
 ylabel("Weight distribution (N/m)");
 grid on
+
+figure(9)
+plot(span, M_torque)
 
 
 

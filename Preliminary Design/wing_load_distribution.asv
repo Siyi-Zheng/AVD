@@ -305,7 +305,7 @@ legend("Case 1a","Case 1b", "Case 3");
 % Get the sectional load vs spanwise diagram for case 1&3 under different
 % conditions so MTOW, EFW, MLW
 
-%%%%%%% CHANGE THE VALUES OF MLW AND EFW
+%%%%%%% CHANGE THE W
 MTOW = 353385;         %mtow in kg
 MLW =  320000        ; % maximum landing weoght
 EFW =  300000      ; %EMPTY FUEL WEIGHT
@@ -326,6 +326,9 @@ plot(span, dl_new(3,:))
 grid on
 xlabel("Spanwise position (m)")
 ylabel("Sectional load (N/m)")
+
+
+
 
 
 

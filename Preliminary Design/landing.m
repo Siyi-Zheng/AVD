@@ -9,4 +9,4 @@ F_gear = W_landing * (n-1); % vertical main gear force
 D_gear = 0.8 * W_landing; % horizontal main gear force (drag)
 % horizontal and vertical forces transmitted to airframe
 H = F_gear * sind(beta) - D_gear * cosd(beta);
-V = F_gear * cosd(beta) + D_gear * sin(beta);
+V = F_gear * cosd(beta) + D_gear * sind(beta);

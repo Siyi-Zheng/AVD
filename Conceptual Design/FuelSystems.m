@@ -288,12 +288,12 @@ title("Area Ratio")
 hold off
 
 %volume calculations
-%volume_available1 = (trapz(span1 , area1));
-%volume_available2 = trapz(span2 , area2);
+volume_available1 = (trapz(span1 , area1));
+volume_available2 = trapz(span2 , area2);
 
 
 
-%total_availablevolume = volume_available1 + volume_available2;
+total_availablevolume = volume_available1 + volume_available2;
 
 %fuel volume required at 15 degrees density of 804kg/m^3
 

@@ -162,14 +162,14 @@ shear_total = sqrt(shear_x.^2 + shear_z.^2);
 for i = 1:3
     for j = 1:length(span)
         temp = shear_z(i,j:length(span));
-        M_x(i,j) = sum(temp);
+        M_x(i,j) = sum(temp)*dy;
     end
 end
 
 for i = 1:3
     for j = 1:length(span)
         temp = shear_x(i,j:length(span));
-        M_z(i,j) = sum(temp);
+        M_z(i,j) = sum(temp)*dy;
     end
 end
 

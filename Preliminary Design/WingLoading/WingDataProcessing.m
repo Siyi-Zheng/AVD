@@ -139,25 +139,29 @@ aoa_opt = alpha(ind);
 disp(['The aoa to get the correct load factor for Va is ' , num2str(aoa_opt) , ' degrees.'])
 
 %Converting to correct disctretisation
-xq = 0.01 : 0.01 : 32.49;
+xq = 2.55 : 0.01 : 32.5;
 
-vals = interp1(Spans(I:end) , Sect_Lhalf(ind,:) , xq , "pchip");
+vq = interp1(Spans(I:end) , Sect_Lhalf(ind,:) , xq , "pchip");
 
-vals(1:255) = 0;
+%vq(1:255) = 0;
 
 figure
 hold on
 
 plot(Spans(I:end) , Sect_Lhalf(ind , :) , 'LineStyle','none' , 'Marker','*' ,  'DisplayName', 'Data')
-plot(xq , vals , 'LineStyle','--' , 'Marker' , 'none' ,  'DisplayName', 'Fit')
+plot(xq , vq , 'LineStyle','--' , 'Marker' , 'none' ,  'DisplayName', 'Fit')
 
-xlim([2.55 40])
+xlim([0 40])
 ylim([-20000 160000])
 
 hold off
 
 %check it's correct
-Lift_fit = 2 * trapz(xq , vals);
+Lift_fit = 2 * trapz(xq , vq);
+
+data = Sect_Lhalf(ind , :);
+
+save("WingLoad.mat" , "data" )
 
 
 

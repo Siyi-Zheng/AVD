@@ -129,11 +129,16 @@ dW_total(3,249:297) = dW_total(3,249:297) - 6.2349e6/48;             %add force 
 
 dW_total = dW_total.*n.*1.5;
 
+%loading lift distribution
+%data = load("WingLoad.mat");
+%dL = data.data;
+
+
 
 %CALCULATING SHEAR
 dS = dy*chord;                              %planform area distribution
 dD = 0.5*rho*v.^2.*C_d.*dS;                 %drag distribution
-dL = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
+%dL = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
 dD(:,623:698) = dD(:,623:698) - T/75;       %subtract thrust of engine 1
 dD(:,1761:1836) = dD(:,1761:1836) - T/75;   %subtract thrust of engine 2
 

@@ -37,15 +37,7 @@ n = 2.5*1.5; % ultimate load factor
 xw_AC = 34.5; % aerodynamic centre of wing
 l1 = abs(x_cg-xw_AC); 
 l2 = 72.1-xw_AC; % distance of tail AC (assume AC coincide with CG) from aircraft AC
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-[~,a,~,rho,~,~] = atmosisa(0); 
->>>>>>> Stashed changes
-=======
-[~,a,~,rho,~,~] = atmosisa(0); 
->>>>>>> Stashed changes
-[~,a,~,rho,~] = atmosisa(10000); 
+[~,a,~,rho,~,~] = atmosisa(0);  
 M_A = 0.5*rho*(V_A)^2*S*MAC*C_M; % pitching moment at VA
 M_D = 0.5*rho*(V_D)^2*S*MAC*C_M; % pitching moment at VD
 L_tail_A = (n*W0*l1-M_A)/l2; % lift produce by tail at VA (downwards positive)

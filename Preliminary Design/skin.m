@@ -1,10 +1,7 @@
 clear
 clc
 
-
 % skin
-
-
 
 table = readtable("catchpole_data.csv");
 catchpoledata = table(1:8, 1:10);
@@ -81,12 +78,8 @@ end
 sigma_cr = stressRatio .* sigma_0;
 
 %Farrar efficiency (stringer local buckling)
-
-% Rib_spacing = ; % m
 % for g = 1:length(Rib_spacing)
-%                     sigma_f(i,j,k)= F_factor(i,j,k)/sqrt(Rib_spacing(g)/N/(E*10^9))/10^6;
-% 
-% resultant = sigma_cr - sigma_f;
+
 
 % 3d plot
 F_factor(F_factor <= 0.5) = NaN;
@@ -118,6 +111,14 @@ t2 = t2(id1, id2, id3);
 sigma_0 = sigma_0(id1, id2, id3);
 sigma_cr = sigma_cr(id1, id2, id3);
 
+Rib_spacing =  0.5:0.05:7; % m
+
+sigma_f= mxv./sqrt(Rib_spacing./N./(E*10^9))./10^6;
+resultant = sigma_cr - sigma_f;
+[result, index] = min(abs(resultant));
+
+%optimal rib spacing
+optimal_rib= Rib_spacing(index)
 
 % spar
 

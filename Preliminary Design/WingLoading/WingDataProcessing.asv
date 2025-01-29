@@ -41,7 +41,7 @@ v = 130.7;
 rho = 1.225;
 
 %load AOA
-alpha = readmatrix("LoadCase1.csv" , 'Range', 'A8:A46');
+alpha = readmatrix("LoadCase1.csv" , 'Range', 'A12:A68')';
 
 %load wing data from CSV file
 Spans = readmatrix("MainWing_a=-4.00_v=130.70ms.csv" , 'Range' , 'A22:A265');
@@ -87,7 +87,25 @@ Cl(38,:) = readmatrix("MainWing_a=14.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
 Cl(39,:) = readmatrix("MainWing_a=15.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
 Cl(40,:) = readmatrix("MainWing_a=15.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
 Cl(41,:) = readmatrix("MainWing_a=16.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(42,:) = readmatrix("MainWing_a=16.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(43,:) = readmatrix("MainWing_a=17.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(44,:) = readmatrix("MainWing_a=17.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(45,:) = readmatrix("MainWing_a=18.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(46,:) = readmatrix("MainWing_a=18.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(47,:) = readmatrix("MainWing_a=19.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(48,:) = readmatrix("MainWing_a=19.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(49,:) = readmatrix("MainWing_a=20.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(50,:) = readmatrix("MainWing_a=20.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(51,:) = readmatrix("MainWing_a=21.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(52,:) = readmatrix("MainWing_a=21.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(53,:) = readmatrix("MainWing_a=22.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(54,:) = readmatrix("MainWing_a=22.50_v=130.70ms.csv" , 'Range' , 'D22:D265');
+Cl(55,:) = readmatrix("MainWing_a=23.00_v=130.70ms.csv" , 'Range' , 'D22:D265');
 
+%what is load produce by central section?
+centreload = trapz(Spans(121:125) , Cl(: , 121:125));
+
+%{
 %removing fuselage lift
 I = (-2.55 < Spans) & (Spans < 2.55);
 I = find(I == 1);
@@ -99,7 +117,7 @@ I = find(Spans>2.55, 1 );
 Cl_half = Cl( : , I : end);
 
 %converting to sectional lift
-for i = 1:39
+for i = 1:55
 
     Sect_L(i,:) = Cl(i,:) * 0.5 * rho * v^2 .* Chords';
     Sect_Lhalf(i,:) = Cl_half(i,:) * 0.5 * rho * v^2 .* Chords(I:end)';
@@ -123,7 +141,7 @@ hold off
 
 %finding the lifts of each aoa
 
-Lifts = zeros(1, 39); % Where `n` is the number of iterations
+Lifts = zeros(1, 55); % Where `n` is the number of iterations
 
 for i = 1:size(Sect_Lhalf , 1)
 
@@ -162,6 +180,6 @@ hold off
 Lift_fit = 2 * trapz(xq , vq);
 
 save("WingLoad.mat" , "vq" )
-
+%}
 
 

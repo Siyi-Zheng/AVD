@@ -40,6 +40,8 @@ d = h .* flangeWebRatio; % mm  %flange width of stringer
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
+            % TODO: consider buckling of stringers, I think this is why we
+            % get unrealistic results with lots of tiny stringers
             As(i,j,k)= ts(j) .* (h(k) + 2 * d(k)); % mm^2
             t2(i,j,k)= (N /3.62/ (E*10^9) * (b(i) / 1000) ^ 2) ^ (1/3) *1000; % mm
             sigma_0(i,j,k) = N / (t2(i,j,k) * 1000); % MPa
@@ -109,7 +111,13 @@ n = n(id1);
 ts = ts(id2);
 h = h(id3);
 b = c ./ n.* 1000; % mm
+
+% extract other values at this optimum
 As = As(id1, id2, id3);
+t2 = t2(id1, id2, id3);
+sigma_0 = sigma_0(id1, id2, id3);
+sigma_cr = sigma_cr(id1, id2, id3);
+
 
 % spar
 
@@ -126,12 +134,9 @@ q_RS = q2 - q0; % Rear spar shear flow, N/mm
 t_FS = (q_FS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Front web thickness, mm
 t_RS = (q_RS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Rear web thickness, mm
 
-t2 = 9.6; % skin thickness, mm (FROM SKIN)
 tau_0 = q0 / t2; % shear stress, N/mm
-b1 = 233; % skin panel width, mm
+b1 = b; % skin panel width, mm
 tau_cr = Ks * E * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
-sigma_0 = 430; % Compressive stress of skin, MPa (FROM SKIN)
-sigma_cr = 564; % Critical compressive stress, MPa (FROM SKIN)
 R_c = sigma_0 / sigma_cr; % Compressive stress ratio
 R_s = tau_0 / tau_cr; % Shear stress ratio
 val = R_s^2 + R_c; % combined stress ratio

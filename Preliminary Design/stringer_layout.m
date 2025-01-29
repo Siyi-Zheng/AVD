@@ -76,5 +76,8 @@ for i = 1:tip_stringers * 6
     end
     plot(x(1:end_pos), stringer_pos(1:end_pos), "b-")
 end
-num_stringers = floor((front_spar - rear_spar) / stringer_spacing);
 
+% get the number of stringers at various locations
+num_stringers = floor((front_spar - rear_spar) / stringer_spacing);
+num_stringers_root = num_stringers(1);
+num_stringers_kink = num_stringers(ceil(kink_span ./ wing_span * 2000));

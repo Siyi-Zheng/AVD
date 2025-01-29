@@ -73,14 +73,14 @@ area_aerofoil = 0.0939*chord.^2;
 
 %cases: [case 1a, case 1b, case 3]
 
-v = [130.537; 171.25; 81.21];           %speed in m/s
-n = [2.5; 2.5; 3];                      %load factor
+v = [130.537; 171.25; 81.21;95.3];           %speed in m/s
+n = [2.5; 2.5; 3;1];                      %load factor
 L = n*W*g;                              %overall lift
 L(3) = 0;                               %assume no aerodynamic forces in case 3
 C_l = (2*n*W_S)./(rho*v.^2);            %lift coefficient
 C_l(3) = 0;                             %assume no aerodynamic forces in case 3
 %C_d = [0.13; 0.022; 0];                 %drag coefficient taken from polars
-C_d = [0.043; 0.017; 0];
+C_d = [0.043; 0.017; 0;0.02];
 D = 0.5.*rho.*v.^2.*S.*C_d;             %overall drag
 L0 = L./(32.5*pi*0.5 - 6.34);           %assume an elliptical lift distribution
 
@@ -103,16 +103,16 @@ dmass_fuel(2747:end) = 0;       %no fuel after y = 30
 dW_fuel = dmass_fuel*g;         %weight of fuel in each section
 
 %add all of the weights to get the total weight experienced at each section
-dW_total = zeros(3, length(chord));             %pre-define array
+dW_total = zeros(4, length(chord));             %pre-define array
 
-%case 1 - worst case scenario with no fuel weight
+%case 1a - worst case scenario with no fuel weight
 dW_total(1,:) = dW_total(1,:) + dW_wing;                             %add weight of wing
 dW_total(1,685:760) = dW_total(1,685:760) + dW_engine(1)/75;         %add weight of engine 1
 dW_total(1,1823:1898) = dW_total(1,1823:1898) + dW_engine(1)/75;     %add weight of engine 2
 dW_total(1,311:359) = dW_total(1,311:359) + dW_mg(1)/48;             %add weight of landing gear
 dW_total(1,:) = dW_total(1,:) * 100;
 
-%case 2 - worst case scenario with no fuel weight
+%case 1b - worst case scenario with no fuel weight
 dW_total(2,:) = dW_total(2,:) + dW_wing;                             %add weight of wing
 dW_total(2,685:760) = dW_total(2,685:760) + dW_engine(2)/75;         %add weight of engine 1
 dW_total(2,1823:1898) = dW_total(2,1823:1898) + dW_engine(2)/75;     %add weight of engine 2
@@ -127,16 +127,23 @@ dW_total(3,311:359) = dW_total(3,311:359) + dW_mg(3)/48;             %add weight
 dW_total(3,:) = dW_total(3,:) * 100;
 dW_total(3,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
+%case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
+dW_total(4,:) = dW_total(4,:) + dW_wing;                             %add weight of wing
+dW_total(4,685:760) = dW_total(4,685:760) + dW_engine(2)/75;         %add weight of engine 1
+dW_total(4,1823:1898) = dW_total(4,1823:1898) + dW_engine(2)/75;     %add weight of engine 2
+dW_total(4,311:359) = dW_total(4,311:359) + dW_mg(2)/48;             %add weight of landing gear
+dW_total(4,:) = dW_total(4,:) * 100;
+
 dW_total = dW_total.*n.*1.5;
 
-%{
-%loading lifting distribution
-data = load("WingLoad.mat");
-dL = data.vq;
-dL(1 , :) = dL';
-dL(2 , :) = dL(1,:);
-dL(3 , :) = zeros(1 , 2997);
-%}
+
+% loading lifting distribution
+% data = load("WingLoad.mat");
+% dL = data.vq;
+% dL(1 , :) = dL';
+% dL(2 , :) = dL(1,:);
+% dL(3 , :) = zeros(1 , 2997);
+
 
 
 %CALCULATING SHEAR
@@ -148,7 +155,7 @@ dD(:,1823:1898) = dD(:,1823:1898) - T/75;   %subtract thrust of engine 2
 
 total_lift = 2 * trapz(dL(1,:));
 
-for i = 1:3  
+for i = 1:4  
     for j = 1:length(span)
         temp = dD(i,j:length(span));
         shear_x(i,j) = sum(temp*dy);
@@ -157,7 +164,7 @@ end
 
 shear_y = 0;
 
-for i = 1:3
+for i = 1:4
     for j = 1:length(span)
         temp1 = dL(i,j:length(span));
         temp2 = dW_total(i,j:length(span));
@@ -170,26 +177,26 @@ shear_total = sqrt(shear_x.^2 + shear_z.^2);
 
 %CALCULATING BENDING MOMENT
 
-for i = 1:3
+for i = 1:4
     for j = 1:length(span)
         temp = shear_z(i,j:length(span));
         M_x(i,j) = sum(temp)*dy;
     end
 end
 
-for i = 1:3
+for i = 1:4
     for j = 1:length(span)
         temp = shear_x(i,j:length(span));
         M_z(i,j) = sum(temp)*dy;
     end
 end
 
-
+%maybe have a look at this again because now we have 4 cases
 %CALCULATING TORQUE
-M_torque = zeros(3, length(span));
+M_torque = zeros(4, length(span));
 landing_gear_force_case3 = zeros(length(span));
 landing_gear_force_case3(311:359) = 3.4278e6/48 ; %double check this is correct or not
-for i=1:3
+for i=1:4
     for j = 1: length(span)
         if i==3 % the landing gear will exert a moment
         x_quart(i, j) = 0.25 * chord(j);
@@ -355,5 +362,24 @@ xlabel("Semi-span (m)");
 ylabel("load distribution (N/m)");
 grid on
 legend("Case 1 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ", "Case 3 - Lift ","Case 1 - Inertial loads","Case 3 - Inertial loads");
+
+
+
+figure
+plot(span,dL(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
+hold on
+plot(span,dL(4,:)-dW_total(1,:),"g",LineWidth = 1.25);
+plot(span,dL(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
+plot(span,dL(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
+plot(span,dL(4,:),"--", LineWidth = 1.25,Color=[50 153 50]/255);
+plot(span,dL(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
+plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
+plot(span,-dW_total(4,:),":", LineWidth = 1.25,Color=[0 50 0]/255);
+plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);
+hold off
+xlabel("Semi-span (m)");
+ylabel("load distribution (N/m)");
+grid on
+legend("Case 1 - Resultant load","Case 2 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ","Case 2 - Lift " ,"Case 3 - Lift ","Case 1 - Inertial loads","Case 2 - Inertial loads","Case 3 - Inertial loads");
 
 

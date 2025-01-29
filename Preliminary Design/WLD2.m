@@ -153,7 +153,7 @@ dL2 = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
 dD(:,685:760) = dD(:,685:760) - T/75;       %subtract thrust of engine 1
 dD(:,1823:1898) = dD(:,1823:1898) - T/75;   %subtract thrust of engine 2
 
-total_lift = 2 * trapz(dL(1,:));
+total_lift = 2 * trapz(dL2(1,:));
 
 for i = 1:4  
     for j = 1:length(span)
@@ -166,7 +166,7 @@ shear_y = 0;
 
 for i = 1:4
     for j = 1:length(span)
-        temp1 = dL1(i,j:length(span));
+        temp1 = dL2(i,j:length(span));
         temp2 = dW_total(i,j:length(span));
         shear_z(i,j) = sum((temp1-temp2)*dy);
     end
@@ -192,29 +192,29 @@ for i = 1:4
 end
 
 %maybe have a look at this again because now we have 4 cases
-%CALCULATING TORQUE
-M_torque = zeros(4, length(span));
-landing_gear_force_case3 = zeros(length(span));
-landing_gear_force_case3(311:359) = 3.4278e6/48 ; %double check this is correct or not
-for i=1:4
-    for j = 1: length(span)
-        if i==3 % the landing gear will exert a moment
-        x_quart(i, j) = 0.25 * chord(j);
-        z_f = 0.07; % depends how we define the axis
-        x_cg= cg;
-        m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
-        dM(i,j) = dL1(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + landing_gear_force_case3(1,j)*(flexAxis - rearSpar) - m_0w(i,j);
-        M_torque(i,j)= sum(dM(i,j)) ;  
-        else
-    x_quart(i, j) = 0.25 * chord(j);
-    z_f = 0.07; % depends how we define the axis
-    x_cg= cg;
-    m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
-    dM(i,j) = dL1(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + - m_0w(i,j);
-    M_torque(i,j)= sum(dM(i,j)) ;
-    end
-    end
-end
+% %CALCULATING TORQUE
+% M_torque = zeros(4, length(span));
+% landing_gear_force_case3 = zeros(length(span));
+% landing_gear_force_case3(311:359) = 3.4278e6/48 ; %double check this is correct or not
+% for i=1:4
+%     for j = 1: length(span)
+%         if i==3 % the landing gear will exert a moment
+%         x_quart(i, j) = 0.25 * chord(j);
+%         z_f = 0.07; % depends how we define the axis
+%         x_cg= cg;
+%         m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
+%         dM(i,j) = dL1(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + landing_gear_force_case3(1,j)*(flexAxis - rearSpar) - m_0w(i,j);
+%         M_torque(i,j)= sum(dM(i,j)) ;  
+%         else
+%     x_quart(i, j) = 0.25 * chord(j);
+%     z_f = 0.07; % depends how we define the axis
+%     x_cg= cg;
+%     m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
+%     dM(i,j) = dL1(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + - m_0w(i,j);
+%     M_torque(i,j)= sum(dM(i,j)) ;
+%     end
+%     end
+% end
 
 
 %PLOTSS
@@ -311,17 +311,16 @@ ylabel("Bending moment distribution in z-direction (N)");
 legend("Case 1a","Case 1b", "Case 3");
 
 
-figure(6)
-subplot(1,2,1);
-plot(span,M_torque(1,:),"r", LineWidth = 1.5);
-hold on
-plot(span,M_torque(2,:),"b--", LineWidth = 1.5);
-plot(span,M_torque(3,:),":", LineWidth = 1.5);
-hold off
-grid on
-xlabel("Semi-span (m)");
-ylabel(" (N)");
-legend("Case 1a","Case 1b", "Case 3");
+% figure(6)
+% plot(span,M_torque(1,:),"r", LineWidth = 1.5);
+% hold on
+% plot(span,M_torque(2,:),"b--", LineWidth = 1.5);
+% plot(span,M_torque(3,:),":", LineWidth = 1.5);
+% hold off
+% grid on
+% xlabel("Semi-span (m)");
+% ylabel(" (N)");
+% legend("Case 1a","Case 1b", "Case 3");
 
 % Get the sectional load vs spanwise diagram for case 1&3 under different
 % conditions so MTOW, EFW, MLW
@@ -367,13 +366,13 @@ legend("Case 1 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ", "Ca
 
 
 figure
-plot(span,dL(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
+plot(span,dL2(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
 hold on
-plot(span,dL(4,:)-dW_total(1,:),"g",LineWidth = 1.25);
-plot(span,dL(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
-plot(span,dL(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
-plot(span,dL(4,:),"--", LineWidth = 1.25,Color=[50 153 50]/255);
-plot(span,dL(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
+plot(span,dL2(4,:)-dW_total(1,:),"g",LineWidth = 1.25);
+plot(span,dL2(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
+plot(span,dL2(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
+plot(span,dL2(4,:),"--", LineWidth = 1.25,Color=[50 153 50]/255);
+plot(span,dL2(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
 plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
 plot(span,-dW_total(4,:),":", LineWidth = 1.25,Color=[0 50 0]/255);
 plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);

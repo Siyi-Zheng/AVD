@@ -1,6 +1,41 @@
 clear 
 clc
 
+%considering the effect of what altitude the analysis is conducted at for
+%wing loading
+
+heightsm = 0:100:40000;
+H = convlength(heightsm,'ft','m');
+
+format long g;
+
+[T,a,P,rhos,nu] = atmosisa(H);
+
+mu = nu .* rhos;
+
+Vd = convvel(333 , 'kts' , 'm/s');
+Va = convvel(254 , 'kts' , 'm/s');
+
+Mach_noa = Va ./ a;
+Mach_nod = Vd ./a;
+
+Rea = (12.41 .* rhos .* Va) ./ mu; 
+Red = (12.41 .* rhos .* Vd) ./ mu;
+
+%lift for 2.5g turn
+
+L = 354000 * 2.5 * 9.81;
+
+Cl_requireda = L ./ (0.5 * 488.545 * Va^2 .* rhos);
+Cl_requiredd = L ./ (0.5 * 488.545 * Vd^2 .* rhos);
+
+
+
+
+%%
+
+%wing load data processing
+
 %define air parameters
 v = 130.7;
 rho = 1.225;
@@ -84,8 +119,6 @@ hold off
 
 %need to find which lift dist represents a lift of 2.5g
 
-L = 354000 * 2.5 * 9.81;
-
 %finding the lifts of each aoa
 
 Lifts = zeros(1, 39); % Where `n` is the number of iterations
@@ -96,9 +129,35 @@ for i = 1:size(Sect_Lhalf , 1)
 
 end
 
-%best AoA to abtain a loading of 2.5g
-ind = min(abs(Lifts - L));
 
-aoa_opt = alpha(i);
+
+%best AoA to abtain a loading of 2.5g
+[~ , ind] = min(abs(Lifts - L));
+
+aoa_opt = alpha(ind);
 
 disp(['The aoa to get the correct load factor for Va is ' , num2str(aoa_opt) , ' degrees.'])
+
+%Converting to correct disctretisation
+xq = 0.01 : 0.01 : 32.49;
+
+vals = interp1(Spans(I:end) , Sect_Lhalf(ind,:) , xq , "pchip");
+
+vals(1:255) = 0;
+
+figure
+hold on
+
+plot(Spans(I:end) , Sect_Lhalf(ind , :) , 'LineStyle','none' , 'Marker','*' ,  'DisplayName', 'Data')
+plot(xq , vals , 'LineStyle','--' , 'Marker' , 'none' ,  'DisplayName', 'Fit')
+
+xlim([2.55 40])
+ylim([-20000 160000])
+
+hold off
+
+%check it's correct
+Lift_fit = 2 * trapz(xq , vals);
+
+
+

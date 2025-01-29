@@ -28,7 +28,7 @@ n = 20: 1: 50;
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:15;
-h = 10:10:100;
+h= 100:5:300;
 b = c ./ n.* 1000; % mm
 d = h .* flangeWebRatio; % mm  %flange width of stringer
 
@@ -79,17 +79,14 @@ sigma_cr = stressRatio .* sigma_0;
 % resultant = sigma_cr - sigma_f;
 
 % 3d plot
-F_factor(F_factor <= 0.5) = NaN;
 for i = 1:length(h)
     slice = squeeze(F_factor(:,:,i));
     xData = n;
     yData = ts;
-    surf(xData, yData, slice')
-    hold on
+    surf(xData, yData, slice)
 end
 xlabel("Panel Width (mm)")
 ylabel("Stringer Thickness (mm)")
 zlabel("Farrar Efficiency")
-
-% best value I could find is n = 33 mm, ts = 10.8 mm, h = 100 mm, F = 0.9193
-% but higher ts and lower b would be better if we had the data for it
+cb = colorbar();
+cb.label("Stringer Height")

@@ -306,7 +306,7 @@ plot(-x_te(256:end), y_te(256:end), 'k-', 'LineWidth', 1.5, 'HandleVisibility', 
 plot(x_fine, y_fine , 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off')
 plot(-x_fine, y_fine , 'k-', 'LineWidth', 1.5, 'HandleVisibility', 'off')
 
-%{
+
 % Plotting wing box
 plot(x_box, y_leboxa, 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'DisplayName', 'WingBox'); % Included in legend
 plot(x_box, y_teboxa, 'Color', [0.9290 0.6940 0.1250], 'LineStyle', '--', 'LineWidth', 1.5, 'HandleVisibility', 'off');
@@ -419,7 +419,7 @@ axis equal
 %}
 %%
 
-%{
+
 clear
 %Tailplane planform
 %horizontal
@@ -521,4 +521,4 @@ legend(FontSize=15);
 % Box around the plot
 box on;
 hold off;
-%}
+

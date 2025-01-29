@@ -22,7 +22,7 @@ gradient1 = (outer_chord - 13.89)/9.75;
 %for outer section
 gradient2 = (3.47 - outer_chord)/(32.45 - 9.75);
 
-span1 = 3.17:0.01:9.75;
+span1 = 2.55:0.01:9.75;
 span2 = 9.75:0.01:32.5;
 
 c2 = outer_chord - gradient2 * 9.75;
@@ -99,7 +99,7 @@ dW_mg = [m_mg*g/4;m_mg*g/4;m_mg*g/4];
 %load due to fuel in the wings in N
 V_fuel = 219.75;                %volume of fuel in m^3
 dmass_fuel = rho_fuel * dV;     %mass of fuel in each section
-dmass_fuel(2685:end) = 0;       %no fuel after y = 30
+dmass_fuel(2747:end) = 0;       %no fuel after y = 30
 dW_fuel = dmass_fuel*g;         %weight of fuel in each section
 
 %add all of the weights to get the total weight experienced at each section
@@ -107,31 +107,35 @@ dW_total = zeros(3, length(chord));             %pre-define array
 
 %case 1 - worst case scenario with no fuel weight
 dW_total(1,:) = dW_total(1,:) + dW_wing;                             %add weight of wing
-dW_total(1,623:698) = dW_total(1,623:698) + dW_engine(1)/75;         %add weight of engine 1
-dW_total(1,1761:1836) = dW_total(1,1761:1836) + dW_engine(1)/75;     %add weight of engine 2
-dW_total(1,249:297) = dW_total(1,249:297) + dW_mg(1)/48;             %add weight of landing gear
+dW_total(1,685:760) = dW_total(1,685:760) + dW_engine(1)/75;         %add weight of engine 1
+dW_total(1,1823:1898) = dW_total(1,1823:1898) + dW_engine(1)/75;     %add weight of engine 2
+dW_total(1,311:359) = dW_total(1,311:359) + dW_mg(1)/48;             %add weight of landing gear
 dW_total(1,:) = dW_total(1,:) * 100;
 
 %case 2 - worst case scenario with no fuel weight
 dW_total(2,:) = dW_total(2,:) + dW_wing;                             %add weight of wing
-dW_total(2,623:698) = dW_total(2,623:698) + dW_engine(2)/75;         %add weight of engine 1
-dW_total(2,1761:1836) = dW_total(2,1761:1836) + dW_engine(2)/75;     %add weight of engine 2
-dW_total(2,249:297) = dW_total(2,249:297) + dW_mg(2)/48;             %add weight of landing gear
+dW_total(2,685:760) = dW_total(2,685:760) + dW_engine(2)/75;         %add weight of engine 1
+dW_total(2,1823:1898) = dW_total(2,1823:1898) + dW_engine(2)/75;     %add weight of engine 2
+dW_total(2,311:359) = dW_total(2,311:359) + dW_mg(2)/48;             %add weight of landing gear
 dW_total(2,:) = dW_total(2,:) * 100;
 
 %case 3 - worst case scenario with fuel weight
 dW_total(3,:) = dW_total(3,:) + dW_wing + dW_fuel;                   %add weight of wing and fuel
-dW_total(3,623:698) = dW_total(3,623:698) + dW_engine(3)/75;         %add weight of engine 1
-dW_total(3,1761:1836) = dW_total(3,1761:1836) + dW_engine(3)/75;     %add weight of engine 2
-dW_total(3,249:297) = dW_total(3,249:297) + dW_mg(3)/48;             %add weight of landing gear
+dW_total(3,685:760) = dW_total(3,685:760) + dW_engine(3)/75;         %add weight of engine 1
+dW_total(3,1823:1898) = dW_total(3,1823:1898) + dW_engine(3)/75;     %add weight of engine 2
+dW_total(3,311:359) = dW_total(3,311:359) + dW_mg(3)/48;             %add weight of landing gear
 dW_total(3,:) = dW_total(3,:) * 100;
-dW_total(3,249:297) = dW_total(3,249:297) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
+dW_total(3,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
 dW_total = dW_total.*n.*1.5;
 
-%loading lift distribution
-%data = load("WingLoad.mat");
-%dL = data.data;
+
+%loading lifting distribution
+data = load("WingLoad.mat");
+dL = data.vq;
+dL(1 , :) = dL';
+dL(2 , :) = dL(1,:);
+dL(3 , :) = zeros(1 , 2997);
 
 
 
@@ -139,8 +143,8 @@ dW_total = dW_total.*n.*1.5;
 dS = dy*chord;                              %planform area distribution
 dD = 0.5*rho*v.^2.*C_d.*dS;                 %drag distribution
 %dL = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
-dD(:,623:698) = dD(:,623:698) - T/75;       %subtract thrust of engine 1
-dD(:,1761:1836) = dD(:,1761:1836) - T/75;   %subtract thrust of engine 2
+dD(:,685:760) = dD(:,685:760) - T/75;       %subtract thrust of engine 1
+dD(:,1823:1898) = dD(:,1823:1898) - T/75;   %subtract thrust of engine 2
 
 for i = 1:3  
     for j = 1:length(span)
@@ -182,7 +186,7 @@ end
 %CALCULATING TORQUE
 M_torque = zeros(3, length(span));
 landing_gear_force_case3 = zeros(length(span));
-landing_gear_force_case3(249:297) = 3.4278e6/48 ; %double check this is correct or not
+landing_gear_force_case3(311:359) = 3.4278e6/48 ; %double check this is correct or not
 for i=1:3
     for j = 1: length(span)
         if i==3 % the landing gear will exert a moment
@@ -349,8 +353,5 @@ xlabel("Semi-span (m)");
 ylabel("load distribution (N/m)");
 grid on
 legend("Case 1 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ", "Case 3 - Lift ","Case 1 - Inertial loads","Case 3 - Inertial loads");
-
-
-
 
 

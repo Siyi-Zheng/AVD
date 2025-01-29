@@ -68,7 +68,7 @@ plot(x, rear_spar, "r-")
 % stringer layout
 tip_stringers = 3; % number of stringers at the top
 stringer_spacing = (front_spar(end) - rear_spar(end)) / (tip_stringers + 1);
-for i = 1:tip_stringers * 5
+for i = 1:tip_stringers * 6
     stringer_pos = max(rear_spar, front_spar - i * stringer_spacing);
     end_pos = 1000;
     if any(stringer_pos == rear_spar)
@@ -76,4 +76,5 @@ for i = 1:tip_stringers * 5
     end
     plot(x(1:end_pos), stringer_pos(1:end_pos), "b-")
 end
+num_stringers = floor((front_spar - rear_spar) / stringer_spacing);
 

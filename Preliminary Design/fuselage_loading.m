@@ -38,6 +38,10 @@ xw_AC = 34.5; % aerodynamic centre of wing
 l1 = abs(x_cg-xw_AC); 
 l2 = 72.1-xw_AC; % distance of tail AC (assume AC coincide with CG) from aircraft AC
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+[~,a,~,rho,~,~] = atmosisa(0); 
+>>>>>>> Stashed changes
 =======
 [~,a,~,rho,~,~] = atmosisa(0); 
 >>>>>>> Stashed changes

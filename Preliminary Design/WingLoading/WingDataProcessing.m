@@ -139,7 +139,7 @@ aoa_opt = alpha(ind);
 disp(['The aoa to get the correct load factor for Va is ' , num2str(aoa_opt) , ' degrees.'])
 
 %Converting to correct disctretisation
-xq = 2.55 : 0.01 : 32.5;
+xq = [2.55 : 0.01 : 32.5 , 32.5];
 
 vq = interp1(Spans(I:end) , Sect_Lhalf(ind,:) , xq , "pchip");
 
@@ -159,9 +159,7 @@ hold off
 %check it's correct
 Lift_fit = 2 * trapz(xq , vq);
 
-data = Sect_Lhalf(ind , :);
-
-save("WingLoad.mat" , "data" )
+save("WingLoad.mat" , "vq" )
 
 
 

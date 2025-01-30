@@ -258,7 +258,7 @@ plot(distance,load2_h,'LineStyle','-','LineWidth',1.5,'Color','m')
 ylabel("Horizontal Load Distribution (N)","FontSize",14);
 ylim([-2.5e6,2.5e6])
 
-legend("Case 1 - Dive","Case 1 - Manoeuvre","Case 2", "Case 2 - Horizontal", "Case 3","Location","northwest","FontSize",12)
+legend("Case 1 - Dive","Case 1 - Manoeuvre","Case 2", "Case 3", "Case 2 - Horizontal","Location","northwest","FontSize",12)
 ax = gca;
 ax.YAxis(1).Color = '#0072BD';
 ax.YAxis(2).Color = 'm';

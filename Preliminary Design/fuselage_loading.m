@@ -36,7 +36,7 @@ n = 2.5*1.5; % ultimate load factor
 
 xw_AC = 34.5; % aerodynamic centre of wing
 l1 = abs(x_cg-xw_AC); 
-l2 = 72.1-xw_AC; % distance of tail AC (assume AC coincide with CG) from aircraft AC
+l2 = abs(x_htail-xw_AC); % distance of tail AC (assume AC coincide with CG) from aircraft AC
 [~,a,~,rho,~,~] = atmosisa(0);  
 M_A = 0.5*rho*(V_A)^2*S*MAC*C_M; % pitching moment at VA
 M_D = 0.5*rho*(V_D)^2*S*MAC*C_M; % pitching moment at VD
@@ -80,7 +80,7 @@ W_wing_total = (W_wing+W_engine+W_fuel+W_mlg*2);
 %%% 3. Fuselage Weight
 
 q_fuselage = W_fuselage/l_plane; % load per unit length 
-q_pass = 45*47.88; % load per unit floor area
+q_pass = 45*47.88*1.5; % load per unit floor area
 q_pass = q_pass*6.34; % load per unit fuselage length
 q_lugg = 9428*9.81/l_plane; % load due to cargo ;
 q_fuel = 6564.66; % load due to fuselage tank
@@ -100,8 +100,8 @@ load1_D = zeros(1000,1);
 load1_A(:) = load1_A(:) -(q_fuselage+q_pass+q_lugg)*n*dl; 
 % load due to fuel tanl
 load1_A(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
-load1_A(round(x_fspar/dl)) = load1_A(round(x_fspar/dl))+ R_F_A-3/4*n*W_wing_total;
-load1_A(round(x_rspar/dl)) = load1_A(round(x_rspar/dl))+ R_R_A-1/4*n*W_wing_total;
+load1_A(round(x_fspar/dl)) = load1_A(round(x_fspar/dl)) + R_F_A - 3/4*n*W_wing_total;
+load1_A(round(x_rspar/dl)) = load1_A(round(x_rspar/dl)) + R_R_A - 1/4*n*W_wing_total;
 load1_A(round(x_htail/dl)) = load1_A(round(x_htail/dl)) - L_tail_A - n*W_htail;
 load1_A(round(x_vtail/dl)) = load1_A(round(x_vtail/dl)) - n*W_vtail;
 load1_A(round(x_mlg/dl)) = load1_A(round(x_mlg/dl)) - n*W_mlg*2;
@@ -112,8 +112,8 @@ load1_A(round(x_nlg/dl)) = load1_A(round(x_nlg/dl)) - n*W_nlg;
 load1_D(:) = load1_D(:) -(q_fuselage+q_pass+q_lugg)*n*dl; 
 % load due to fuel tanl
 load1_D(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
-load1_D(round(x_fspar/dl)) = load1_D(round(x_fspar/dl))+ R_F_D-3/4*n*W_wing_total;
-load1_D(round(x_rspar/dl)) = load1_D(round(x_rspar/dl))+ R_R_D -1/4*n*W_wing_total;
+load1_D(round(x_fspar/dl)) = load1_D(round(x_fspar/dl))+ R_F_D - 3/4*n*W_wing_total;
+load1_D(round(x_rspar/dl)) = load1_D(round(x_rspar/dl))+ R_R_D - 1/4*n*W_wing_total;
 load1_D(round(x_htail/dl)) = load1_D(round(x_htail/dl))- L_tail_D - n*W_htail;
 load1_D(round(x_vtail/dl)) = load1_D(round(x_vtail/dl)) - n*W_vtail;
 load1_D(round(x_mlg/dl)) = load1_D(round(x_mlg/dl)) - n*W_mlg*2;
@@ -138,42 +138,58 @@ grid on
 
 
 
-% LOAD CASE 2: OEI
-% create torsion on the fuselage
+% LOAD CASE 2: OEI 
+% equivalent as cruise at 1g + force on vertical stabliser
+
+%%% 1. Torsion on the fuselage
 V_vs = 1.885e5; % shear force on vertical stabliser
 l_vs = 6.80*1.3+6/2; % moment arm for torsion
 T_vs = 1.885e5*l_vs; % torsion on fuselage
 
 % discretize
-load2 = zeros(1000,1);
+load2_v = zeros(1000,1);
+load2_h = zeros(1000,1);
+load2_h(round(x_vtail/dl)) = load2_h(round(x_vtail/dl)) + T_vs;
+
+%%% 2. Lift on Vertical Tailplane
+V_OEI = V_A;
+M_OEI = 0.5*rho*(V_OEI)^2*S*MAC*C_M; % pitching moment at VD
+L_tail_OEI = (W0*l1-M_OEI)/l2; % lift produce by tail at VA (downwards positive)
 
 % find spar reaction
 A = [l_F, -l_R;
     1, 1];
-B = [-L_tail_D+l2;
-    W0+L_tail_D];
+B = [-L_tail_OEI+l2;
+    W0+L_tail_OEI];
 x = A^(-1)*B;
 R_F_OEI = x(1) ; % reaction force on front spar
 R_R_OEI = x(2); % reaction force on rear spar
 
 % populate values
 % uniform load due to fuselage empty weight, luggage, passenger
-load2(:) = load2(:) -(q_fuselage+q_pass+q_lugg)*dl; 
+load2_v(:) = load2_v(:) -(q_fuselage+q_pass+q_lugg)*dl; 
 % load due to fuel tank
-load2(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*dl;
-load2(round(x_fspar/dl)) = load2(round(x_fspar/dl))+ R_F_OEI - 3/4*W_wing_total;
-load2(round(x_rspar/dl)) = load2(round(x_rspar/dl))+ R_R_OEI - 1/4*W_wing_total;
-load2(round(x_htail/dl)) = load2(round(x_htail/dl))- L_tail_D - W_htail;
-load2(round(x_vtail/dl)) = load2(round(x_vtail/dl)) - W_vtail;
-load2(round(x_mlg/dl)) = load2(round(x_mlg/dl)) - W_mlg*2;
-load2(round(x_nlg/dl)) = load2(round(x_nlg/dl)) - W_nlg;
+load2_v(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*dl;
+load2_v(round(x_fspar/dl)) = load2_v(round(x_fspar/dl))+ R_F_OEI - 3/4*W_wing_total;
+load2_v(round(x_rspar/dl)) = load2_v(round(x_rspar/dl))+ R_R_OEI - 1/4*W_wing_total;
+load2_v(round(x_htail/dl)) = load2_v(round(x_htail/dl))- L_tail_D - W_htail;
+load2_v(round(x_vtail/dl)) = load2_v(round(x_vtail/dl)) - W_vtail;
+load2_v(round(x_mlg/dl)) = load2_v(round(x_mlg/dl)) - W_mlg*2;
+load2_v(round(x_nlg/dl)) = load2_v(round(x_nlg/dl)) - W_nlg;
 
 figure(3)
-plot(distance,load2,'LineStyle','-');
-title("Weight distribution along fuselage");
+yyaxis left
+plot(distance,load2_v,'LineStyle','-','LineWidth',1.5);
+ylabel("Vertical Load Distribution (N)");
 xlabel("Length (m)");
-ylabel("Weight distribution (N)");
-% ylim([-10000,10000])
+xlim([0,l_plane])
+ylim([-5e5,20e5])
+yyaxis right
+plot(distance,load2_h,'LineStyle','-.','LineWidth',1.5)
+% title("Weight distribution along fuselage");
+ylabel("Horizontal Load Distribution (N)");
+ylim([-5e6/8,2.5e6])
+legend("Vertical Load","Horizontal Load",Location="northwest")
 grid on
 
 
@@ -185,8 +201,7 @@ load3 = zeros(1000,1);
 % load due to landing gear
 n = 3; % landing load factor
 gear_load = 6.2349e6; % load on one landing gear
-load3(round(x_mlg/dl)) = load3(round(x_mlg/dl)) + gear_load*2;
-load3(round(x_mlg/dl)) = load3(round(x_mlg/dl)) - n*W_mlg*2;
+load3(round(x_mlg/dl)) = load3(round(x_mlg/dl)) + gear_load*2 - n*W_mlg*2;
 load3(round(x_nlg/dl)) = load3(round(x_nlg/dl)) - n*W_nlg;
 
 
@@ -227,15 +242,26 @@ ylabel("Weight distribution (N)");
 grid on
 
 figure(5)
-plot(distance,load1_D,'LineStyle',':','LineWidth',1.5);
+yyaxis left
+plot(distance,load1_D,'LineStyle','-','LineWidth',1.75,'Color',"#0072BD");
 hold on
-plot(distance,load1_A,'LineStyle',"-.",'LineWidth',1.5)
-plot(distance,load3,'LineStyle',"--",'LineWidth',1.5)
-title("Weight distribution along fuselage");
-xlabel("Length (m)");
-ylabel("Weight distribution (N)");
-legend("D","A","Landing")
-% ylim([-100000,100000])
+plot(distance,load1_A,'LineStyle',"-.",'LineWidth',1.5,'Color',"r")
+plot(distance,load2_v,'LineStyle',"--",'LineWidth',1.5,'Color',"g")
+plot(distance,load3,'LineStyle',":",'LineWidth',2,'Color',"#EDB120")
+xlabel("Length (m)","FontSize",14);
+ylabel("Vertical Load Distribution (N)","FontSize",14);
+ylim([-30000,30000])
+xlim([0,l_plane])
+yyaxis right
+plot(distance,load2_h,'LineStyle','-','LineWidth',1.5,'Color','m')
+% title("Weight distribution along fuselage");
+ylabel("Horizontal Load Distribution (N)","FontSize",14);
+ylim([-2.5e6,2.5e6])
+
+legend("Case 1 - Dive","Case 1 - Manoeuvre","Case 2", "Case 2 - Horizontal", "Case 3","Location","northwest","FontSize",12)
+ax = gca;
+ax.YAxis(1).Color = '#0072BD';
+ax.YAxis(2).Color = 'm';
 grid on
 
 %%

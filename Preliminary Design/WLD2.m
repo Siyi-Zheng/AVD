@@ -71,16 +71,16 @@ span = [span1,span2];      %29.33 is the length of the wing that is outside of t
 area_aerofoil = 0.0939*chord.^2;
 
 
-%cases: [case 1a, case 1b, case 3]
+%cases: [case 1a, case 1b, case 2, case 3]
 
-v = [130.537; 171.25; 81.21;95.3];           %speed in m/s
-n = [2.5; 2.5; 3;1];                      %load factor
+v = [130.537; 171.25;95.3; 81.21];           %speed in m/s
+n = [3.75; 3.75;1;3];                      %load factor
 L = n*W*g;                              %overall lift
-L(3) = 0;                               %assume no aerodynamic forces in case 3
+L(4) = 0;                               %assume no aerodynamic forces in case 3
 C_l = (2*n*W_S)./(rho*v.^2);            %lift coefficient
-C_l(3) = 0;                             %assume no aerodynamic forces in case 3
+C_l(4) = 0;                             %assume no aerodynamic forces in case 3
 %C_d = [0.13; 0.022; 0];                 %drag coefficient taken from polars
-C_d = [0.043; 0.017; 0;0.02];
+C_d = [0.043; 0.017; 0.02;0];
 D = 0.5.*rho.*v.^2.*S.*C_d;             %overall drag
 L0 = L./(32.5*pi*0.5 - 6.34);           %assume an elliptical lift distribution
 
@@ -91,10 +91,10 @@ dV = area_aerofoil * dy;        %volume of each section
 dW_wing = (weight_wing/V_wing) * dV;
 
 %load due to 1 engine in N
-dW_engine = [m_engine*g;m_engine*g;m_engine*g]; 
+dW_engine = [m_engine*g;m_engine*g;m_engine*g;m_engine*g]; 
 
 %load due to 1 main landing gear in N
-dW_mg = [m_mg*g/4;m_mg*g/4;m_mg*g/4];
+dW_mg = [m_mg*g/4;m_mg*g/4;m_mg*g/4;m_mg*g/4];
 
 %load due to fuel in the wings in N
 V_fuel = 219.75;                %volume of fuel in m^3
@@ -119,46 +119,60 @@ dW_total(2,1823:1898) = dW_total(2,1823:1898) + dW_engine(2)/75;     %add weight
 dW_total(2,311:359) = dW_total(2,311:359) + dW_mg(2)/48;             %add weight of landing gear
 dW_total(2,:) = dW_total(2,:) * 100;
 
-%case 3 - worst case scenario with fuel weight
-dW_total(3,:) = dW_total(3,:) + dW_wing + dW_fuel;                   %add weight of wing and fuel
+%case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
+dW_total(3,:) = dW_total(3,:) + dW_wing;                             %add weight of wing
 dW_total(3,685:760) = dW_total(3,685:760) + dW_engine(3)/75;         %add weight of engine 1
 dW_total(3,1823:1898) = dW_total(3,1823:1898) + dW_engine(3)/75;     %add weight of engine 2
 dW_total(3,311:359) = dW_total(3,311:359) + dW_mg(3)/48;             %add weight of landing gear
 dW_total(3,:) = dW_total(3,:) * 100;
-dW_total(3,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
-%case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
-dW_total(4,:) = dW_total(4,:) + dW_wing;                             %add weight of wing
-dW_total(4,685:760) = dW_total(4,685:760) + dW_engine(2)/75;         %add weight of engine 1
-dW_total(4,1823:1898) = dW_total(4,1823:1898) + dW_engine(2)/75;     %add weight of engine 2
-dW_total(4,311:359) = dW_total(4,311:359) + dW_mg(2)/48;             %add weight of landing gear
+%case 3 - worst case scenario with fuel weight
+dW_total(4,:) = dW_total(4,:) + dW_wing + dW_fuel;                   %add weight of wing and fuel
+dW_total(4,685:760) = dW_total(4,685:760) + dW_engine(4)/75;         %add weight of engine 1
+dW_total(4,1823:1898) = dW_total(4,1823:1898) + dW_engine(4)/75;     %add weight of engine 2
+dW_total(4,311:359) = dW_total(4,311:359) + dW_mg(4)/48;             %add weight of landing gear
 dW_total(4,:) = dW_total(4,:) * 100;
+dW_total(4,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
-dW_total = dW_total.*n.*1.5;
+
+
+dW_total = dW_total.*n;
 
 
 %loading lifting distribution
-data = load("WingLoad.mat");
-dL = data.vq;
-dL1(1 , :) = dL';
-dL1(2 , :) = dL(1,:);
-dL1(3 , :) = zeros(1 , 2997);
+data1 = load("WingLoadCase1.mat");
+data2 = load("WingLoadCase2.mat");
+dL1 = data1.vq;
+dL2 = data2.vq;
+dL(1 , :) = dL1';                            %case 1a
+dL(2 , :) = dL(1,:);                        %case 1b
+dL(3 , :) = dL2';                            %case 1a
+dL(4 , :) = zeros(1 , length(span));        %case 3
 
-
-
-%CALCULATING SHEAR
-dS = dy*chord;                              %planform area distribution
+%drag distribution and thrust distribution
+dS = dy*chord; 
 dD = 0.5*rho*v.^2.*C_d.*dS;                 %drag distribution
-dL2 = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
-dD(:,685:760) = dD(:,685:760) - T/75;       %subtract thrust of engine 1
-dD(:,1823:1898) = dD(:,1823:1898) - T/75;   %subtract thrust of engine 2
+dD = dD * 100;
+dT = zeros(4,length(span));
+dT(1:3,685:760) = dT(1:3,685:760) + T/75;         %thrust of engine 1 for cases 1a, 1b and 3
+dT(1:3,1823:1898) = dT(1:3,1823:1898) + T/75;         %thrust of engine 2 for cases 1a, 1b and 3
+dT(4,685:760) = dT(4,685:760) + T/75;             %only add thrust from engine 1 for worst case scenario
 
-total_lift = 2 * trapz(dL2(1,:));
+
+
+%CALCULATING SHEAR                            %planform area distribution
+%dD = 0.5*rho*v.^2.*C_d.*dS;                 %drag distribution
+%dL = L0.*sqrt(1-(span/32.5).^2);            %elliptical lift distribution
+% dD(:,685:760) = dD(:,685:760) - T/75;       %subtract thrust of engine 1
+% dD(:,1823:1898) = dD(:,1823:1898) - T/75;   %subtract thrust of engine 2
+
+% total_lift = 2 * trapz(dL(1,:));
 
 for i = 1:4  
     for j = 1:length(span)
-        temp = dD(i,j:length(span));
-        shear_x(i,j) = sum(temp*dy);
+        temp1 = dD(i,j:length(span));
+        temp2 = dT(i,j:length(span));
+        shear_x(i,j) = sum((temp1-temp2)*dy);
     end
 end
 
@@ -166,7 +180,7 @@ shear_y = 0;
 
 for i = 1:4
     for j = 1:length(span)
-        temp1 = dL2(i,j:length(span));
+        temp1 = dL(i,j:length(span));
         temp2 = dW_total(i,j:length(span));
         shear_z(i,j) = sum((temp1-temp2)*dy);
     end
@@ -219,96 +233,103 @@ end
 
 %PLOTSS
 
-figure(1)
-plot(span,-dW_total(1,:),"r", LineWidth = 1.5);
-hold on
-plot(span,-dW_total(2,:),"b--", LineWidth = 1.5);
-plot(span,-dW_total(3,:),":", LineWidth = 1.5);
-hold off
-grid on
-xlabel("Semi-span (m)");
-ylabel("Weight distribution (N/m)");
-legend("Case 1a","Case 1b", "Case 3");
+% figure
+% plot(span,-dW_total(1,:),"r", LineWidth = 1.5);
+% hold on
+% plot(span,-dW_total(2,:),"b--", LineWidth = 1.5);
+% plot(span,-dW_total(3,:),"g:", LineWidth = 1.5);
+% hold off
+% grid on
+% xlabel("Semi-span (m)");
+% ylabel("Weight distribution (N/m)");
+% legend("Case 1a","Case 1b", "Case 3");
 
-figure(2)
-plot(span,dL1(1,:),"r", LineWidth = 1.5);
-hold on
-plot(span,dL1(2,:),"b--", LineWidth = 1.5);
-plot(span,dL1(3,:),":", LineWidth = 1.5);
-hold off
-title("Lift distribution");
-xlabel("Semi-span (m)");
-ylabel("Lift (N/m)");
-grid on
-legend("Case 1a","Case 1b", "Case 3");
+% figure
+% plot(span,dL(1,:),"r", LineWidth = 1.5);
+% hold on
+% plot(span,dL(2,:),"b--", LineWidth = 1.5);
+% plot(span,dL(3,:),"k-.");
+% plot(span,dL(4,:),"g:", LineWidth = 1.5);
+% hold off
+% title("Lift distribution");
+% xlabel("Semi-span (m)");
+% ylabel("Lift (N/m)");
+% grid on
+% legend("Case 1a","Case 1b", "Case 2","Case 3");
 
-figure(3)
-plot(span,dL1(1,:)-dW_total(1,:),"r", LineWidth = 1.5);
-hold on
-plot(span,dL1(2,:)-dW_total(2,:),"b--", LineWidth = 1.5);
-plot(span,dL1(3,:)-dW_total(3,:),":", LineWidth = 1.5);
-hold off
-xlabel("Semi-span (m)");
-ylabel("load distribution (N/m)");
-grid on
-legend("Case 1a","Case 1b", "Case 3");
+% figure
+% plot(span,dL(1,:)-dW_total(1,:),"r", LineWidth = 1.5);
+% hold on
+% plot(span,dL(2,:)-dW_total(2,:),"b--", LineWidth = 1.5);
+% plot(span,dL(3,:)-dW_total(3,:),"k-.", LineWidth = 1.5);
+% plot(span,dL(4,:)-dW_total(3,:),"g:", LineWidth = 1.5);
+% hold off
+% xlabel("Semi-span (m)");
+% ylabel("load distribution (N/m)");
+% grid on
+% legend("Case 1a","Case 1b","Case 2", "Case 3");
 
-figure(4)
+figure
 subplot(1,3,1);
 plot(span,shear_x(1,:),"r", LineWidth = 1.5);
 hold on
 plot(span,shear_x(2,:),"b--", LineWidth = 1.5);
-plot(span,shear_x(3,:),":", LineWidth = 1.5);
+plot(span,shear_x(3,:),"k-.", LineWidth = 1.5);
+plot(span,shear_x(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
 ylabel("Shear distribution in x-direction (N/m^2)");
-legend("Case 1a","Case 1b", "Case 3");
+legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 subplot(1,3,2);
 plot(span,shear_z(1,:),"r", LineWidth = 1.5);
 hold on
 plot(span,shear_z(2,:),"b--", LineWidth = 1.5);
-plot(span,shear_z(3,:),":", LineWidth = 1.5);
+plot(span,shear_z(3,:),"k-.", LineWidth = 1.5);
+plot(span,shear_z(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
 ylabel("Shear distribution in z-direction (N/m^2)");
-legend("Case 1a","Case 1b", "Case 3");
+legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 subplot(1,3,3);
 plot(span,shear_total(1,:),"r", LineWidth = 1.5);
 hold on
 plot(span,shear_total(2,:),"b--", LineWidth = 1.5);
-plot(span,shear_total(3,:),":", LineWidth = 1.5);
+plot(span,shear_total(3,:),"k-.", LineWidth = 1.5);
+plot(span,shear_total(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
 ylabel("Total shear distribution (N/m^2)");
-legend("Case 1a","Case 1b", "Case 3");
+legend("Case 1a","Case 1b","Case 2", "Case 3");
 
-figure(5)
+figure
 subplot(1,2,1);
 plot(span,M_x(1,:),"r", LineWidth = 1.5);
 hold on
 plot(span,M_x(2,:),"b--", LineWidth = 1.5);
-plot(span,M_x(3,:),":", LineWidth = 1.5);
+plot(span,M_x(3,:),"k-.", LineWidth = 1.5);
+plot(span,M_x(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
 ylabel("Bending moment distribution in x-direction (N)");
-legend("Case 1a","Case 1b", "Case 3");
+legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 subplot(1,2,2);
 plot(span,M_z(1,:),"r", LineWidth = 1.5);
 hold on
 plot(span,M_z(2,:),"b--", LineWidth = 1.5);
-plot(span,M_z(3,:),":", LineWidth = 1.5);
+plot(span,M_z(3,:),"k-.", LineWidth = 1.5);
+plot(span,M_z(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
 ylabel("Bending moment distribution in z-direction (N)");
-legend("Case 1a","Case 1b", "Case 3");
+legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 
 % figure(6)
@@ -326,60 +347,60 @@ legend("Case 1a","Case 1b", "Case 3");
 % conditions so MTOW, EFW, MLW
 
 %%%%%%% CHANGE THE VALUES OF MLW AND EFW
-MTOW = 353385;         %mtow in kg
-MLW =  320000        ; % maximum landing weoght
-EFW =  300000      ; %EMPTY FUEL WEIGHT
-n= 3.75;
-mass=[MTOW, MLW, EFW];
-
-for j= 1:3
-    lift(j) = n* mass(j)*g;
-    L0(j)= lift(j)/(32.5*pi*0.5 - 6.34);  %assume an elliptical lift distribution
-    dl_new(j,:) = L0(j)*sqrt(1-(span/32.5).^2);
-end
-
-figure
-plot(span, dl_new(1,:))
-hold on
-plot(span, dl_new(2,:))
-plot(span, dl_new(3,:))
-grid on
-xlabel("Spanwise position (m)")
-ylabel("Sectional load (N/m)")
-
-
-figure
-plot(span,dL1(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
-hold on
-plot(span,dL1(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
-plot(span,dL1(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
-plot(span,dL1(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
-plot(span,dL2(1,:),"k:")
-plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
-plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);
-hold off
-xlabel("Semi-span (m)");
-ylabel("load distribution (N/m)");
-grid on
-legend("Case 1 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ", "Case 3 - Lift ","Case 1 - Inertial loads","Case 3 - Inertial loads");
+% MTOW = 353385;         %mtow in kg
+% MLW =  320000        ; % maximum landing weoght
+% EFW =  300000      ; %EMPTY FUEL WEIGHT
+% n= 3.75;
+% mass=[MTOW, MLW, EFW];
+% 
+% for j= 1:3
+%     lift(j) = n* mass(j)*g;
+%     L0(j)= lift(j)/(32.5*pi*0.5 - 6.34);  %assume an elliptical lift distribution
+%     dl_new(j,:) = L0(j)*sqrt(1-(span/32.5).^2);
+% end
+% 
+% figure
+% plot(span, dl_new(1,:))
+% hold on
+% plot(span, dl_new(2,:))
+% plot(span, dl_new(3,:))
+% grid on
+% xlabel("Spanwise position (m)")
+% ylabel("Sectional load (N/m)")
 
 
-
-figure
-plot(span,dL2(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
-hold on
-plot(span,dL2(4,:)-dW_total(1,:),"g",LineWidth = 1.25);
-plot(span,dL2(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
-plot(span,dL2(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
-plot(span,dL2(4,:),"--", LineWidth = 1.25,Color=[50 153 50]/255);
-plot(span,dL2(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
-plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
-plot(span,-dW_total(4,:),":", LineWidth = 1.25,Color=[0 50 0]/255);
-plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);
-hold off
-xlabel("Semi-span (m)");
-ylabel("load distribution (N/m)");
-grid on
-legend("Case 1 - Resultant load","Case 2 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ","Case 2 - Lift " ,"Case 3 - Lift ","Case 1 - Inertial loads","Case 2 - Inertial loads","Case 3 - Inertial loads");
-
+% figure
+% plot(span,dL(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
+% hold on
+% plot(span,dL(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
+% plot(span,dL(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
+% plot(span,dL(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
+% plot(span,dL(1,:),"k:")
+% plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
+% plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);
+% hold off
+% xlabel("Semi-span (m)");
+% ylabel("load distribution (N/m)");
+% grid on
+% legend("Case 1 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ", "Case 3 - Lift ","Case 1 - Inertial loads","Case 3 - Inertial loads");
+% 
+% 
+% 
+% figure
+% plot(span,dL(1,:)-dW_total(1,:),"r",LineWidth = 1.25);
+% hold on
+% plot(span,dL(4,:)-dW_total(1,:),"g",LineWidth = 1.25);
+% plot(span,dL(3,:)-dW_total(3,:),LineWidth = 1.25,Color=[0 128 255]/255);
+% plot(span,dL(1,:),"--", LineWidth = 1.25,Color=[255 102 102]/255);
+% plot(span,dL(4,:),"--", LineWidth = 1.25,Color=[50 153 50]/255);
+% plot(span,dL(3,:),"--", LineWidth = 1.25,Color=[102 102 255]/255);
+% plot(span,-dW_total(1,:),":", LineWidth = 1.25,Color=[153 0 0]/255);
+% plot(span,-dW_total(4,:),":", LineWidth = 1.25,Color=[0 50 0]/255);
+% plot(span,-dW_total(3,:),":", LineWidth = 1.25,Color=[0 0 153]/255);
+% hold off
+% xlabel("Semi-span (m)");
+% ylabel("load distribution (N/m)");
+% grid on
+% legend("Case 1 - Resultant load","Case 2 - Resultant load","Case 3 - Resultant load","Case 1 - Lift ","Case 2 - Lift " ,"Case 3 - Lift ","Case 1 - Inertial loads","Case 2 - Inertial loads","Case 3 - Inertial loads");
+% 
 

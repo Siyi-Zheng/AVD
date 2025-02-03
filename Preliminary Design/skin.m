@@ -19,19 +19,19 @@ farrardata= table(9:16, 1:10);
 
 %fixed variables
 % if there is an error run wing_load_distribution.m first
-momentMax = 4362716978.29012/100; % Nm
-c = (0.7 - 0.12) .* 12.05; % m
-b2 = 1.51; % m
-E = 70; % GPa
+momentMax = 4362716978.29012/100; % Nm % maximum bending moment
+c = (0.7 - 0.12) .* 12.05; % m %wingbox width
+b2 = 1.51; % m     web height (wingbox height)  %
+E = 70; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
-flangeWebRatio = 0.7; % ratio of flange length to web height
+flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 5: 1: 50;
+n = 5: 1: 50;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
-ts= 1:0.1:15;
-h = 90:1:110;
-b = c ./ n.* 1000; % mm
+ts= 1:0.1:15;     %stringer thickness
+h = 60:2:120;     %stringer web height
+b = c ./ n.* 1000; % mm      % 
 d = h .* flangeWebRatio; % mm  %flange width of stringer
 
 for i = 1:length(n)
@@ -88,10 +88,13 @@ for i = 1:length(h)
     % mass = squeeze(effectivePanelCSA(:,:,i));
     xData = n;
     yData = ts;
-    surf(n, ts, slice')
+    color = h(i) .* slice' ./ slice';
+    surf(n, ts, slice', color, "EdgeColor", "none");
     % surf(n, ts, mass')
     hold on
 end
+colormap("turbo")
+colorbar
 xlabel("Number of Stringers")
 ylabel("Stringer Thickness (mm)")
 zlabel("Farrar Efficiency")
@@ -118,11 +121,11 @@ resultant = sigma_cr - sigma_f;
 [result, index] = min(abs(resultant));
 
 %optimal rib spacing
-optimal_rib= Rib_spacing(index)
+optimal_rib= Rib_spacing(index);
 
 % spar
 
-a = 2; % Web panel spacing, m
+a = optimal_rib; % Web panel spacing, m
 E = 70; % Young's Modulus, GPa
 sigma_y = 324; % Yield Stress, MPa
 Ks = 10.4; % Read from graph
@@ -152,3 +155,10 @@ t_r = 7.3; % design rib thickness, mm
 sigma_c = (F / t_r) * (c / 1000); % crush stress, MPa
 sigma_b = F / (t_r * c * 1e3); % buckling stress, MPa
 t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
+
+
+%varying rib spacing with bending moments and then get how the rib
+%thickness varies with rib spacing.
+
+rib_spacing = constant * bending_moment^(-1/3);
+

@@ -111,7 +111,7 @@ load1_A(round(x_nlg/dl)) = load1_A(round(x_nlg/dl)) - n*W_nlg;
 % uniform load due to fuselage empty weight, luggage, passenger
 load1_D(:) = load1_D(:) -(q_fuselage+q_pass+q_lugg)*n*dl; 
 % load due to fuel tanl
-load1_D(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
+load1_D(round(23.9/dl):round(32.6/dl)) = load1_D(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
 load1_D(round(x_fspar/dl)) = load1_D(round(x_fspar/dl))+ R_F_D - 3/4*n*W_wing_total;
 load1_D(round(x_rspar/dl)) = load1_D(round(x_rspar/dl))+ R_R_D - 1/4*n*W_wing_total;
 load1_D(round(x_htail/dl)) = load1_D(round(x_htail/dl))- L_tail_D - n*W_htail;
@@ -169,7 +169,7 @@ R_R_OEI = x(2); % reaction force on rear spar
 % uniform load due to fuselage empty weight, luggage, passenger
 load2_v(:) = load2_v(:) -(q_fuselage+q_pass+q_lugg)*dl; 
 % load due to fuel tank
-load2_v(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*dl;
+load2_v(round(23.9/dl):round(32.6/dl)) = load2_v(round(23.9/dl):round(32.6/dl)) - q_fuel*dl;
 load2_v(round(x_fspar/dl)) = load2_v(round(x_fspar/dl))+ R_F_OEI - 3/4*W_wing_total;
 load2_v(round(x_rspar/dl)) = load2_v(round(x_rspar/dl))+ R_R_OEI - 1/4*W_wing_total;
 load2_v(round(x_htail/dl)) = load2_v(round(x_htail/dl))- L_tail_D - W_htail;
@@ -201,7 +201,7 @@ load3 = zeros(1000,1);
 % load due to landing gear
 n = 3; % landing load factor
 gear_load = 6.2349e6; % load on one landing gear
-load3(round(x_mlg/dl)) = load3(round(x_mlg/dl)) + gear_load*2 - n*W_mlg*2;
+load3(round(x_mlg/dl)) = load3(round(x_mlg/dl)) + gear_load*4 - n*W_mlg*2;
 load3(round(x_nlg/dl)) = load3(round(x_nlg/dl)) - n*W_nlg;
 
 

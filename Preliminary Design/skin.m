@@ -1,6 +1,3 @@
-clear
-clc
-
 % skin
 
 table = readtable("catchpole_data.csv");
@@ -160,5 +157,15 @@ t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
 %varying rib spacing with bending moments and then get how the rib
 %thickness varies with rib spacing.
 
-
-rib_spacing = constant * bending_moment^(-1/3);
+figure
+constant = optimal_rib * momentMax^(1/3);
+M_x = max(abs(M_x));
+rib_spacing = constant * M_x.^(-1/3); % run the WLD2 code first
+rib_list = [min(span)];
+while i < length(span)
+    loc = rib_list(end);
+    next_rib = loc + rib_spacing(i);
+    i = find(span > next_rib, 1);
+    rib_list = [rib_list next_rib];
+    disp(loc);
+end

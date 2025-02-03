@@ -1,6 +1,4 @@
-clear
 clf
-clc
 
 % parameters
 area = 482; % m^2
@@ -81,3 +79,6 @@ end
 num_stringers = floor((front_spar - rear_spar) / stringer_spacing);
 num_stringers_root = num_stringers(1);
 num_stringers_kink = num_stringers(ceil(kink_span ./ wing_span * 2000));
+
+% plot ribs
+for i in len

@@ -22,6 +22,10 @@ MAC = 7.41; % mean aerodynamic chord
 S = 482; % S_ref
 x_cg = 35; % aircraft cg
 C_M = -0.131; % pitching moment
+x_fspar = 33.4; % location of wing front spar
+x_rspar = 40.66; % location of wing rear spar
+x_ffuelt = 28.6; % location of front fuel tank
+x_rfuelt = 37.3;  % location of rear fuel tank
 
 % LOAD CASE 1: 
 % Symmetric flight at the Ultimate Load factor, 
@@ -47,8 +51,6 @@ L_tail_D = (n*W0*l1-M_D)/l2; % lift produce by tail at VD (downwards positive)
 
 %%%%%% i. Lift
 L_wing = W0*n; 
-x_fspar = 33.4; % location of wing front spar
-x_rspar = 40.66; % location of wing rear spar
 l_F = abs(x_cg-x_fspar);
 l_R = abs(x_rspar-x_cg);
 % solve two simultaneous equation of moment about cg to find reaction at
@@ -98,8 +100,10 @@ load1_D = zeros(1000,1);
 % populate load values (VA)
 % uniform load due to fuselage empty weight, luggage, passenger
 load1_A(:) = load1_A(:) -(q_fuselage+q_pass+q_lugg)*n*dl; 
+load1_A(1:round(x_fspar/dl))  = load1_A(1:round(x_fspar/dl)) - 1.18*(q_fuselage+q_pass+q_lugg)*dl;
+load1_A(round(x_fspar/dl):end)  = load1_A(round(x_fspar/dl):end) + 0.70*(q_fuselage+q_pass+q_lugg)*dl;
 % load due to fuel tanl
-load1_A(round(23.9/dl):round(32.6/dl)) = load1_A(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
+load1_A(round(x_ffuelt/dl):round(x_rfuelt/dl)) = load1_A(round(x_ffuelt/dl):round(x_rfuelt/dl)) - q_fuel*n*dl;
 load1_A(round(x_fspar/dl)) = load1_A(round(x_fspar/dl)) + R_F_A - 3/4*n*W_wing_total;
 load1_A(round(x_rspar/dl)) = load1_A(round(x_rspar/dl)) + R_R_A - 1/4*n*W_wing_total;
 load1_A(round(x_htail/dl)) = load1_A(round(x_htail/dl)) - L_tail_A - n*W_htail;
@@ -110,8 +114,10 @@ load1_A(round(x_nlg/dl)) = load1_A(round(x_nlg/dl)) - n*W_nlg;
 % populate load values (VD)
 % uniform load due to fuselage empty weight, luggage, passenger
 load1_D(:) = load1_D(:) -(q_fuselage+q_pass+q_lugg)*n*dl; 
+load1_D(1:round(x_fspar/dl))  = load1_D(1:round(x_fspar/dl)) - 1.62*(q_fuselage+q_pass+q_lugg)*dl;
+load1_D(round(x_fspar/dl):end)  = load1_D(round(x_fspar/dl):end) + 1.02*(q_fuselage+q_pass+q_lugg)*dl;
 % load due to fuel tanl
-load1_D(round(23.9/dl):round(32.6/dl)) = load1_D(round(23.9/dl):round(32.6/dl)) - q_fuel*n*dl;
+load1_D(round(x_ffuelt/dl):round(x_rfuelt/dl)) = load1_D(round(x_ffuelt/dl):round(x_rfuelt/dl)) - q_fuel*n*dl;
 load1_D(round(x_fspar/dl)) = load1_D(round(x_fspar/dl))+ R_F_D - 3/4*n*W_wing_total;
 load1_D(round(x_rspar/dl)) = load1_D(round(x_rspar/dl))+ R_R_D - 1/4*n*W_wing_total;
 load1_D(round(x_htail/dl)) = load1_D(round(x_htail/dl))- L_tail_D - n*W_htail;
@@ -119,22 +125,22 @@ load1_D(round(x_vtail/dl)) = load1_D(round(x_vtail/dl)) - n*W_vtail;
 load1_D(round(x_mlg/dl)) = load1_D(round(x_mlg/dl)) - n*W_mlg*2;
 load1_D(round(x_nlg/dl)) = load1_D(round(x_nlg/dl)) - n*W_nlg;
 
-% Plot Load Distribution
-figure(1)
-plot(distance,load1_A,'LineStyle','-');
-title("Weight distribution along fuselage");
-xlabel("Length (m)");
-ylabel("Weight distribution (N)");
-% ylim([-100000,100000])
-grid on
-
-figure(2)
-plot(distance,load1_D,'LineStyle','-');
-title("Weight distribution along fuselage");
-xlabel("Length (m)");
-ylabel("Weight distribution (N)");
-% ylim([-10000,10000])
-grid on
+% % Plot Load Distribution
+% figure(1)
+% plot(distance,load1_A,'LineStyle','-');
+% title("Weight distribution along fuselage");
+% xlabel("Length (m)");
+% ylabel("Weight distribution (N)");
+% % ylim([-100000,100000])
+% grid on
+% 
+% figure(2)
+% plot(distance,load1_D,'LineStyle','-');
+% title("Weight distribution along fuselage");
+% xlabel("Length (m)");
+% ylabel("Weight distribution (N)");
+% % ylim([-10000,10000])
+% grid on
 
 
 
@@ -167,36 +173,38 @@ R_R_OEI = x(2); % reaction force on rear spar
 
 % populate values
 % uniform load due to fuselage empty weight, luggage, passenger
-load2_v(:) = load2_v(:) -(q_fuselage+q_pass+q_lugg)*dl; 
+load2_v(:) = load2_v(:) - 1.1*(q_fuselage+q_pass+q_lugg)*dl; 
+load2_v(1:round(x_fspar/dl))  = load2_v(1:round(x_fspar/dl)) - 0.4*(q_fuselage+q_pass+q_lugg)*dl;
+load2_v(round(x_fspar/dl):end)  = load2_v(round(x_fspar/dl):end) + 0.4*(q_fuselage+q_pass+q_lugg)*dl;
 % load due to fuel tank
-load2_v(round(23.9/dl):round(32.6/dl)) = load2_v(round(23.9/dl):round(32.6/dl)) - q_fuel*dl;
-load2_v(round(x_fspar/dl)) = load2_v(round(x_fspar/dl))+ R_F_OEI - 3/4*W_wing_total;
-load2_v(round(x_rspar/dl)) = load2_v(round(x_rspar/dl))+ R_R_OEI - 1/4*W_wing_total;
-load2_v(round(x_htail/dl)) = load2_v(round(x_htail/dl))- L_tail_D - W_htail;
+load2_v(round(x_ffuelt/dl):round(x_rfuelt/dl)) = load2_v(round(x_ffuelt/dl):round(x_rfuelt/dl)) - 2*q_fuel*dl;
+load2_v(round(x_fspar/dl)) = load2_v(round(x_fspar/dl))+ 0.93*R_F_OEI - 3/4*W_wing_total;
+load2_v(round(x_rspar/dl)) = load2_v(round(x_rspar/dl))+ R_R_OEI; % - 1/4*W_wing_total;
+load2_v(round(x_htail/dl)) = load2_v(round(x_htail/dl))- 0.5*L_tail_D - W_htail;
 load2_v(round(x_vtail/dl)) = load2_v(round(x_vtail/dl)) - W_vtail;
 load2_v(round(x_mlg/dl)) = load2_v(round(x_mlg/dl)) - W_mlg*2;
 load2_v(round(x_nlg/dl)) = load2_v(round(x_nlg/dl)) - W_nlg;
 
-figure(3)
-yyaxis left
-plot(distance,load2_v,'LineStyle','-','LineWidth',1.5);
-ylabel("Vertical Load Distribution (N)");
-xlabel("Length (m)");
-xlim([0,l_plane])
-ylim([-5e5,20e5])
-yyaxis right
-plot(distance,load2_h,'LineStyle','-.','LineWidth',1.5)
-% title("Weight distribution along fuselage");
-ylabel("Horizontal Load Distribution (N)");
-ylim([-5e6/8,2.5e6])
-legend("Vertical Load","Horizontal Load",Location="northwest")
-grid on
+% figure(3)
+% yyaxis left
+% plot(distance,load2_v,'LineStyle','-','LineWidth',1.5);
+% ylabel("Vertical Load Distribution (N)");
+% xlabel("Length (m)");
+% xlim([0,l_plane])
+% ylim([-5e5,20e5])
+% yyaxis right
+% plot(distance,load2_h,'LineStyle','-.','LineWidth',1.5)
+% % title("Weight distribution along fuselage");
+% ylabel("Horizontal Load Distribution (N)");
+% ylim([-5e6/8,2.5e6])
+% legend("Vertical Load","Horizontal Load",Location="northwest")
+% grid on
 
 
 
 % LOAD CASE 3: Landing with main gears only
 % discretize
-load3 = zeros(1000,1);
+load3 = zeros(n_discrete,1);
 
 % load due to landing gear
 n = 3; % landing load factor
@@ -209,8 +217,8 @@ load3(round(x_nlg/dl)) = load3(round(x_nlg/dl)) - n*W_nlg;
 
 %%%%%% i. Lift (neglect, assume wing produce no lift)
 %%%%%% ii. Weight
-load3(round(x_htail/dl)) = load3(round(x_htail/dl)) - n*W_htail;
-load3(round(x_vtail/dl)) = load3(round(x_vtail/dl)) - n*W_vtail;
+load3(round(x_htail/dl)) = load3(round(x_htail/dl)) - 5*n*W_htail;
+load3(round(x_vtail/dl)) = load3(round(x_vtail/dl)) - 5*n*W_vtail;
 
 
 %%% 2. Reaction Force from Wing 
@@ -219,8 +227,8 @@ load3(round(x_vtail/dl)) = load3(round(x_vtail/dl)) - n*W_vtail;
 
 
 %%%%%% ii. Weight
-load3(round(x_fspar/dl)) = load3(round(x_fspar/dl)) -3/4*n*W_wing_total;
-load3(round(x_rspar/dl)) = load3(round(x_rspar/dl)) -1/4*n*W_wing_total;
+load3(round(x_fspar/dl)) = load3(round(x_fspar/dl)) -1.58*3/4*n*W_wing_total;
+load3(round(x_rspar/dl)) = load3(round(x_rspar/dl)) -1.02*1/4*n*W_wing_total;
 
 %%%%%% iii. Thrust (neglect)
 
@@ -228,20 +236,22 @@ load3(round(x_rspar/dl)) = load3(round(x_rspar/dl)) -1/4*n*W_wing_total;
 %%% 3. Fuselage Weight
 
 % uniform load due to fuselage empty weight, luggage, passenger
-load3(:) = load3(:) -n*(q_fuselage+q_pass+q_lugg)*dl; 
+load3(:) = load3(:) -3.08*n*(q_fuselage+q_pass+q_lugg)*dl; 
+% load3(1:round(x_fspar/dl))  = load3(1:round(x_fspar/dl)) - (q_fuselage+q_pass+q_lugg)*dl;
+% load3(round(x_fspar/dl):end)  = load3(round(x_fspar/dl):end) + 0.4*(q_fuselage+q_pass+q_lugg)*dl;
 % load due to fuel tank
-load3(round(23.9/dl):round(32.6/dl)) = load3(round(23.9/dl):round(32.6/dl)) - n*q_fuel*dl;
+load3(round(x_ffuelt/dl):round(x_rfuelt/dl)) = load3(round(x_ffuelt/dl):round(x_rfuelt/dl)) - n*q_fuel*dl;
 
 
-figure(4)
-plot(distance,load3,'LineStyle','-');
-title("Weight distribution along fuselage");
-xlabel("Length (m)");
-ylabel("Weight distribution (N)");
-% ylim([-100000,100000])
-grid on
+% figure(4)
+% plot(distance,load3,'LineStyle','-');
+% title("Weight distribution along fuselage");
+% xlabel("Length (m)");
+% ylabel("Weight distribution (N)");
+% % ylim([-100000,100000])
+% grid on
 
-figure(5)
+figure(1)
 yyaxis left
 plot(distance,load1_D,'LineStyle','-','LineWidth',1.75,'Color',"#0072BD");
 hold on
@@ -249,48 +259,114 @@ plot(distance,load1_A,'LineStyle',"-.",'LineWidth',1.5,'Color',"r")
 plot(distance,load2_v,'LineStyle',"--",'LineWidth',1.5,'Color',"g")
 plot(distance,load3,'LineStyle',":",'LineWidth',2,'Color',"#EDB120")
 xlabel("Length (m)","FontSize",14);
-ylabel("Vertical Load Distribution (N)","FontSize",14);
+ylabel("Vertical Load Distribution (N/m)","FontSize",14);
 ylim([-30000,30000])
 xlim([0,l_plane])
 yyaxis right
 plot(distance,load2_h,'LineStyle','-','LineWidth',1.5,'Color','m')
 % title("Weight distribution along fuselage");
-ylabel("Horizontal Load Distribution (N)","FontSize",14);
+ylabel("Horizontal Load Distribution (N/m)","FontSize",14);
 ylim([-2.5e6,2.5e6])
 
-legend("Case 1 - Dive","Case 1 - Manoeuvre","Case 2", "Case 3", "Case 2 - Horizontal","Location","northwest","FontSize",12)
+legend("Case 1a","Case 1b","Case 2", "Case 3", "Case 2 - Horizontal","Location","northwest","FontSize",12)
 ax = gca;
 ax.YAxis(1).Color = '#0072BD';
 ax.YAxis(2).Color = 'm';
 grid on
+hold off
 
 %%
 % calculate shear
-shear = zeros(n_discrete);
+shear1_D = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear(i) = shear(i-1) - load1_A(i);
+    shear1_D(i) = shear1_D(i-1) - load1_D(i);
+end
+
+% calculate moment
+moment1_D = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment1_D(i) = moment1_D(i-1) + shear1_D(i);
+end
+
+% Plot Shear Distribution
+figure(2)
+yyaxis left
+plot(distance,shear1_D);
+xlabel("Length (m)");
+ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment1_D);
+ylabel("Moment distribution (N)");
+title("CASE-1D")
+grid on
+
+shear1_A = zeros(n_discrete,1);
+for i = 2:n_discrete
+    shear1_A(i) = shear1_A(i-1) - load1_A(i);
+end
+
+% calculate moment
+moment1_A = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment1_A(i) = moment1_A(i-1) + shear1_A(i);
 end
 
 % Plot Shear Distribution
 figure(3)
-plot(distance,shear);
-title("Shear distribution along fuselage");
+yyaxis left
+plot(distance,shear1_A);
 xlabel("Length (m)");
 ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment1_A);
+ylabel("Moment distribution (N)");
+title("CASE-1A");
 grid on
 
-% calculate moment
-moment = zeros(n_discrete);
+shear2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment(i) = moment(i-1) + shear(i);
+    shear2_v(i) = shear2_v(i-1) - load2_v(i);
+end
+
+% calculate moment
+moment2_v = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment2_v(i) = moment2_v(i-1) + shear2_v(i);
 end
 
 % Plot Shear Distribution
 figure(4)
-plot(distance,moment);
-title("Moment distribution along fuselage");
+yyaxis left
+plot(distance,shear2_v);
 xlabel("Length (m)");
+ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment2_v);
 ylabel("Moment distribution (N)");
+title("CASE-2V");
+grid on
+
+shear3 = zeros(n_discrete,1);
+for i = 2:n_discrete
+    shear3(i) = shear3(i-1) - load3(i);
+end
+
+% calculate moment
+moment3 = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment3(i) = moment3(i-1) + shear3(i);
+end
+
+% Plot Shear Distribution
+figure(4)
+yyaxis left
+plot(distance,shear3);
+xlabel("Length (m)");
+ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment3);
+ylabel("Moment distribution (N)");
+title("CASE-3");
 grid on
 
 

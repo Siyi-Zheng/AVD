@@ -182,7 +182,14 @@ vq = vq .* 1.0228;
 %check it's correct
 Lift_fit = 2 * trapz(xq , vq);
 
-save("WingLoad.mat" , "vq" )
+save("WingLoadCase1.mat" , "vq" );
 
+%scaled wing load for 1g
+vq = vq*(1/2.5);
+
+%check it's correct
+Lift_fit = 2 * trapz(xq , vq);
+
+save("WingLoadCase2.mat" , "vq");
 
 

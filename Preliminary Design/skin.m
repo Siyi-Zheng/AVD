@@ -160,5 +160,5 @@ t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
 %varying rib spacing with bending moments and then get how the rib
 %thickness varies with rib spacing.
 
-rib_spacing = constant * bending_moment^(-1/3);
 
+rib_spacing = constant * bending_moment^(-1/3);

@@ -52,11 +52,10 @@ axis equal
 
 % get chord and spars
 x = linspace(2.55, wing_span/2, 1000);
-le = le_root + (le_tip - le_root) .* x ./ (wing_span / 2);
-te1 = te_root + (te_root - te_tip) .* (kink_span - x) ./ ((wing_span / 2) - kink_span);
-te = min(te_root, te1);
+le = linspace(le_root, le_tip, 1000); % leading edge points
+te = interp1([0 kink_span wing_span/2], [te_root te_root te_tip], x);
 chord = le - te;
-% front spar/ 
+% front spar
 front_spar = le - 0.12 * chord;
 rear_spar = te + 0.3 * chord;
 front_spar = linspace(front_spar(1), front_spar(end), 1000);
@@ -81,8 +80,6 @@ num_stringers_root = num_stringers(1);
 num_stringers_kink = num_stringers(ceil(kink_span ./ wing_span * 2000));
 
 % plot ribs
-le = linspace(le_root, le_tip, 1000); % leading edge points
-te = interp1([0 kink_span wing_span/2], [te_root te_root te_tip], x);
 for i = 1:length(rib_list)
     loc = rib_list(i);
     if loc < max(x)

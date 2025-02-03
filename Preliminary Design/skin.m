@@ -19,7 +19,7 @@ farrardata= table(9:16, 1:10);
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.05; % m %wingbox width
 b2 = 1.51; % m     web height (wingbox height)  %
-E = 70; % GPa     %Young's modulus      
+E_comp = 120.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
@@ -37,7 +37,7 @@ for i = 1:length(n)
             % TODO: consider buckling of stringers, I think this is why we
             % get unrealistic results with lots of tiny stringers
             As(i,j,k)= ts(j) .* (h(k) + 2 * d(k)); % mm^2
-            t2(i,j,k)= (N /3.62/ (E*10^9) * (b(i) / 1000) ^ 2) ^ (1/3) *1000; % mm
+            t2(i,j,k)= (N /3.62/ (E_comp*10^9) * (b(i) / 1000) ^ 2) ^ (1/3) *1000; % mm
             sigma_0(i,j,k) = N / (t2(i,j,k) * 1000); % MPa
             t_e(i,j,k) = t2(i,j,k) + (As(i,j,k) / b(i)); % mm
             effectivePanelCSA(i,j,k) = n(i)* b(i)* t_e(i,j,k); % mm^2
@@ -91,7 +91,8 @@ for i = 1:length(h)
     hold on
 end
 colormap("turbo")
-colorbar
+bar = colorbar;
+bar.Label.String = "Stringer Height (mm)";
 xlabel("Number of Stringers")
 ylabel("Stringer Thickness (mm)")
 zlabel("Farrar Efficiency")
@@ -113,7 +114,8 @@ sigma_cr = sigma_cr(id1, id2, id3);
 
 Rib_spacing =  0.5:0.05:7; % m
 
-sigma_f= mxv./sqrt(Rib_spacing./N./(E*10^9))./10^6;
+E_al = 73.85;
+sigma_f= mxv./sqrt(Rib_spacing./N./(E_al*10^9))./10^6;
 resultant = sigma_cr - sigma_f;
 [result, index] = min(abs(resultant));
 
@@ -123,7 +125,7 @@ optimal_rib= Rib_spacing(index);
 % spar
 
 a = optimal_rib; % Web panel spacing, m
-E = 70; % Young's Modulus, GPa
+E_al = 73.85; % Young's Modulus, GPa
 sigma_y = 324; % Yield Stress, MPa
 Ks = 10.4; % Read from graph
 V = 3311650; % Shear Load, N
@@ -132,12 +134,12 @@ q0 = T / (2 * c * b2 * 1000); % Torque shear flow, N/mm
 q2 = V / (2 * b2 * 1000); % Load shear flow, N/mm
 q_FS = q2 + q0; % Front spar shear flow, N/mm
 q_RS = q2 - q0; % Rear spar shear flow, N/mm
-t_FS = (q_FS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Front web thickness, mm
-t_RS = (q_RS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Rear web thickness, mm
+t_FS = (q_FS * 1000 * b2 / (Ks * E_al * 1e9)) ^ (1/3) * 1000; % Front web thickness, mm
+t_RS = (q_RS * 1000 * b2 / (Ks * E_al * 1e9)) ^ (1/3) * 1000; % Rear web thickness, mm
 
 tau_0 = q0 / t2; % shear stress, N/mm
 b1 = b; % skin panel width, mm
-tau_cr = Ks * E * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
+tau_cr = Ks * E_al * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
 R_c = sigma_0 / sigma_cr; % Compressive stress ratio
 R_s = tau_0 / tau_cr; % Shear stress ratio
 val = R_s^2 + R_c; % combined stress ratio
@@ -147,7 +149,7 @@ M = momentMax;
 t_e = ts + (As / b);
 s = 2; % rib spacing, m
 I = (c * (t_e / 1000) ^ 3 / 12 + c * (t_e / 1000) * (b2 / 2) ^ 2); % 2nd moment of area of panel, m^4
-F = M^2 * s * b2 * (t_e / 1000) * c / (2 * E * 1e9) / (I ^ 2); % Crush load, N
+F = M^2 * s * b2 * (t_e / 1000) * c / (2 * E_al * 1e9) / (I ^ 2); % Crush load, N
 t_r = 7.3; % design rib thickness, mm
 sigma_c = (F / t_r) * (c / 1000); % crush stress, MPa
 sigma_b = F / (t_r * c * 1e3); % buckling stress, MPa
@@ -169,3 +171,16 @@ while i < length(span)
     rib_list = [rib_list next_rib];
     disp(loc);
 end
+rib_list = rib_list(1:end-1);
+
+% rib thickness calculation
+chord = chord * 0.58;
+I = chord .* (t_e ./ 1000) .^ 3 ./ 12 + chord .* (t_e / 1000) * b2 .^ 2 / 4;
+crush_load = M_x .^ 2 .* rib_spacing .* b2 .* (t_e ./ 1000) .* chord...
+    ./ (2 .* E_al .* 1e9 .* (I .^ 2)) ./ 10;
+t_r = (crush_load ./ chord ./ 3.62 ./ (E_al .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
+rib_thickness = interp1(span, t_r, rib_list);
+scatter(rib_list, rib_thickness, "kx");
+xlabel("Semi-span (m)")
+ylabel("Rib Thickness (mm)")
+grid on

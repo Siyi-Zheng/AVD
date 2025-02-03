@@ -30,7 +30,7 @@ n = 5: 1: 50;
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:15;
-h = 90:1:110;
+h = 60:2:120;
 b = c ./ n.* 1000; % mm
 d = h .* flangeWebRatio; % mm  %flange width of stringer
 
@@ -88,10 +88,13 @@ for i = 1:length(h)
     % mass = squeeze(effectivePanelCSA(:,:,i));
     xData = n;
     yData = ts;
-    surf(n, ts, slice')
+    color = h(i) .* slice' ./ slice';
+    surf(n, ts, slice', color, "EdgeColor", "none");
     % surf(n, ts, mass')
     hold on
 end
+colormap("turbo")
+colorbar
 xlabel("Number of Stringers")
 ylabel("Stringer Thickness (mm)")
 zlabel("Farrar Efficiency")

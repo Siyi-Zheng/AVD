@@ -177,9 +177,10 @@ rib_list = rib_list(1:end-1);
 
 % rib thickness calculation
 % remove duplicates
+minThickness = 2; % mm
 span = unique(span);
 M_x(721) = [];
-chord = unique(chord);
+chord = flip(unique(chord));
 rib_spacing(721) = [];
 b2_span = 0.097 * chord;
 c_span = chord * 0.58;
@@ -187,9 +188,7 @@ I = c_span .* (t_e ./ 1000) .^ 3 ./ 12 + c_span .* (t_e ./ 1000) .* b2_span .^ 2
 crush_load = M_x .^ 2 .* rib_spacing .* b2_span .* (t_e ./ 1000) .* c_span...
     ./ (2 .* E_Aluminium .* 1e9 .* (I .^ 2)) ./ 10;
 t_r = (crush_load ./ c_span ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;
-rib_thickness = interp1(span, t_r, rib_list);
-figure
-minThickness = 1; % mm
+rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 % % calculation
 % chord = chord * 0.58;
 % I = chord .* (t_e ./ 1000) .^ 3 ./ 12 + chord .* (t_e / 1000) * b2 .^ 2 / 4;

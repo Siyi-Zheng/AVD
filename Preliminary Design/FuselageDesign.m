@@ -38,12 +38,16 @@ fus_ring = zeros(length(phi) , 1);
 fus_ring(:) = min(q);
 
 %plotting shear flow distribution
-figure 
-ax = polaraxes;
+figure
 
-polarplot(phi , rho , Color='r')
+polarplot(phi , rho , Color='r' , LineWidth=2)
 hold on
-polarplot(phi , q , Color='b')
+polarplot(phi , q , Color='c' , LineWidth=2)
+
+ax = gca;
+d = ax.ThetaDir;
+ax.ThetaDir = 'counterclockwise';
+ax.ThetaZeroLocation = 'bottom';
 
 hold off
 

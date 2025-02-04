@@ -94,7 +94,8 @@ for i = 1:length(h)
     hold on
 end
 colormap("turbo")
-colorbar
+bar = colorbar;
+bar.Label.String = "Stringer Height (mm)";
 xlabel("Number of Stringers")
 ylabel("Stringer Thickness (mm)")
 zlabel("Farrar Efficiency")
@@ -141,7 +142,7 @@ t_RS = (q_RS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000 % Rear web thickness, 
 
 tau_0 = q0 / t2; % shear stress, N/mm
 b1 = b; % skin panel width, mm
-tau_cr = Ks * E * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
+tau_cr = Ks * E_al * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
 R_c = sigma_0 / sigma_cr; % Compressive stress ratio
 R_s = tau_0 / tau_cr; % Shear stress ratio
 val = R_s^2 + R_c % combined stress ratio
@@ -173,3 +174,16 @@ while i < length(span)
     rib_list = [rib_list next_rib];
     disp(loc);
 end
+rib_list = rib_list(1:end-1);
+
+% rib thickness calculation
+chord = chord * 0.58;
+I = chord .* (t_e ./ 1000) .^ 3 ./ 12 + chord .* (t_e / 1000) * b2 .^ 2 / 4;
+crush_load = M_x .^ 2 .* rib_spacing .* b2 .* (t_e ./ 1000) .* chord...
+    ./ (2 .* E_al .* 1e9 .* (I .^ 2)) ./ 10;
+t_r = (crush_load ./ chord ./ 3.62 ./ (E_al .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
+rib_thickness = interp1(span, t_r, rib_list);
+scatter(rib_list, rib_thickness, "kx");
+xlabel("Semi-span (m)")
+ylabel("Rib Thickness (mm)")
+grid on

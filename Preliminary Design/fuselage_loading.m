@@ -327,12 +327,12 @@ shear2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
     shear2_v(i) = shear2_v(i-1) - load2_v(i);
 end
-
 % calculate moment
 moment2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
     moment2_v(i) = moment2_v(i-1) + shear2_v(i);
 end
+
 
 % Plot Shear Distribution
 figure(4)
@@ -346,11 +346,35 @@ ylabel("Moment distribution (N)");
 title("CASE-2V");
 grid on
 
+
+
+shear2_h = zeros(n_discrete,1);
+for i = 2:n_discrete
+    shear2_h(i) = shear2_h(i-1) - load2_h(i);
+end
+% calculate moment
+moment2_h = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment2_h(i) = moment2_h(i-1) + shear2_h(i);
+end
+
+
+% Plot Shear Distribution
+figure(5)
+yyaxis left
+plot(distance,shear2_h);
+xlabel("Length (m)");
+ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment2_h);
+ylabel("Moment distribution (N)");
+title("CASE-2H");
+grid on
+
 shear3 = zeros(n_discrete,1);
 for i = 2:n_discrete
     shear3(i) = shear3(i-1) - load3(i);
 end
-
 % calculate moment
 moment3 = zeros(n_discrete,1);
 for i = 2:n_discrete
@@ -358,7 +382,7 @@ for i = 2:n_discrete
 end
 
 % Plot Shear Distribution
-figure(4)
+figure(6)
 yyaxis left
 plot(distance,shear3);
 xlabel("Length (m)");

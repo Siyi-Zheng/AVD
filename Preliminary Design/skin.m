@@ -203,18 +203,32 @@ ylim([0 max(rib_thickness) + 1])
 grid on
 
 % plotting how the web thickness varies with the span 
+% IF RIB SPACING CHANGES THEN KS CHANGES
+% DOUBLE CHECK KS VALUES
+V_x = max(abs(shear_x));
+V_x(721) = [];
+T = max(abs(M_torque));
+T(721) = [];
 a = rib_thickness; % Web panel spacing, m
 E = E_Aluminium; % Young's Modulus, GPa
 sigma_y = 495; % Yield Stress, MPa
-Ks = 7; % Read from graph
-V = 3311650; % Shear Load, N
-T = 4200000; % Torque Load, Nm
+Ks = 8.1; % Read from graph
+V = V_x; % Shear Load, N
 q0 = T ./ (2 .* c_span .* b2_span .* 1000); % Torque shear flow, N/mm
-q2 = V ./ (2 * b2_span * 1000); % Load shear flow, N/mm
-q_FS = q2 + q0; % Front spar shear flow, N/mm
-q_RS = q2 - q0; % Rear spar shear flow, N/mm
+q2 = V ./ (2 .* b2_span .* 1000); % Load shear flow, N/mm
+q_FS = abs(q2 + q0); % Front spar shear flow, N/mm
+q_RS = abs(q2 - q0); % Rear spar shear flow, N/mm
 t_FS = (q_FS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Front web thickness, mm
-t_RS = (q_RS .* 1000 .* b2_span / (Ks .* E_Aluminium * 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
+t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
+
+discrete_thickness = 1;
+difference_array = abs(t_RS - t_RS(1));
+number = max(difference_array) - min(difference_array);
+
+for i =1: length(difference_array)
+    index = 
+
+
 
 figure
 plot(span, t_RS)

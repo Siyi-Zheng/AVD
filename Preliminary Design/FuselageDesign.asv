@@ -1,0 +1,65 @@
+clear
+clc
+
+
+
+%%
+%skin thickness shear flow
+%need to break load cases down into 
+
+
+
+%data for fuselage ring
+r = 6.34;
+
+
+phi = 0:0.1:360;
+rho = zeros(length(phi) , 1);
+rho(:) = r;
+
+%tangiential load
+P = 5000; %N
+
+%Radial Loading
+Q = 10000; %N
+
+%Pure Torque
+T = 10000; %Nm
+
+%Calculating shear flow around the fuselage ring
+q = (T + P*r)/(2 * pi * r^2) + (P .* cosd(phi)) ./ (pi * r) + (Q .* sind(phi)) ./ (pi * r);
+
+%plotting shear flow distribution
+figure 
+ax = polaraxes;
+hold on
+
+polarplot(phi , rho)
+
+polarplot
+
+hold off
+
+
+%%
+%Pressurization Loads
+%taking pressure difference at cruise
+Ho = 43000;
+Hi = 8000;
+Ho = convlength(Ho,'ft','m');
+Hi = convlength(Hi,'ft','m');
+format long g;
+[~,~,Po] = atmosisa(Ho);
+[~,~,Pi] = atmosisa(Hi);
+
+P = Pi - Po;
+
+%fuselage is perfect cylinder with diameter 
+D = 6.34;
+
+stress_thickness_ratio_h = (P * D) / 2;
+
+stress_thickness_ratio_l = (P * D) / 4;
+
+
+

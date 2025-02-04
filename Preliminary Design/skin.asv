@@ -19,7 +19,8 @@ farrardata= table(9:16, 1:10);
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.05; % m %wingbox width
 b2 = 1.51; % m     web height (wingbox height)  %
-E = 70; % GPa     %Young's modulus      
+E_composite = 
+E = 73.85; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
@@ -100,14 +101,15 @@ zlabel("Farrar Efficiency")
 
 [mxv, idx] = max(F_factor(:));
 [id1, id2, id3] = ind2sub(size(F_factor), idx);
-n = n(id1);
+n = n(id1)
 ts = ts(id2);
 h = h(id3);
 b = c ./ n.* 1000; % mm
 
+
 % extract other values at this optimum
 As = As(id1, id2, id3);
-t2 = t2(id1, id2, id3);
+t2 = t2(id1, id2, id3)   %skin thickness
 sigma_0 = sigma_0(id1, id2, id3);
 sigma_cr = sigma_cr(id1, id2, id3);
 
@@ -123,8 +125,8 @@ optimal_rib= Rib_spacing(index);
 % spar
 
 a = optimal_rib; % Web panel spacing, m
-E = 70; % Young's Modulus, GPa
-sigma_y = 324; % Yield Stress, MPa
+E = 72.5; % Young's Modulus, GPa
+sigma_y = 495; % Yield Stress, MPa
 Ks = 10.4; % Read from graph
 V = 3311650; % Shear Load, N
 T = 303353; % Torque Load, Nm
@@ -157,10 +159,15 @@ t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
 %varying rib spacing with bending moments and then get how the rib
 %thickness varies with rib spacing.
 
-figure
-constant = optimal_rib * momentMax^(1/3);
-rib_spacing = constant * M_x.^(-1/3); % run the WLD2 code first
-rib_list = [];
-while x < max(span)
-    
-end
+% figure
+% constant = optimal_rib * momentMax^(1/3);
+% M_x = max(abs(M_x));
+% rib_spacing = constant * M_x.^(-1/3); % run the WLD2 code first
+% rib_list = [min(span)];
+% while i < length(span)
+%     loc = rib_list(end);
+%     next_rib = loc + rib_spacing(i);
+%     i = find(span > next_rib, 1);
+%     rib_list = [rib_list next_rib];
+%     disp(loc);
+% end

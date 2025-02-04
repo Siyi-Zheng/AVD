@@ -184,9 +184,23 @@ crush_load = M_x .^ 2 .* rib_spacing .* b2_span .* (t_e ./ 1000) .* c_span...
 t_r = (crush_load ./ c_span ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;
 rib_thickness = interp1(span, t_r, rib_list);
 figure
+minThickness = 2; % mm
+% remove duplicates
+M_x(721) = [];
+span = unique(span);
+chord = unique(chord);
+rib_spacing(721) = [];
+% calculation
+chord = chord * 0.58;
+I = chord .* (t_e ./ 1000) .^ 3 ./ 12 + chord .* (t_e / 1000) * b2 .^ 2 / 4;
+crush_load = M_x .^ 2 .* rib_spacing .* b2 .* (t_e ./ 1000) .* chord...
+    ./ (2 .* E_al .* 1e9 .* (I .^ 2)) ./ 10;
+t_r = (crush_load ./ chord ./ 3.62 ./ (E_al .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
+rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 scatter(rib_list, rib_thickness, "kx");
 xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
+ylim([0 max(rib_thickness) + 1])
 grid on
 
 % plotting how the web thickness varies with the span 

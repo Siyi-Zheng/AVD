@@ -1,5 +1,5 @@
 % skin
-
+WLD2;
 table = readtable("catchpole_data.csv");
 catchpoledata = table(1:8, 1:10);
 farrardata= table(9:16, 1:10);
@@ -178,7 +178,7 @@ rib_list = rib_list(1:end-1);
 % rib thickness calculation
 b2_span = 0.097 * chord;
 c_span = chord * 0.58;
-I = c_span .* (t_e ./ 1000) .^ 3 ./ 12 + c_span .* (t_e / 1000) * b2_span .^ 2 / 4;
+I = c_span .* (t_e ./ 1000) .^ 3 ./ 12 + c_span .* (t_e ./ 1000) .* b2_span .^ 2 / 4;
 crush_load = M_x .^ 2 .* rib_spacing .* b2_span .* (t_e ./ 1000) .* c_span...
     ./ (2 .* E_Aluminium .* 1e9 .* (I .^ 2)) ./ 10;
 t_r = (crush_load ./ c_span ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;

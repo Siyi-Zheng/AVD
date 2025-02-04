@@ -323,16 +323,17 @@ h2 = height(:,2);
 c = centroid(:,2);
 final = cumtrapz(h1, h2); % integrate the height to find the mean
 final2 = cumtrapz(h1, c); % integrate the centroid to find the mean
-spar_height = (final(73) - final(15)) / (0.7 - 0.12); % mean value theorem
+spar_height = (h2(73) + h2(15)) / 2; % mean value theorem
 box_centroid = (final2(73) - final2(15)) / (0.7 - 0.12); % mean value theorem
 box_lower = box_centroid - spar_height/2; % find the lower end of the wing box
 
 plot(NACA(:,1),NACA(:,2),'k',LineWidth=1.1)
 axis equal 
 grid on
-xlabel('X-pos x/c')
-ylabel('Y-pos y/c')
+xlabel('Chordwise position (x/c)')
+ylabel('Streamwise position (y/c)')
 xlim([0,max(NACA(:,1))])
+ylim([-0.1 0.1])
 hold on
 
 rectangle('Position',[fspar_pos,box_lower,rspar_pos-fspar_pos,spar_height],'EdgeColor','r','LineWidth',1.3)

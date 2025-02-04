@@ -214,13 +214,19 @@ for i=1:4
         x_quart(i, j) = 0.25 * chord(j);
         z_f = 0.07; % depends how we define the axis
         x_cg= cg;
+        % temp1 = dL(i,j:length(span));
+        % temp2 = dW_total(i,j:length(span));
         m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
         dM(i,j) = dL(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + - m_0w(i,j);
-        M_torque(i,j)= sum(dM(i,j)) ;
+
     end
 end
-
-
+for i=1:4
+    for j = 1: length(span)
+        temp= dM(i, j:length(span));
+        M_torque(i,j)= sum(temp)*dy;
+     end
+end
 
 % M_torque = zeros(4, length(span));
 % % landing_gear_force_case3 = zeros(length(span));

@@ -318,12 +318,10 @@ lower = [0.000000  0.000000
 
 height = upper - lower; % get height of spar along x/c
 centroid = upper + lower; % get centroid of spar along x/c
-h1 = upper(:,1);
-h2 = height(:,2);
+hx = upper(:,1);
+hy = height(:,2);
 c = centroid(:,2);
-final = cumtrapz(h1, h2); % integrate the height to find the mean
-final2 = cumtrapz(h1, c); % integrate the centroid to find the mean
-spar_height = (h2(73) + h2(15)) / 2; % mean value theorem
+
 box_centroid = (final2(73) - final2(15)) / (0.7 - 0.12); % mean value theorem
 box_lower = box_centroid - spar_height/2; % find the lower end of the wing box
 

@@ -1,3 +1,4 @@
+%Dependencies: StringerCounterFunc.m and SweepCalcFunc.m
 clear
 clc
 bluez=[0 0 1];
@@ -6,17 +7,17 @@ greenz=[0 0.75 0];
 lilaz=[0.75 0 0.75];
 orangz=[1 0.5 0];
 colorz={bluez, redz, greenz, orangz, lilaz};
-density= ; %of tailplane material
-Vtail_W = ; %Weight of tailplane kg
+density= 1565; %of tailplane material
+Vtail_W = 1900; %Weight of tailplane kg
 
 
 n=451; %Number of discretizations
 
-cbar= ; %Mean aerodynamic chord of vertical stabiliser (m)
+cbar= 3.7; %Mean aerodynamic chord of vertical stabiliser (m)
 lambda=0.55; %Taper ratio
-ctip= ; %tip chord length
+ctip= 1.5; %tip chord length
 croot=ctip/lambda;
-l_unswept= ; %Length of vertical stabiliser (m) without sweep (in the z direction)
+l_unswept= 6.5; %Length of vertical stabiliser (m) without sweep (in the z direction)
 sweep=34.1; %Stabiliser sweep angle (deg)
 
 fs_c=0.2; %Front spar chord percentage
@@ -26,10 +27,10 @@ LF=3.75; %load factor
 
 %Solving moment balance for OEI case to find lift force
 thrust=322000; %Engine thrust (N)
-engine_y= ; %Engine cg y coordinate (m)
+engine_y= 3.7; %Engine cg y coordinate (m)
 ac_xcg=36; %Aircraft overall x_cg (m), using MTOW as aftmost
 ac_xcg_alt =35.6; %x_cg (m) for ZW case
-vert_le_x= ; %x coordinate of vertical stabiliser leading edge at root (m)
+vert_le_x= 33; %x coordinate of vertical stabiliser leading edge at root (m)
 
 L=(engine_y*thrust)/(cbar/4+vert_le_x- ac_xcg);
 L_alt=(engine_y*thrust)/(cbar/4+vert_le_x- ac_xcg_alt);

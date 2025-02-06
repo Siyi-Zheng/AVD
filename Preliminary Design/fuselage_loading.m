@@ -41,7 +41,7 @@ n = 2.5*1.5; % ultimate load factor
 xw_AC = 34.5; % aerodynamic centre of wing
 l1 = abs(x_cg-xw_AC); 
 l2 = abs(x_htail-xw_AC); % distance of tail AC (assume AC coincide with CG) from aircraft AC
-[~,a,~,rho,~,~] = atmosisa(0);  
+[~,a,~,rho,~] = atmosisa(0);  
 M_A = 0.5*rho*(V_A)^2*S*MAC*C_M; % pitching moment at VA
 M_D = 0.5*rho*(V_D)^2*S*MAC*C_M; % pitching moment at VD
 L_tail_A = (n*W0*l1-M_A)/l2; % lift produce by tail at VA (downwards positive)
@@ -327,12 +327,12 @@ shear2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
     shear2_v(i) = shear2_v(i-1) - load2_v(i);
 end
-
 % calculate moment
 moment2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
     moment2_v(i) = moment2_v(i-1) + shear2_v(i);
 end
+
 
 % Plot Shear Distribution
 figure(4)
@@ -346,11 +346,35 @@ ylabel("Moment distribution (N)");
 title("CASE-2V");
 grid on
 
+
+
+shear2_h = zeros(n_discrete,1);
+for i = 2:n_discrete
+    shear2_h(i) = shear2_h(i-1) - load2_h(i);
+end
+% calculate moment
+moment2_h = zeros(n_discrete,1);
+for i = 2:n_discrete
+    moment2_h(i) = moment2_h(i-1) + shear2_h(i);
+end
+
+
+% Plot Shear Distribution
+figure(5)
+yyaxis left
+plot(distance,shear2_h);
+xlabel("Length (m)");
+ylabel("Shear distribution (N)");
+yyaxis right
+plot(distance,moment2_h);
+ylabel("Moment distribution (N)");
+title("CASE-2H");
+grid on
+
 shear3 = zeros(n_discrete,1);
 for i = 2:n_discrete
     shear3(i) = shear3(i-1) - load3(i);
 end
-
 % calculate moment
 moment3 = zeros(n_discrete,1);
 for i = 2:n_discrete
@@ -358,7 +382,7 @@ for i = 2:n_discrete
 end
 
 % Plot Shear Distribution
-figure(4)
+figure(6)
 yyaxis left
 plot(distance,shear3);
 xlabel("Length (m)");

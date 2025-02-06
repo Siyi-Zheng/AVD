@@ -281,3 +281,5 @@ legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "M
 
 
 
+% d-cell design
+perimeter = 0.2606 * c_span;

@@ -327,6 +327,18 @@ spar_height = (h2(73) + h2(15)) / 2; % mean value theorem
 box_centroid = (final2(73) - final2(15)) / (0.7 - 0.12); % mean value theorem
 box_lower = box_centroid - spar_height/2; % find the lower end of the wing box
 
+% get perimeter of the wing skin forward of the front spar
+perimeter = 0;
+for i = 1:15
+    changeX1 = upper(i+1, 1) - upper(i, 1);
+    changeY1 = upper(i+1, 2) - upper(i, 2);
+    changeTotal1 = sqrt(changeX1 ^ 2) + (changeY1 ^ 2);
+    changeX2 = lower(i+1, 1) - lower(i, 1);
+    changeY2 =lower(i+1, 2) - lower(i, 2);
+    changeTotal2 = sqrt(changeX2 ^ 2) + (changeY2 ^ 2);
+    perimeter = perimeter + changeTotal1 + changeTotal2;
+end
+
 plot(NACA(:,1),NACA(:,2),'k',LineWidth=1.1)
 axis equal 
 grid on

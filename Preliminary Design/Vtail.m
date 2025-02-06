@@ -30,7 +30,7 @@ thrust=322000; %Engine thrust (N)
 engine_y= 3.7; %Engine cg y coordinate (m)
 ac_xcg=36; %Aircraft overall x_cg (m), using MTOW as aftmost
 ac_xcg_alt =35.6; %x_cg (m) for ZW case
-vert_le_x= 33; %x coordinate of vertical stabiliser leading edge at root (m)
+vert_le_x= 70.3; %x coordinate of vertical stabiliser leading edge at root (m)
 
 L=(engine_y*thrust)/(cbar/4+vert_le_x- ac_xcg);
 L_alt=(engine_y*thrust)/(cbar/4+vert_le_x- ac_xcg_alt);

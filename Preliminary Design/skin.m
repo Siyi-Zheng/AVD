@@ -236,3 +236,5 @@ hold on
 plot(span, t_FS)
 hold off
 
+% d-cell design
+perimeter = 0.2606 * c_span;

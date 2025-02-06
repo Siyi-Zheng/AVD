@@ -224,15 +224,60 @@ t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000;
 discrete_thickness = 1;
 difference_array = abs(t_RS - t_RS(1));
 number = max(difference_array) - min(difference_array);
+difference_array_f = abs(t_FS - t_FS(1));
+number_f = max(difference_array_f) - min(difference_array_f);
 
-for i =1: length(difference_array)
-    index = 
+index = [];  % Initialize index array
+for i = 1:number
+    idx = find(difference_array < i & difference_array > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
 
+index(1) =1;
+
+for i = 1:length(index)
+    if i < length(index)
+        t_RS_dis(index(i):index(i+1)-1) = t_RS(index(i));
+    else
+        t_RS_dis(index(i): length(t_RS)) = t_RS(index(i));
+    end
+end
+
+index_f = [];  % Initialize index array
+for i = 1:number
+    idx_f = find(difference_array_f < i & difference_array_f > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx_f)
+        index_f(end+1) = idx_f;  % Append found index
+    end
+end
+
+index_f(1) =1;
+
+for i = 1:length(index_f)
+    if i < length(index_f)
+        t_FS_dis(index_f(i):index_f(i+1)-1) = t_FS(index_f(i));
+    else
+        t_FS_dis(index_f(i):length(t_FS)) = t_FS(index_f(i));
+    end
+end
 
 
 figure
-plot(span, t_RS)
+plot(span, t_RS, LineStyle="--", LineWidth= 1.5)
 hold on
-plot(span, t_FS)
+plot(span, t_FS, LineStyle="--", LineWidth= 1.5)
+plot(span, t_FS_dis, LineWidth=1.5)
+plot(span, t_RS_dis, LineWidth=1.5)
 hold off
+grid on
+xlabel("Semi_span")
+ylabel("Spar web thickness (mm)")
+legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "Manufacturing front spar thickness", "Manufacturing rear spar thickness")
+
+
+
+
+
 

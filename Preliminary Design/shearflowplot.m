@@ -15,7 +15,5 @@ rho(:) = r;
 %Calculating shear flow around the fuselage ring
 q = (T + P*r)./(2 * pi * r^2) + (P .* cos(phi)) ./ (pi * r) + (Q .* sin(phi)) ./ (pi * r);
 
-%make positive, normalise and add the radius for visual appeal and ease of reading
-q(:,:) = abs(q(:,:)./max(q)) + r;
 
 end

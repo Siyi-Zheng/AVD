@@ -307,49 +307,17 @@ end
 %skin thickness shear flow
 %need to break load cases down into 
 
+q1A = shearflowplot(0 , shear1_A , 0);
+q1D = shearflowplot(0 , shear1_D , 0);
+q2 = shearflowplot(shear2_h , shear2_v , T_max);
+q3 = shearflowplot(0 , shear3 , 0);
 
+%max shear flow is needed
+max1A = max(q1A);
+max1D = max(q1D);
+max2 = max(q2);
+max3 = max(q3);
 
-%data for fuselage ring
-r = 6.34;
-
-
-phi = 0:10:360;
-phi = phi .* (pi/180);
-rho = zeros(length(phi) , 1);
-rho(:) = r;
-
-%tangiential load
-P = 0; %N
-
-%Radial Loading
-Q = 2500000; %N
-
-%Pure Torque
-T = 0; %Nm
-
-%Calculating shear flow around the fuselage ring
-q = (T + P*r)/(2 * pi * r^2) + (P .* cos(phi)) ./ (pi * r) + (Q .* sin(phi)) ./ (pi * r);
-
-%make positive, normalise and add the radius for visual appeal and ease of reading
-q(:) = abs(q(:)/max(q)) + r;
-
-%fuselage ring
-fus_ring = zeros(length(phi) , 1);
-fus_ring(:) = min(q);
-
-%plotting shear flow distribution
-figure
-
-polarplot(phi , rho , Color='r' , LineWidth=2)
-hold on
-polarplot(phi , q , Color='c' , LineWidth=2)
-
-ax = gca;
-d = ax.ThetaDir;
-ax.ThetaDir = 'counterclockwise';
-ax.ThetaZeroLocation = 'bottom';
-
-hold off
 
 
 %%

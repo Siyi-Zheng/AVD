@@ -344,6 +344,7 @@ yyaxis right
 plot(distance,moment2_v);
 ylabel("Moment distribution (N)");
 title("CASE-2V");
+%ylim([0 15000000])
 grid on
 
 
@@ -365,6 +366,7 @@ yyaxis left
 plot(distance,shear2_h);
 xlabel("Length (m)");
 ylabel("Shear distribution (N)");
+%ylim([0 150000000])
 yyaxis right
 plot(distance,moment2_h);
 ylabel("Moment distribution (N)");

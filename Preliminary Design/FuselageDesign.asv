@@ -352,15 +352,15 @@ fus_ring(:) = min(qmax);
 %plotting shear flow distribution
 figure
 
-polarplot(phi , rho , Color='r' , LineWidth=2)
+polarplot(phi , rho , Color='r' , LineWidth=2 , DisplayName='Fusalge Skin')
 hold on
-polarplot(phi , qmax , Color='c' , LineWidth=2)
+polarplot(phi , qmax , Color='c' , LineWidth=2 , DisplayName='Shear Flow')
 
 ax = gca;
 d = ax.ThetaDir;
 ax.ThetaDir = 'counterclockwise';
 ax.ThetaZeroLocation = 'bottom';
-
+legend(FontSize=3)
 hold off
 
 %max thickness needed
@@ -370,14 +370,17 @@ t = 0:0.0001:0.01;
 max_stress = zeros(length(t) , 1);
 max_stress(:) = sigma;
 
+%t in mm
+t_mm = t*1000;
+
 figure
 hold on
 set(gca, 'YScale', 'log') % Force log scale on Y-axis
-semilogy(t , max_stress/1000000 , 'r--')
-semilogy(t , (max3./t))
+semilogy(t_mm , max_stress/1000000 , 'r--')
+semilogy(t_mm , (max3./t/1000000))
 
 ylabel('Stress (Mpa)')
-xlabel('Skin ')
+xlabel('Skin Thickess (m)')
 hold off
 
 

@@ -4,8 +4,10 @@ clc
 
 
 %%
-%selected material yield strength
-sigma = 431*10^6;
+%selected material properites (probably going to change this!!)
+sigma_y = 431*10^6;
+E = 73850000000;
+G = 28700000000;
 
 %%
 %load calculation
@@ -352,15 +354,15 @@ fus_ring(:) = min(qmax);
 %plotting shear flow distribution
 figure
 
-polarplot(phi , rho , Color='r' , LineWidth=2)
+polarplot(phi , rho , Color='r' , LineWidth=2 , DisplayName='Fusalge Skin')
 hold on
-polarplot(phi , qmax , Color='c' , LineWidth=2)
+polarplot(phi , qmax , Color='c' , LineWidth=2 , DisplayName='Shear Flow')
 
 ax = gca;
 d = ax.ThetaDir;
 ax.ThetaDir = 'counterclockwise';
 ax.ThetaZeroLocation = 'bottom';
-
+legend(FontSize=14)
 hold off
 
 %max thickness needed
@@ -368,7 +370,7 @@ t = 0:0.0001:0.01;
 
 %take maximum acceptable yield stress as 1/3 of yield stress
 max_stress = zeros(length(t) , 1);
-max_stress(:) = sigma;
+max_stress(:) = sigma_y;
 
 %t in mm
 t_mm = t*1000;
@@ -406,4 +408,7 @@ stress_thickness_ratio_h = (P * D) / 2;
 stress_thickness_ratio_l = (P * D) / 4;
 
 
+%%
+
+%light frame design
 

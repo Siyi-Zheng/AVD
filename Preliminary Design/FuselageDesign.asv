@@ -2,6 +2,11 @@ clear
 clc
 
 
+
+%%
+%selected material yield strength
+sigma = 431*10^6;
+
 %%
 %load calculation
 
@@ -361,7 +366,20 @@ hold off
 %max thickness needed
 t = 0:0.0001:0.01;
 
-%material shear stress
+%take maximum acceptable yield stress as 1/3 of yield stress
+max_stress = zeros(length(t) , 1);
+max_stress(:) = sigma;
+
+figure
+hold on
+set(gca, 'YScale', 'log') % Force log scale on Y-axis
+semilogy(t , max_stress/1000000 , 'r--')
+semilogy(t , (max3./t))
+
+ylabel('Stress (Mpa)')
+xlabel('Skin ')
+hold off
+
 
 
 %%

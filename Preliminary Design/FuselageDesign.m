@@ -368,14 +368,21 @@ t = 0:0.0001:0.01;
 
 %take maximum acceptable yield stress as 1/3 of yield stress
 max_stress = zeros(length(t) , 1);
-max_stress(:) = 1/3 * sigma;
+max_stress(:) = sigma;
+
+%t in mm
+t_mm = t*1000;
 
 figure
 hold on
 set(gca, 'YScale', 'log') % Force log scale on Y-axis
-semilogy(t , max_stress , 'r--')
-semilogy(t , (max3./t))
+semilogy(t_mm , max_stress/1000000 , 'r--')
+semilogy(t_mm , (max3./t/1000000))
+
+ylabel('Stress (Mpa)')
+xlabel('Skin Thickess (m)')
 hold off
+
 
 
 %%

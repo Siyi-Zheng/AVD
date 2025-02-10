@@ -272,12 +272,15 @@ legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "D
 
 %%%%%%%%%shear flow in skin
 moment_span = M_x;
-b_span = c_span ./ n.* 1000;% skin panel width, mm
+span = unique(span);
+M_x(721) = [];
+chord = flip(unique(chord));
 N_span = moment_span ./ (c_span .* b2_span);
-t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
+t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b2_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
 
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
+b_span = c_span ./ n.* 1000;% skin panel width, mm
 tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
 Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));

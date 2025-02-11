@@ -285,13 +285,27 @@ b_span = c_span ./ n.* 1000;% skin panel width, mm
 N_span = moment_span ./ (c_span .* b2_span);
 t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
 
+difference_array_new = abs(t2_span - t2_span(1));
+number_new = max(difference_array_new) - min(difference_array_new);
+
+index = [];  % Initialize index array
+for i = 1:number_new
+    idx = find(difference_array_new < i & difference_array_new > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
+
+
+t2_span(t2_span<1) = 1;
+
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
 tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
 Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
 sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
-R_c = sigma_0_span ./ sigma_cr; % Compressive stress ratio
+R_c = sigma_0_span ./ sigma_cr_span; % Compressive stress ratio
 R_s = tau_0 ./ tau_cr; % Shear stress ratio
 val = R_s.^2 + R_c; % combined stress ratio
 

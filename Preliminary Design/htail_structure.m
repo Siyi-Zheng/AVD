@@ -14,7 +14,9 @@ farrardata= table(9:16, 1:10);
 %%%%%%%%%Design panel size and stringer size
 % max bending moment - with stringers
 
-%fixed variables
+%fixed variables#
+density_comp = 1515;
+density_al = 2800;
 % if there is an error run wing_load_distribution.m first
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.41; % m %wingbox width
@@ -163,7 +165,6 @@ while i < length(span)
     next_rib = loc + rib_spacing(i);
     i = find(span > next_rib, 1);
     rib_list = [rib_list next_rib];
-    disp(loc);
 end
 rib_list = rib_list(1:end-1);
 
@@ -189,7 +190,13 @@ rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 % t_r = (crush_load ./ chord ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
 % rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 scatter(rib_list, rib_thickness, "kx");
-mass = sum(rib_area * )
+area_list = 0.0939 * c_span .^2;
+rib_area_list = [];
+for i = 1:length(rib_list)
+    rib_loc = rib_list(i);
+    rib_area_list = [rib_area_list max(area_list(span > rib_loc))];
+end
+main_rib_mass = sum(rib_area_list .* rib_thickness / 1000) * density_al;
 xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
@@ -277,13 +284,27 @@ b_span = c_span ./ n.* 1000;% skin panel width, mm
 N_span = moment_span ./ (c_span .* b2_span);
 t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
 
+difference_array_new = abs(t2_span - t2_span(1));
+number_new = max(difference_array_new) - min(difference_array_new);
+
+index = [];  % Initialize index array
+for i = 1:number_new
+    idx = find(difference_array_new < i & difference_array_new > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
+
+
+t2_span(t2_span<1) = 1;
+
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
 tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
 Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
 sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
-R_c = sigma_0_span ./ sigma_cr; % Compressive stress ratio
+R_c = sigma_0_span ./ sigma_cr_span; % Compressive stress ratio
 R_s = tau_0 ./ tau_cr; % Shear stress ratio
 val = R_s.^2 + R_c; % combined stress ratio
 
@@ -310,8 +331,6 @@ buckling_coeff = [];
 total_mass = [];
 rib_thickness = 2; % mm, idk what a sensible value for this is
 tau_cr = 145; % tresca shear yielding stress
-density_comp = 1515;
-density_al = 2800;
 for num_pseudoribs = min_pseudoribs:max_pseudoribs
     span = span_old_var;
     a = (max(span) - min(span)) / (num_pseudoribs + 1);
@@ -322,7 +341,6 @@ for num_pseudoribs = min_pseudoribs:max_pseudoribs
     span_list = [];
     area_list = [];
     for i = 1:num_pseudoribs
-        disp(i)
         p = max(perimeter(span >= pseudorib_locs(i)));
         r = max(radius(span >= pseudorib_locs(i)));
         s = max(span(span >= pseudorib_locs(i)));
@@ -376,6 +394,6 @@ ax.YAxis(1).Color = [0 0 0];
 ax.YAxis(2).Color = [0 0 0];
 xline(25, "k--")
 % labels
-xlabel("Number of Pseudoribs")
-ylabel("Rib mass (kg)")
+xlabel("Number of pseudoribs")
+ylabel("Total pseudorib mass (kg)")
 legend(["Total", "Skin", "Pseudoribs"], Location="northwest")

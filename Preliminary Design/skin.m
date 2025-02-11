@@ -165,7 +165,6 @@ while i < length(span)
     next_rib = loc + rib_spacing(i);
     i = find(span > next_rib, 1);
     rib_list = [rib_list next_rib];
-    disp(loc);
 end
 rib_list = rib_list(1:end-1);
 
@@ -342,7 +341,6 @@ for num_pseudoribs = min_pseudoribs:max_pseudoribs
     span_list = [];
     area_list = [];
     for i = 1:num_pseudoribs
-        disp(i)
         p = max(perimeter(span >= pseudorib_locs(i)));
         r = max(radius(span >= pseudorib_locs(i)));
         s = max(span(span >= pseudorib_locs(i)));
@@ -396,6 +394,6 @@ ax.YAxis(1).Color = [0 0 0];
 ax.YAxis(2).Color = [0 0 0];
 xline(25, "k--")
 % labels
-xlabel("Number of Pseudoribs")
-ylabel("Rib mass (kg)")
+xlabel("Number of pseudoribs")
+ylabel("Total pseudorib mass (kg)")
 legend(["Total", "Skin", "Pseudoribs"], Location="northwest")

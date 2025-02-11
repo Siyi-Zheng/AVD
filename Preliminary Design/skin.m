@@ -14,12 +14,14 @@ farrardata= table(9:16, 1:10);
 %%%%%%%%%Design panel size and stringer size
 % max bending moment - with stringers
 
-%fixed variables
+%fixed variables#
+density_comp = 1515;
+density_al = 2800;
 % if there is an error run wing_load_distribution.m first
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.41; % m %wingbox width
 b2 = 0.097 * 12.41; % m     web height (wingbox height)  %
-E_composite = 147.5 ; %Gpa
+E_composite = 61 ; %Gpa
 E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
@@ -189,6 +191,13 @@ rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 % t_r = (crush_load ./ chord ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
 % rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 scatter(rib_list, rib_thickness, "kx");
+area_list = 0.0939 * c_span .^2;
+rib_area_list = [];
+for i = 1:length(rib_list)
+    rib_loc = rib_list(i);
+    rib_area_list = [rib_area_list max(area_list(span > rib_loc))];
+end
+main_rib_mass = sum(rib_area_list .* rib_thickness / 1000) * density_al;
 xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
@@ -289,21 +298,26 @@ val = R_s.^2 + R_c; % combined stress ratio
 figure
 plot(span, val)
 
+span_old_var = span; % so it doesn't get overwritten
 
+% get cylindrical buckling data ready to interpolate
+bucklingdata = readtable("buckling_dcell.csv");
+Y_grid = [0, 2, 4, 6, 10, 16, 50]; % (Y-coordinates)
+X_grid = [0, 0.2, 0.667, 1, 1.5, 2, 3, 10];  % (X-coordinates)
+bucklingdata_matrix = table2array(bucklingdata);
+buckling_coeffs = bucklingdata_matrix(2:end,2:end);
 
 % d-cell design
 perimeter = 0.1739 * c_span;
 area = 0.243 / 100 * c_span .^ 2;
-min_pseudoribs = 2;
-max_pseudoribs = 36;
-root_radius = 0.5; % m, this can be anything lol
+min_pseudoribs = 8;
+max_pseudoribs = 45;
+root_radius = 0.3; % m, this can be anything lol
 radius = root_radius .* c_span / c_span(1);
 buckling_coeff = [];
 total_mass = [];
-rib_thickness = 3; % mm, idk what a sensible value for this is
+rib_thickness = 2; % mm, idk what a sensible value for this is
 tau_cr = 145; % tresca shear yielding stress
-density_comp = 1515;
-density_al = 2800;
 for num_pseudoribs = min_pseudoribs:max_pseudoribs
     span = span_old_var;
     a = (max(span) - min(span)) / (num_pseudoribs + 1);
@@ -314,6 +328,7 @@ for num_pseudoribs = min_pseudoribs:max_pseudoribs
     span_list = [];
     area_list = [];
     for i = 1:num_pseudoribs
+        disp(i)
         p = max(perimeter(span >= pseudorib_locs(i)));
         r = max(radius(span >= pseudorib_locs(i)));
         s = max(span(span >= pseudorib_locs(i)));
@@ -333,7 +348,9 @@ for num_pseudoribs = min_pseudoribs:max_pseudoribs
         b = b_list(rib);
         span = span_list(rib);
         bucklingX = aspect_ratio(rib); % x-coordinate of graph to read from
-        while abs(old_ts - ts) > 1e-3
+        step = 0; % stops solution diverging
+        while abs(old_ts - ts) > 1e-3 && step < 10
+            step = step + 1;
             old_ts = t_s;
             bucklingY = min(a, b) / sqrt(radius_at_rib * t_s / 1000); % convert to m
             % actually do the interpolation
@@ -352,18 +369,18 @@ end
 
 figure
 ax = gca();
-plot(5:max_pseudoribs, total_mass(5:end), "k-")
+plot(8:max_pseudoribs, total_mass(8:end), "k-")
 hold on
-plot(5:max_pseudoribs, total_skin_mass(5:end), "r-")
+plot(8:max_pseudoribs, total_skin_mass(8:end), "r-")
 ylabel("Skin/Total mass (kg)")
 yyaxis right
-plot(5:max_pseudoribs, total_rib_mass(5:end), "b-")
+plot(8:max_pseudoribs, total_rib_mass(8:end), "b-")
 grid on
-xlim([5, max_pseudoribs])
+xlim([8, max_pseudoribs])
 % Set the color of each axis to black
 ax.YAxis(1).Color = [0 0 0];
 ax.YAxis(2).Color = [0 0 0];
-xline(23, "k--")
+xline(25, "k--")
 % labels
 xlabel("Number of Pseudoribs")
 ylabel("Rib mass (kg)")

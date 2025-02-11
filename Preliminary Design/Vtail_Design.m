@@ -70,7 +70,7 @@ b_flange = flange_web_ratio*h_web;
 Ixx_spar = (h_web(1).^3.*(1.25/1000))/12 + 2*(((1.25/1000)^3.*b_flange(1))/12 + ((1.25/1000).*b_flange(1).*h_web(1).^2)/4); % m^4
 
 
-Spar cab
+% Spar cab
 
 n_sc_tensile = BM./((sigma_xx_tensile*10^6).*(t_ply/1000).*h_web.*b_flange);
 n_sc_comp = BM./((sigma_xx_comp*10^6).*(t_ply/1000).*h_web.*b_flange);
@@ -150,14 +150,14 @@ N_xy_old = SF./h_web; % N/m
 N_xy_applied = spline(spanstation, N_xy_old, span_web);
 
 
-Check interaction
+% Check interaction
 web_buckle = (N_xy_applied./N_xy_crit).^2 + (N_x_applied./N_x_crit)
 
 % this is the stress in the VTail in the xy direction
 N_xy = SF./h_web; % N/m
 
 
-Composite Skin
+% Composite Skin
 D11 = 713593;
 D22 = 221598;
 D12 = 92887.6;
@@ -172,7 +172,7 @@ N_x_applied = BM(1)/(b(1)*h_web(1)) % N/m
 skin_buckle = N_x_applied./N_x_crit
 
 
-Composite Rib
+% Composite Rib
 t_e = 3.25; % skin composite thickness in mm
 no_ribs = 5;
 ribspace = l/no_ribs%rib spacing
@@ -202,7 +202,7 @@ N_x_crit = ((2*pi^2)./b_des.^2).*((sqrt(D11*10^-3*D22*10^-3) + D12*10^-3 + 2*D66
 
 rib_buckle = N_x_applied./N_x_crit
 
-Plotting for number of pliers
+% Plotting for number of pliers
 figure
 set(findobj(gcf,'type','axes'),'FontName','Palatino','FontSize',12,'FontWeight','Bold', 'LineWidth', 1.5);
 plot(spanstation, n_sc_comp, '--r', 'LineWidth', 1.5)
@@ -230,7 +230,7 @@ xlabel('Distance along span [m]','FontSize',14,'interpreter','latex')
 ylabel('Number of ${n_{45}}$ in the spar caps','FontSize',14,'interpreter','latex')
 
 
-Plot of TAIL WING
+% Plot of TAIL WING
 
 
 syms x
@@ -319,7 +319,6 @@ for i = 1:length(L_output)
     length_ribs(i) = double(vpa(sqrt((x(100)-x(1))^2 + (y(100) - y(1))^2), 2));
 end
 
-Weight
 % Weights
 
 boxw_distb = b_new(2:7);

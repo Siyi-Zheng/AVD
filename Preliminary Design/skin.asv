@@ -19,7 +19,7 @@ farrardata= table(9:16, 1:10);
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.41; % m %wingbox width
 b2 = 0.097 * 12.41; % m     web height (wingbox height)  %
-E_composite = 147.5 ; %Gpa
+E_composite = 61 ; %Gpa
 E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
@@ -189,6 +189,7 @@ rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 % t_r = (crush_load ./ chord ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
 % rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 scatter(rib_list, rib_thickness, "kx");
+mass = sum(rib_area * )
 xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
@@ -215,13 +216,48 @@ t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000;
 
 discrete_thickness = 1;
 difference_array = abs(t_RS - t_RS(1));
-number = max(difference_array) 
-for i = 1:length(difference_array)
-    index_1 = 
-index_1 = 1<=difference_array<=2 ;
-index_2 = 
+number = max(difference_array) - min(difference_array);
+difference_array_f = abs(t_FS - t_FS(1));
+number_f = max(difference_array_f) - min(difference_array_f);
 
+index = [];  % Initialize index array
+for i = 1:number
+    idx = find(difference_array < i & difference_array > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
 
+index(1) =1;
+
+for i = 1:length(index)
+    if i < length(index)
+        t_RS_dis(index(i):index(i+1)-1) = t_RS(index(i));
+    else
+        t_RS_dis(index(i): length(t_RS)) = t_RS(index(i));
+    end
+end
+
+index_f = [];  % Initialize index array
+for i = 1:number
+    idx_f = find(difference_array_f < i & difference_array_f > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx_f)
+        index_f(end+1) = idx_f;  % Append found index
+    end
+end
+
+index_f(1) =1;
+
+for i = 1:length(index_f)
+    if i < length(index_f)
+        t_FS_dis(index_f(i):index_f(i+1)-1) = t_FS(index_f(i));
+    else
+        t_FS_dis(index_f(i):length(t_FS)) = t_FS(index_f(i));
+    end
+end
+
+t_FS_dis(t_FS_dis<2) = 2;
+t_RS_dis(t_RS_dis<2) = 2;
 
 figure
 plot(span, t_RS, LineStyle="--", LineWidth= 1.5)
@@ -230,4 +266,116 @@ plot(span, t_FS, LineStyle="--", LineWidth= 1.5)
 plot(span, t_FS_dis, LineWidth=1.5)
 plot(span, t_RS_dis, LineWidth=1.5)
 hold off
+grid on
+xlabel("Semi span")
+ylabel("Spar web thickness (mm)")
+legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "Discretised front spar thickness", "Discretised rear spar thickness")
 
+%%%%%%%%%shear flow in skin
+moment_span = M_x;
+b_span = c_span ./ n.* 1000;% skin panel width, mm
+N_span = moment_span ./ (c_span .* b2_span);
+t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
+
+%compression-shear combination for stringer and skin
+tau_0 = q0 ./ t2_span; % shear stress, N/mm
+tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
+sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
+Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
+sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
+R_c = sigma_0_span ./ sigma_cr; % Compressive stress ratio
+R_s = tau_0 ./ tau_cr; % Shear stress ratio
+val = R_s.^2 + R_c; % combined stress ratio
+
+figure
+plot(span, val)
+
+span_old_var = span; % so it doesn't get overwritten
+
+% get cylindrical buckling data ready to interpolate
+bucklingdata = readtable("buckling_dcell.csv");
+Y_grid = [0, 2, 4, 6, 10, 16, 50]; % (Y-coordinates)
+X_grid = [0, 0.2, 0.667, 1, 1.5, 2, 3, 10];  % (X-coordinates)
+bucklingdata_matrix = table2array(bucklingdata);
+buckling_coeffs = bucklingdata_matrix(2:end,2:end);
+
+% d-cell design
+perimeter = 0.1739 * c_span;
+area = 0.243 / 100 * c_span .^ 2;
+min_pseudoribs = 8;
+max_pseudoribs = 45;
+root_radius = 0.3; % m, this can be anything lol
+radius = root_radius .* c_span / c_span(1);
+buckling_coeff = [];
+total_mass = [];
+rib_thickness = 2; % mm, idk what a sensible value for this is
+tau_cr = 145; % tresca shear yielding stress
+density_comp = 1515;
+density_al = 2800;
+for num_pseudoribs = min_pseudoribs:max_pseudoribs
+    span = span_old_var;
+    a = (max(span) - min(span)) / (num_pseudoribs + 1);
+    pseudorib_locs = linspace(min(span), max(span), num_pseudoribs);
+    % remove outer rib in calculations of d-cell perimeter
+    b_list = [];
+    radius_list = [];
+    span_list = [];
+    area_list = [];
+    for i = 1:num_pseudoribs
+        disp(i)
+        p = max(perimeter(span >= pseudorib_locs(i)));
+        r = max(radius(span >= pseudorib_locs(i)));
+        s = max(span(span >= pseudorib_locs(i)));
+        ar = max(area(span >= pseudorib_locs(i)));
+        b_list = [b_list p];
+        radius_list = [radius_list r];
+        span_list = [span_list s];
+        area_list = [area_list ar];
+    end
+    aspect_ratio = a./b_list;
+    skin_mass = 0; % start running total
+    rib_mass = 0;
+    for rib = 1:num_pseudoribs
+        t_s = 10; % iterative process
+        old_ts = 0;
+        radius_at_rib = radius_list(rib);
+        b = b_list(rib);
+        span = span_list(rib);
+        bucklingX = aspect_ratio(rib); % x-coordinate of graph to read from
+        step = 0; % stops solution diverging
+        while abs(old_ts - ts) > 1e-3 && step < 10
+            step = step + 1;
+            old_ts = t_s;
+            bucklingY = min(a, b) / sqrt(radius_at_rib * t_s / 1000); % convert to m
+            % actually do the interpolation
+            buckling_coeff = interp2(Y_grid, X_grid, buckling_coeffs,...
+                bucklingY, bucklingX);
+            % shear stress calculation
+            t_s = sqrt(tau_cr .* 1e6 .* b^2 ./ (buckling_coeff .* E_composite .* 1e9)) .* 1000;
+        end
+        skin_mass = skin_mass + b .* a .* t_s./1000 .* density_comp;
+        rib_mass = rib_mass + density_al * area_list(rib) * rib_thickness / 1000; % kg
+    end
+    total_skin_mass(num_pseudoribs) = skin_mass;
+    total_rib_mass(num_pseudoribs) = rib_mass;
+    total_mass(num_pseudoribs) = total_rib_mass(num_pseudoribs) + total_skin_mass(num_pseudoribs);
+end
+
+figure
+ax = gca();
+plot(8:max_pseudoribs, total_mass(8:end), "k-")
+hold on
+plot(8:max_pseudoribs, total_skin_mass(8:end), "r-")
+ylabel("Skin/Total mass (kg)")
+yyaxis right
+plot(8:max_pseudoribs, total_rib_mass(8:end), "b-")
+grid on
+xlim([8, max_pseudoribs])
+% Set the color of each axis to black
+ax.YAxis(1).Color = [0 0 0];
+ax.YAxis(2).Color = [0 0 0];
+xline(25, "k--")
+% labels
+xlabel("Number of Pseudoribs")
+ylabel("Rib mass (kg)")
+legend(["Total", "Skin", "Pseudoribs"], Location="northwest")

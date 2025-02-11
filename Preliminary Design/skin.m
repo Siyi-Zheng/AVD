@@ -121,7 +121,7 @@ resultant = sigma_cr - sigma_f;
 [result, index] = min(abs(resultant));
 
 %optimal rib spacing
-optimal_rib= Rib_spacing(index)
+optimal_rib= Rib_spacing(index);
 
 % spar
 
@@ -305,4 +305,79 @@ plot(span, val)
 
 
 % d-cell design
-perimeter = 0.2606 * c_span;
+perimeter = 0.1739 * c_span;
+area = 0.243 / 100 * c_span .^ 2;
+min_pseudoribs = 2;
+max_pseudoribs = 36;
+root_radius = 0.5; % m, this can be anything lol
+radius = root_radius .* c_span / c_span(1);
+buckling_coeff = [];
+total_mass = [];
+rib_thickness = 3; % mm, idk what a sensible value for this is
+tau_cr = 145; % tresca shear yielding stress
+density_comp = 1515;
+density_al = 2800;
+for num_pseudoribs = min_pseudoribs:max_pseudoribs
+    span = span_old_var;
+    a = (max(span) - min(span)) / (num_pseudoribs + 1);
+    pseudorib_locs = linspace(min(span), max(span), num_pseudoribs);
+    % remove outer rib in calculations of d-cell perimeter
+    b_list = [];
+    radius_list = [];
+    span_list = [];
+    area_list = [];
+    for i = 1:num_pseudoribs
+        p = max(perimeter(span >= pseudorib_locs(i)));
+        r = max(radius(span >= pseudorib_locs(i)));
+        s = max(span(span >= pseudorib_locs(i)));
+        ar = max(area(span >= pseudorib_locs(i)));
+        b_list = [b_list p];
+        radius_list = [radius_list r];
+        span_list = [span_list s];
+        area_list = [area_list ar];
+    end
+    aspect_ratio = a./b_list;
+    skin_mass = 0; % start running total
+    rib_mass = 0;
+    for rib = 1:num_pseudoribs
+        t_s = 10; % iterative process
+        old_ts = 0;
+        radius_at_rib = radius_list(rib);
+        b = b_list(rib);
+        span = span_list(rib);
+        bucklingX = aspect_ratio(rib); % x-coordinate of graph to read from
+        while abs(old_ts - ts) > 1e-3
+            old_ts = t_s;
+            bucklingY = min(a, b) / sqrt(radius_at_rib * t_s / 1000); % convert to m
+            % actually do the interpolation
+            buckling_coeff = interp2(Y_grid, X_grid, buckling_coeffs,...
+                bucklingY, bucklingX);
+            % shear stress calculation
+            t_s = sqrt(tau_cr .* 1e6 .* b^2 ./ (buckling_coeff .* E_composite .* 1e9)) .* 1000;
+        end
+        skin_mass = skin_mass + b .* a .* t_s./1000 .* density_comp;
+        rib_mass = rib_mass + density_al * area_list(rib) * rib_thickness / 1000; % kg
+    end
+    total_skin_mass(num_pseudoribs) = skin_mass;
+    total_rib_mass(num_pseudoribs) = rib_mass;
+    total_mass(num_pseudoribs) = total_rib_mass(num_pseudoribs) + total_skin_mass(num_pseudoribs);
+end
+
+figure
+ax = gca();
+plot(5:max_pseudoribs, total_mass(5:end), "k-")
+hold on
+plot(5:max_pseudoribs, total_skin_mass(5:end), "r-")
+ylabel("Skin/Total mass (kg)")
+yyaxis right
+plot(5:max_pseudoribs, total_rib_mass(5:end), "b-")
+grid on
+xlim([5, max_pseudoribs])
+% Set the color of each axis to black
+ax.YAxis(1).Color = [0 0 0];
+ax.YAxis(2).Color = [0 0 0];
+xline(23, "k--")
+% labels
+xlabel("Number of Pseudoribs")
+ylabel("Rib mass (kg)")
+legend(["Total", "Skin", "Pseudoribs"], Location="northwest")

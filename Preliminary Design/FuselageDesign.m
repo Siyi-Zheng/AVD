@@ -2,6 +2,13 @@ clear
 clc
 
 
+
+%%
+%selected material properites (probably going to change this!!)
+sigma_y = 431*10^6;
+E = 73850000000;
+G = 28700000000;
+
 %%
 %load calculation
 
@@ -307,49 +314,77 @@ end
 %skin thickness shear flow
 %need to break load cases down into 
 
+q1A = shearflowplot(0 , shear1_A , 0);
+q1D = shearflowplot(0 , shear1_D , 0);
+q2 = shearflowplot(shear2_h , shear2_v , T_vs);
+q3  = shearflowplot(0 , shear3 , 0);
+
+%max shear flow is needed
+[max1A , I1A] = max(abs(q1A(:)));
+[max1D , I1D] = max(abs(q1D(:)));
+[max2 , I2]= max(abs(q2(:)));
+[max3 , I3] = max(abs(q3(:)));
+
+[row_max1A, col_max1A] = ind2sub(size(q1A), I1A);
+[row_max1D, col_max1D] = ind2sub(size(q1D), I1D);
+[row_max2, col_max2] = ind2sub(size(q2), I2);
+[row_max3, col_max3] = ind2sub(size(q3), I3);
+
+%plotting shear for max case
+%copy data
+
+qmax = q3(500,:);
 
 
 %data for fuselage ring
 r = 6.34;
 
+%normalize qmax
+qmax(:) = abs(qmax(:)./max(qmax)) + r;
 
 phi = 0:10:360;
 phi = phi .* (pi/180);
 rho = zeros(length(phi) , 1);
 rho(:) = r;
 
-%tangiential load
-P = 0; %N
-
-%Radial Loading
-Q = 2500000; %N
-
-%Pure Torque
-T = 0; %Nm
-
-%Calculating shear flow around the fuselage ring
-q = (T + P*r)/(2 * pi * r^2) + (P .* cos(phi)) ./ (pi * r) + (Q .* sin(phi)) ./ (pi * r);
-
-%make positive, normalise and add the radius for visual appeal and ease of reading
-q(:) = abs(q(:)/max(q)) + r;
-
 %fuselage ring
 fus_ring = zeros(length(phi) , 1);
-fus_ring(:) = min(q);
+fus_ring(:) = min(qmax);
 
 %plotting shear flow distribution
 figure
 
-polarplot(phi , rho , Color='r' , LineWidth=2)
+polarplot(phi , rho , Color='r' , LineWidth=2 , DisplayName='Fusalge Skin')
 hold on
-polarplot(phi , q , Color='c' , LineWidth=2)
+polarplot(phi , qmax , Color='c' , LineWidth=2 , DisplayName='Shear Flow')
 
 ax = gca;
 d = ax.ThetaDir;
 ax.ThetaDir = 'counterclockwise';
 ax.ThetaZeroLocation = 'bottom';
-
+legend(FontSize=14)
 hold off
+
+%max thickness needed
+t = 0:0.0001:0.01;
+
+%take maximum acceptable yield stress as 1/3 of yield stress
+max_stress = zeros(length(t) , 1);
+max_stress(:) = sigma_y;
+
+%t in mm
+t_mm = t*1000;
+
+figure
+hold on
+set(gca, 'YScale', 'log') % Force log scale on Y-axis
+semilogy(t_mm , max_stress/1000000 , 'r--')
+semilogy(t_mm , (max3./t/1000000))
+
+ylabel('Stress (Mpa)')
+xlabel('Skin Thickess (m)')
+hold off
+
 
 
 %%
@@ -373,4 +408,7 @@ stress_thickness_ratio_h = (P * D) / 2;
 stress_thickness_ratio_l = (P * D) / 4;
 
 
+%%
+
+%light frame design
 

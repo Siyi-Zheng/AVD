@@ -19,8 +19,8 @@ farrardata= table(9:16, 1:10);
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.41; % m %wingbox width
 b2 = 0.097 * 12.41; % m     web height (wingbox height)  %
-E_composite = 120.5 ; %Gpa
-E_Aluminium = 73.85; % GPa     %Young's modulus      
+E_composite = 147.5 ; %Gpa
+E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
@@ -128,7 +128,7 @@ optimal_rib= Rib_spacing(index);
 a = optimal_rib; % Web panel spacing, m
 E = E_Aluminium; % Young's Modulus, GPa
 sigma_y = 495; % Yield Stress, MPa
-Ks = 7; % Read from graph
+Ks = 8.5; % Read from graph
 V = 3311650; % Shear Load, N
 T = 4200000; % Torque Load, Nm
 q0 = T / (2 * c * b2 * 1000); % Torque shear flow, N/mm
@@ -137,14 +137,6 @@ q_FS = q2 + q0; % Front spar shear flow, N/mm
 q_RS = q2 - q0; % Rear spar shear flow, N/mm
 t_FS = (q_FS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Front web thickness, mm
 t_RS = (q_RS * 1000 * b2 / (Ks * E * 1e9)) ^ (1/3) * 1000; % Rear web thickness, mm
-
-%compression-shear combination for stringer and skin
-tau_0 = q0 / t2; % shear stress, N/mm
-b1 = b; % skin panel width, mm
-tau_cr = Ks * E_Aluminium * 1e9 * (t2 / b1) ^ 2 * 1e-6; % critical shear buckling stress, MPa
-R_c = sigma_0 / sigma_cr; % Compressive stress ratio
-R_s = tau_0 / tau_cr; % Shear stress ratio
-val = R_s^2 + R_c; % combined stress ratio
 
 % ribs
 M = momentMax;
@@ -212,7 +204,7 @@ T(721) = [];
 a = rib_thickness; % Web panel spacing, m
 E = E_Aluminium; % Young's Modulus, GPa
 sigma_y = 495; % Yield Stress, MPa
-Ks = 8.1; % Read from graph
+Ks = 8.5; % Read from graph
 V = V_x; % Shear Load, N
 q0 = T ./ (2 .* c_span .* b2_span .* 1000); % Torque shear flow, N/mm
 q2 = V ./ (2 .* b2_span .* 1000); % Load shear flow, N/mm
@@ -221,19 +213,83 @@ q_RS = abs(q2 - q0); % Rear spar shear flow, N/mm
 t_FS = (q_FS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Front web thickness, mm
 t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
 
-figure
-plot(span, t_RS)
-hold on
-plot(span, t_FS)
-hold off
-span_old_var = span; % so it doesn't get overwritten
+discrete_thickness = 1;
+difference_array = abs(t_RS - t_RS(1));
+number = max(difference_array) - min(difference_array);
+difference_array_f = abs(t_FS - t_FS(1));
+number_f = max(difference_array_f) - min(difference_array_f);
 
-% get cylindrical buckling data ready to interpolate
-bucklingdata = readtable("buckling_dcell.csv");
-Y_grid = [0, 2, 4, 6, 10, 16, 50]; % (Y-coordinates)
-X_grid = [0, 0.2, 0.667, 1, 1.5, 2, 3, 10];  % (X-coordinates)
-bucklingdata_matrix = table2array(bucklingdata);
-buckling_coeffs = bucklingdata_matrix(2:end,2:end);
+index = [];  % Initialize index array
+for i = 1:number
+    idx = find(difference_array < i & difference_array > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
+
+index(1) =1;
+
+for i = 1:length(index)
+    if i < length(index)
+        t_RS_dis(index(i):index(i+1)-1) = t_RS(index(i));
+    else
+        t_RS_dis(index(i): length(t_RS)) = t_RS(index(i));
+    end
+end
+
+index_f = [];  % Initialize index array
+for i = 1:number
+    idx_f = find(difference_array_f < i & difference_array_f > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx_f)
+        index_f(end+1) = idx_f;  % Append found index
+    end
+end
+
+index_f(1) =1;
+
+for i = 1:length(index_f)
+    if i < length(index_f)
+        t_FS_dis(index_f(i):index_f(i+1)-1) = t_FS(index_f(i));
+    else
+        t_FS_dis(index_f(i):length(t_FS)) = t_FS(index_f(i));
+    end
+end
+
+t_FS_dis(t_FS_dis<2) = 2;
+t_RS_dis(t_RS_dis<2) = 2;
+
+figure
+plot(span, t_RS, LineStyle="--", LineWidth= 1.5)
+hold on
+plot(span, t_FS, LineStyle="--", LineWidth= 1.5)
+plot(span, t_FS_dis, LineWidth=1.5)
+plot(span, t_RS_dis, LineWidth=1.5)
+hold off
+grid on
+xlabel("Semi span")
+ylabel("Spar web thickness (mm)")
+legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "Discretised front spar thickness", "Discretised rear spar thickness")
+
+%%%%%%%%%shear flow in skin
+moment_span = M_x;
+b_span = c_span ./ n.* 1000;% skin panel width, mm
+N_span = moment_span ./ (c_span .* b2_span);
+t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
+
+%compression-shear combination for stringer and skin
+tau_0 = q0 ./ t2_span; % shear stress, N/mm
+tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
+sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
+Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
+sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
+R_c = sigma_0_span ./ sigma_cr; % Compressive stress ratio
+R_s = tau_0 ./ tau_cr; % Shear stress ratio
+val = R_s.^2 + R_c; % combined stress ratio
+
+figure
+plot(span, val)
+
+
 
 % d-cell design
 perimeter = 0.1739 * c_span;

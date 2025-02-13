@@ -79,14 +79,32 @@ num_stringers = floor((front_spar - rear_spar) / stringer_spacing);
 num_stringers_root = num_stringers(1);
 num_stringers_kink = num_stringers(ceil(kink_span ./ wing_span * 2000));
 
+le_new = le - 0.5 * (le - front_spar) .* (x <= max(x) * 0.667);
+te_new = te + 0.5 * (rear_spar - te) .* (x <= max(x) * 0.95);
+
+flap_end = max(x) * 0.667;
+
+plot(x, le_new, 'k-', 'LineWidth', 1)
+plot(x, te_new, 'k-', 'LineWidth', 1)
+
 % plot ribs
 for i = 1:length(rib_list)
     loc = rib_list(i);
     if loc < max(x)
-        ribFore = interp1(x, le, loc);
-        ribAft = interp1(x, te, loc);
+        ribFore = interp1(x, front_spar, loc);
+        ribAft = interp1(x, te_new, loc);
         plot([loc loc], [ribFore ribAft], "k-")
     end
+end
+
+% plot pseudoribs
+num_pribs = 24;
+prib_loc = linspace(2.55, 32.5, num_pribs);
+for i = 1:length(prib_loc)
+    loc = prib_loc(i);
+    ribFore = interp1(x, le_new, loc);
+    ribAft = interp1(x, front_spar, loc);
+    plot([loc loc], [ribFore ribAft], "k-")
 end
 
 xlim([0 35])

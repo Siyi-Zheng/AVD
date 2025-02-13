@@ -1,4 +1,5 @@
 %VTail Composite Design
+
 % housekeeping
 
 clear,clc, close all
@@ -112,6 +113,9 @@ hold on
 stairs([span_web 6], [N_x_crit N_x_crit(end)])
 plot(spanstation, N_x)
 legend('Nx_crit', 'N')
+ylabel('Buckling load (N)')
+xlabel('Distance along span (m)')
+xlim([0,6.8])
 grid minor
 
 Spar Web
@@ -215,6 +219,7 @@ legend('Theoretical number ${n_0}$', 'Step theoretical number ${n_0}$', 'Final s
 xlabel('Distance along span [m]','FontSize',14,'interpreter','latex')
 ylabel('Number of ${n_0}$ in the spar caps','FontSize',14,'interpreter','latex')
 ylim([0 15])
+xlim([0,6.8])
 grid minor
 box on
 
@@ -225,14 +230,13 @@ hold on
 stairs(spanstation ,n_sw_manu, 'b', 'LineWidth', 1.5)
 grid minor
 box on
+xlim([0,6.8]);
 legend('Theoretical number ${n_{45}}$', 'Manufactured number ${n_{45}}$','FontName','Palatino', 'FontSize',12,'interpreter','latex')
 xlabel('Distance along span [m]','FontSize',14,'interpreter','latex')
 ylabel('Number of ${n_{45}}$ in the spar caps','FontSize',14,'interpreter','latex')
 
 
 Plot of TAIL WING
-
-
 syms x
 
 ht.b = 6.8*2;
@@ -319,10 +323,11 @@ for i = 1:length(L_output)
     length_ribs(i) = double(vpa(sqrt((x(100)-x(1))^2 + (y(100) - y(1))^2), 2));
 end
 
+
 Weight
 % Weights
 
-boxw_distb = b_new(2:7);
+boxw_distb = b_new(1:5);
 t_rb = 1.5;
 
 stringers_weight = 2.*1550.*(120/10^6).*length_stringers;
@@ -334,3 +339,4 @@ ribs_weight_total = sum(ribs_weight); % KG
 skin_weight_total = 2*1550*10.25*(2.5/1000); % KG
 
 spar_weight = (1550*(2*(1.3125/1000)*0.16 + h_web(1)*(1.3125/1000)))*(6.11 + 7.03)
+

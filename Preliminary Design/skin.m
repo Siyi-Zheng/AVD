@@ -19,19 +19,21 @@ farrardata= table(9:16, 1:10);
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.41; % m %wingbox width
 b2 = 0.097 * 12.41; % m     web height (wingbox height)  %
-E_composite = 147.5 ; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus      
+E_composite = 61; %Gpa
+E_Aluminium = 72.5; % GPa     %Young's modulus  
+density_comp = 1515;
+density_al = 2800;
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 5: 1: 50;   % no of panels
+n = 5: 1: 30;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:15;     %stringer thickness
 h = 60:2:120;     %stringer web height
 b = c ./ n.* 1000; % mm      % 
 d = h .* flangeWebRatio; % mm  %flange width of stringer
-
+rib_spacing = 3.3; %vary this after iterations
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
@@ -45,6 +47,9 @@ for i = 1:length(n)
             % catchpole diagram
             catchpoleY(i,j,k) = ts(j)/ t2(i,j,k); % x-value to read
             catchpoleX(i,j,k) = As(i,j,k)/ (b(i)* t2(i,j,k)); % y-value to read
+             %%optimise using mass
+            volume(i,j,k) = n(i) * b(i) * t_e(i,j,k) * rib_spacing *1000;
+            mass(i,j,k) = density_comp * volume(i,j,k);
         end
     end
 end
@@ -75,38 +80,69 @@ end
 
 sigma_cr = stressRatio .* sigma_0;
 
-%Farrar efficiency (stringer local buckling)
-% for g = 1:length(Rib_spacing)
+% % 3d plot
+% figure
+% F_factor(F_factor <= 0.7) = NaN;
+% for i = 1:length(h)
+%     slice = squeeze(mass(:,:,i));
+%     % mass = squeeze(effectivePanelCSA(:,:,i));
+%     xData = n;
+%     yData = ts;
+%     color = h(i) .* slice' ./ slice';
+%     surf(n, ts, slice', color, "EdgeColor", "none");
+%     % surf(n, ts, mass')
+%     hold on
+% end
+% colormap("turbo")
+% bar = colorbar;
+% bar.Label.String = "Stringer Height (mm)";
+% xlabel("Number of Stringers")
+% ylabel("Stringer Thickness (mm)")
+% zlabel("Mass")
+% 
+% figure;
+% F_factor(F_factor <= 0.7) = NaN;
+% 
+% % Plot the original surface plot
+% for i = 1:length(h)
+%     slice = squeeze(mass(:,:,i)); % Extract mass slice
+%     xData = n;  % Number of stringers
+%     yData = ts; % Stringer thickness
+%     color = 100 .* slice' ./ slice'; % Color mapping based on height
+% 
+%     surf(n, ts, slice', color, "EdgeColor", "none");
+%     hold on;
+% end
+% 
+% colormap("turbo");
+% bar = colorbar;
+% bar.Label.String = "Stringer Height (mm)";
+% xlabel("Number of Stringers");
+% ylabel("Stringer Thickness (mm)");
+% zlabel("Mass");
 
 
-% 3d plot
-F_factor(F_factor <= 0.5) = NaN;
-for i = 1:length(h)
-    slice = squeeze(F_factor(:,:,i));
-    % mass = squeeze(effectivePanelCSA(:,:,i));
-    xData = n;
-    yData = ts;
-    color = h(i) .* slice' ./ slice';
-    surf(n, ts, slice', color, "EdgeColor", "none");
-    % surf(n, ts, mass')
-    hold on
-end
-colormap("turbo")
-bar = colorbar;
-bar.Label.String = "Stringer Height (mm)";
-xlabel("Number of Stringers")
-ylabel("Stringer Thickness (mm)")
-zlabel("Farrar Efficiency")
 
 % get the optimal values based on the farrar plot
+[if1, if2, if3] = ind2sub(size(F_factor), find(F_factor>0.7));
+% Extract values from mass at the found indices
+selectedValues = mass(sub2ind(size(mass), if1, if2, if3));
 
-[mxv, idx] = max(F_factor(:));
-[id1, id2, id3] = ind2sub(size(F_factor), idx);
-n = n(id1);
-ts = ts(id2);
-h = h(id3);
+% Find the minimum value and its index
+[minValue, minIdx] = min(selectedValues);
+
+% Get the corresponding row, column, and depth indices
+id1 = if1(minIdx);
+id2 = if2(minIdx);
+id3 = if3(minIdx);
+% new_mass= mass([if1, if2, if3])
+% [mxv, idx] = min(mass(:));
+% [id1, id2, id3] = ind2sub(size(F_factor), idx);
+n = n(id1)
+ts = ts(id2)
+h = h(id3)
 b = c ./ n.* 1000; % mm
-
+mxv = F_factor(id1, id2, id3)
 
 % extract other values at this optimum
 As = As(id1, id2, id3);
@@ -114,7 +150,9 @@ t2 = t2(id1, id2, id3);   %skin thickness
 sigma_0 = sigma_0(id1, id2, id3);
 sigma_cr = sigma_cr(id1, id2, id3);
 
-Rib_spacing =  0.5:0.05:7; % m
+RATIO= As/(b*t2);
+
+Rib_spacing =  0.5:0.05:2; % m
 
 sigma_f= mxv./sqrt(Rib_spacing./N./(E_Aluminium*10^9))./10^6;
 resultant = sigma_cr - sigma_f;
@@ -122,6 +160,7 @@ resultant = sigma_cr - sigma_f;
 
 %optimal rib spacing
 optimal_rib= Rib_spacing(index);
+
 
 % spar
 
@@ -193,6 +232,8 @@ xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
 grid on
+
+
 
 % plotting how the web thickness varies with the span 
 % IF RIB SPACING CHANGES THEN KS CHANGES
@@ -286,7 +327,6 @@ for i = 1:number_new
         index(end+1) = idx;  % Append found index
     end
 end
-
 
 t2_span(t2_span<1) = 1;
 

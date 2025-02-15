@@ -166,4 +166,24 @@ legend('MTOW Case', 'MZFW Case');
 
 save("torque_vtail",'T'); %effective panel thick
 
+% Vertical stabiliser planform dimensions:
+S_v = 29.1; % Reference area in m^2 (Change based on design)
+AR_v = 1.6; % Aspect ratio of the vertical stabilizer
+lambda_v = 0.55; % Taper ratio (tip chord / root chord)
+sweep_v = 34.1; % Leading-edge sweep angle of vertical stabilizer (in degrees)
+
+bperp_v = sqrt(AR_v * S_v); % Vertical span (height of vertical stabilizer)
+b_v = bperp_v / cosd(sweep_v); % Actual slant height considering sweep
+s_v = bperp_v ; % Semispan (half of the vertical stabilizer height)
+
+% Spanwise points from root to tip
+yspan_v = linspace(0, bperp_v, 452); 
+
+% Spanwise position at root and tip
+yroot_v = 0; % Root (base of the vertical stabilizer)
+ytip_v = b_v ; % Tip (top of the vertical stabilizer)
+
+% Save the spanwise coordinate data
+save('yspan_vtail', 'yspan_v')
+
 maxvalue = [max(abs([SF,SF_alt])),max(abs([BM,BM_alt])),max(abs([T,T_alt]))]

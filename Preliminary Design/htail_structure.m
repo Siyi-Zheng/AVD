@@ -19,25 +19,21 @@ density_comp = 1515;
 density_al = 2800;
 % if there is an error run wing_load_distribution.m first
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
-c = (0.7 - 0.12) .* 12.4085; % m %wingbox width
-b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
-E_composite = 61; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus  
-density_comp = 1515;
-density_al = 2800;
+c = (0.7 - 0.12) .* 12.41; % m %wingbox width
+b2 = 0.097 * 12.41; % m     web height (wingbox height)  %
 E_composite = 61 ; %Gpa
 E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 5: 1: 30;   % no of panels
+n = 5: 1: 50;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:15;     %stringer thickness
 h = 60:2:120;     %stringer web height
-b = c ./ n.* 1000; % mm      % Panel width
+b = c ./ n.* 1000; % mm      % 
 d = h .* flangeWebRatio; % mm  %flange width of stringer
-rib_spacing = 0.6; %vary this after iterations
+
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
@@ -51,9 +47,6 @@ for i = 1:length(n)
             % catchpole diagram
             catchpoleY(i,j,k) = ts(j)/ t2(i,j,k); % x-value to read
             catchpoleX(i,j,k) = As(i,j,k)/ (b(i)* t2(i,j,k)); % y-value to read
-             %%optimise using mass
-            volume(i,j,k) = n(i) * b(i) * t_e(i,j,k) * rib_spacing *1000;
-            mass(i,j,k) = (density_comp/(1000)^3) * volume(i,j,k);
         end
     end
 end
@@ -84,89 +77,53 @@ end
 
 sigma_cr = stressRatio .* sigma_0;
 
-% % 3d plot
-% figure
-% F_factor(F_factor <= 0.7) = NaN;
-% for i = 1:length(h)
-%     slice = squeeze(mass(:,:,i));
-%     % mass = squeeze(effectivePanelCSA(:,:,i));
-%     xData = n;
-%     yData = ts;
-%     color = h(i) .* slice' ./ slice';
-%     surf(n, ts, slice', color, "EdgeColor", "none");
-%     % surf(n, ts, mass')
-%     hold on
-% end
-% colormap("turbo")
-% bar = colorbar;
-% bar.Label.String = "Stringer Height (mm)";
-% xlabel("Number of Stringers")
-% ylabel("Stringer Thickness (mm)")
-% zlabel("Mass")
-% 
-% figure;
-% F_factor(F_factor <= 0.7) = NaN;
-% 
-% % Plot the original surface plot
-% for i = 1:length(h)
-%     slice = squeeze(mass(:,:,i)); % Extract mass slice
-%     xData = n;  % Number of stringers
-%     yData = ts; % Stringer thickness
-%     color = 100 .* slice' ./ slice'; % Color mapping based on height
-% 
-%     surf(n, ts, slice', color, "EdgeColor", "none");
-%     hold on;
-% end
-% 
-% colormap("turbo");
-% bar = colorbar;
-% bar.Label.String = "Stringer Height (mm)";
-% xlabel("Number of Stringers");
-% ylabel("Stringer Thickness (mm)");
-% zlabel("Mass");
+%Farrar efficiency (stringer local buckling)
+% for g = 1:length(Rib_spacing)
 
 
+% 3d plot
+F_factor(F_factor <= 0.5) = NaN;
+for i = 1:length(h)
+    slice = squeeze(F_factor(:,:,i));
+    % mass = squeeze(effectivePanelCSA(:,:,i));
+    xData = n;
+    yData = ts;
+    color = h(i) .* slice' ./ slice';
+    surf(n, ts, slice', color, "EdgeColor", "none");
+    % surf(n, ts, mass')
+    hold on
+end
+colormap("turbo")
+bar = colorbar;
+bar.Label.String = "Stringer Height (mm)";
+xlabel("Number of Stringers")
+ylabel("Stringer Thickness (mm)")
+zlabel("Farrar Efficiency")
 
 % get the optimal values based on the farrar plot
-[if1, if2, if3] = ind2sub(size(F_factor), find(F_factor>0.7));
-% Extract values from mass at the found indices
-selectedValues = mass(sub2ind(size(mass), if1, if2, if3));
 
-% Find the minimum value and its index
-[minValue, minIdx] = min(selectedValues);
-
-% Get the corresponding row, column, and depth indices
-id1 = if1(minIdx);
-id2 = if2(minIdx);
-id3 = if3(minIdx);
-% new_mass= mass([if1, if2, if3])
-% [mxv, idx] = min(mass(:));
-% [id1, id2, id3] = ind2sub(size(F_factor), idx);
-n = n(id1)
-ts = ts(id2)
-h = h(id3)
+[mxv, idx] = max(F_factor(:));
+[id1, id2, id3] = ind2sub(size(F_factor), idx);
+n = n(id1);
+ts = ts(id2);
+h = h(id3);
 b = c ./ n.* 1000; % mm
-mxv = F_factor(id1, id2, id3)
+
 
 % extract other values at this optimum
 As = As(id1, id2, id3);
-t2 = t2(id1, id2, id3)  ; %skin thickness
+t2 = t2(id1, id2, id3);   %skin thickness
 sigma_0 = sigma_0(id1, id2, id3);
 sigma_cr = sigma_cr(id1, id2, id3);
 
-RATIO1= As/(b*t2)
-RATIO2 = ts / t2
+Rib_spacing =  0.5:0.05:7; % m
 
-% Rib_spacing =  0.5:0.05:2; % m
-% 
-% sigma_f= mxv./sqrt(Rib_spacing./N./(E_Aluminium*10^9))./10^6;
-% resultant = sigma_cr - sigma_f;
-% [result, index] = min(abs(resultant));
-% 
-% %optimal rib spacing
-% optimal_rib= Rib_spacing(index)
+sigma_f= mxv./sqrt(Rib_spacing./N./(E_Aluminium*10^9))./10^6;
+resultant = sigma_cr - sigma_f;
+[result, index] = min(abs(resultant));
 
-optimal_rib = 0.6;
+%optimal rib spacing
+optimal_rib= Rib_spacing(index);
 
 % spar
 
@@ -194,6 +151,7 @@ sigma_c = (F / t_r) * (c / 1000); % crush stress, MPa
 sigma_b = F / (t_r * c * 1e3); % buckling stress, MPa
 t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
 
+
 %varying rib spacing with bending moments and then get how the rib
 %thickness varies with rib spacing.
 
@@ -219,8 +177,7 @@ chord = flip(unique(chord));
 rib_spacing(721) = [];
 b2_span = 0.097 * chord;
 c_span = chord * 0.58;
-I = c_span .* (t_e ./ 1000) .^ 3 / 12 + c_span .* (t_e ./ 1000) .* b2_span .^ 2 / 4;
-
+I = c_span .* (t_e ./ 1000) .^ 3 ./ 12 + c_span .* (t_e ./ 1000) .* b2_span .^ 2 / 4;
 crush_load = M_x .^ 2 .* rib_spacing .* b2_span .* (t_e ./ 1000) .* c_span...
     ./ (2 .* E_Aluminium .* 1e9 .* (I .^ 2)) ./ 10;
 t_r = (crush_load ./ c_span ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;
@@ -245,32 +202,6 @@ ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
 grid on
 
-
-%mass optimisation to get optimal rib spacing
-rib_spacing_test = 0.2:0.05:1.5; % m %vary this after iterations
-
-number_ribs = (32.5 ./rib_spacing_test) +1;
-t_e_farrar = (1/mxv) .* sqrt(N .* rib_spacing_test./ E_composite); %mm
-
-volume= n .* b .* (t_e_farrar) .* rib_spacing_test.*1000; %mm^3
-mass_skin_stringer = (((density_comp.* 1e-9) .* volume))  ./(span(end) * c);
-
-mass_ribs = number_ribs .* ((rib_area_list(1).* rib_thickness(1) ./ 1000) .* density_al) ./(span(end) * c);
-
-total_mass = (mass_skin_stringer + mass_ribs);
-
-figure 
-plot(rib_spacing_test, total_mass)
-hold on
-plot(rib_spacing_test, mass_skin_stringer)
-plot(rib_spacing_test, mass_ribs)
-grid on
-legend('total mass', 'mass skin-stringer', 'mass ribs')
-hold off
-
-[value, in ]= min(total_mass)
-final_optimal_rib_spacing = rib_spacing_test(in)
-
 % plotting how the web thickness varies with the span 
 % IF RIB SPACING CHANGES THEN KS CHANGES
 % DOUBLE CHECK KS VALUES
@@ -281,7 +212,7 @@ T(721) = [];
 a = rib_thickness; % Web panel spacing, m
 E = E_Aluminium; % Young's Modulus, GPa
 sigma_y = 495; % Yield Stress, MPa
-Ks = 7.5; % Read from graph
+Ks = 8.5; % Read from graph
 V = V_x; % Shear Load, N
 q0 = T ./ (2 .* c_span .* b2_span .* 1000); % Torque shear flow, N/mm
 q2 = V ./ (2 .* b2_span .* 1000); % Load shear flow, N/mm
@@ -290,8 +221,50 @@ q_RS = abs(q2 - q0); % Rear spar shear flow, N/mm
 t_FS = (q_FS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Front web thickness, mm
 t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
 
-t_FS_dis = discretisation_1mm(t_FS, 2);
-t_RS_dis = discretisation_1mm(t_RS, 2);
+discrete_thickness = 1;
+difference_array = abs(t_RS - t_RS(1));
+number = max(difference_array) - min(difference_array);
+difference_array_f = abs(t_FS - t_FS(1));
+number_f = max(difference_array_f) - min(difference_array_f);
+
+index = [];  % Initialize index array
+for i = 1:number
+    idx = find(difference_array < i & difference_array > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
+
+index(1) =1;
+
+for i = 1:length(index)
+    if i < length(index)
+        t_RS_dis(index(i):index(i+1)-1) = t_RS(index(i));
+    else
+        t_RS_dis(index(i): length(t_RS)) = t_RS(index(i));
+    end
+end
+
+index_f = [];  % Initialize index array
+for i = 1:number
+    idx_f = find(difference_array_f < i & difference_array_f > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx_f)
+        index_f(end+1) = idx_f;  % Append found index
+    end
+end
+
+index_f(1) =1;
+
+for i = 1:length(index_f)
+    if i < length(index_f)
+        t_FS_dis(index_f(i):index_f(i+1)-1) = t_FS(index_f(i));
+    else
+        t_FS_dis(index_f(i):length(t_FS)) = t_FS(index_f(i));
+    end
+end
+
+t_FS_dis(t_FS_dis<2) = 2;
+t_RS_dis(t_RS_dis<2) = 2;
 
 figure
 plot(span, t_RS, LineStyle="--", LineWidth= 1.5)
@@ -310,12 +283,24 @@ moment_span = M_x;
 b_span = c_span ./ n.* 1000;% skin panel width, mm
 N_span = moment_span ./ (c_span .* b2_span);
 t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
+
+difference_array_new = abs(t2_span - t2_span(1));
+number_new = max(difference_array_new) - min(difference_array_new);
+
+index = [];  % Initialize index array
+for i = 1:number_new
+    idx = find(difference_array_new < i & difference_array_new > i - 1, 1);  % Find first occurrence
+    if ~isempty(idx)
+        index(end+1) = idx;  % Append found index
+    end
+end
+
+
 t2_span(t2_span<1) = 1;
-t2_span_disc = discretisation_1mm(t2_span, 1);
 
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
-tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
+tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span ./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
 Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
 sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
@@ -325,7 +310,6 @@ val = R_s.^2 + R_c; % combined stress ratio
 
 figure
 plot(span, val)
-%% 
 
 span_old_var = span; % so it doesn't get overwritten
 
@@ -413,32 +397,3 @@ xline(25, "k--")
 xlabel("Number of pseudoribs")
 ylabel("Total pseudorib mass (kg)")
 legend(["Total", "Skin", "Pseudoribs"], Location="northwest")
-
-
-
-function disc_val = discretisation_1mm( t_RS, min_val)
-
-difference_array = abs(t_RS - t_RS(1));
-number = max(difference_array) - min(difference_array);
-
-index = [];  % Initialize index array
-for i = 1:number
-    idx = find(difference_array < i & difference_array > i - 1, 1);  % Find first occurrence
-    if ~isempty(idx)
-        index(end+1) = idx;  % Append found index
-    end
-end
-
-index(1) =1;
-
-for i = 1:length(index)
-    if i < length(index)
-        disc_val(index(i):index(i+1)-1) = t_RS(index(i));
-    else
-        disc_val(index(i): length(t_RS)) = t_RS(index(i));
-    end
-end
-
-disc_val(disc_val< min_val) = min_val;
-
-end

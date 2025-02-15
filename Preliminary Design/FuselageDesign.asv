@@ -412,8 +412,6 @@ stress_thickness_ratio_l = (P * D) / 4;
 
 %%
 %ADD STRINGER CODE HERE
-
-%{
 %ultimate bending moment
 M_ult = 2.6 * 10^9;
 
@@ -423,7 +421,7 @@ M_ult = 2.6 * 10^9;
 C = pi * D;                     %Circumference
 syms b_string                   %stringer spacing, a variable we can optimise for
 syms nstringer                  %number of stringers (related to stringer spacing
-nstringer = C / b_string;
+nstringer = C / stringer_spacing;
 
 syms stringer_area      
 syms B_o                         %section area
@@ -437,18 +435,6 @@ syms S                          %Single boom area
 B_i = 15 * (skin_thickness)^2;
 
 B_eff = B_o + B_i;
-
-%find angles of each of the booms
-delta_theta = 360 / nstringer;
-
-% find boom properties
-%angles = 0: delta_theta : 360;
-
-x = cosd(angles);
-y = sind(angles);
-%}
-
-
 
 
 

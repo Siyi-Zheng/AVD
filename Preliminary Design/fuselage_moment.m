@@ -18,7 +18,10 @@ u = zeros(1,no_stringer);
 v = zeros(1,no_stringer);
 
 figure(1)
-plot(x,y,".",MarkerSize=8)
+hold on
+plot((d_fuslg/2).*cosd(0:0.01:360) , (d_fuslg/2).*sind(0:0.01:360),'b-')
+plot(x,y,".",MarkerSize=20 , Color='b')
+hold off
 
 Ix = sum(A_boom*(y.*y)); % second moment of area about x
 Iy = sum(A_boom*(x.*x)); % second moment of area about y
@@ -29,7 +32,6 @@ y_max = max(y); % max y distance from centre
 sigx = moment_x*y/Ix;
 sigy = moment_y*x/Iy;
 
-
 sigx_max = max(sigx);
 sigy_max = max(sigy);
 
@@ -38,7 +40,8 @@ figure;
 hold on;
 grid on;
 plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
-plot3(x, y, z, '.','MarkerSize', 12,'Color','b') 
+plot3(x, y, z, '.','MarkerSize', 12,'Color','b')
+
 
 % Plot stress vectors at each stringer location
 quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);

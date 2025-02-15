@@ -413,40 +413,64 @@ stress_thickness_ratio_l = (P * D) / 4;
 %%
 %ADD STRINGER CODE HERE
 
-%{
-%ultimate bending moment
-M_ult = 2.6 * 10^9;
+%inputs
+dl_stringer = 0.15; % stringer spacing
+no_stringer = 70; % number of stringers
+A_stringer = 0.00055; % one stringer area
 
-%need to get boom separation and ultimate stresses
+%fixed vals for function
+moment_x = 1e5; % bending moment about x
+moment_y = 2e5; % bending moment about y
+d_fuslg = 6.3; % fuselage diameter
+A_boom = A_stringer + 15*skin_thickness^2; % boom area
 
-%defining key parameters
-C = pi * D;                     %Circumference
-syms b_string                   %stringer spacing, a variable we can optimise for
-syms nstringer                  %number of stringers (related to stringer spacing
-nstringer = C / b_string;
 
-syms stringer_area      
-syms B_o                         %section area
-syms S                          %Single boom area
 
-%need to design for stinger area and separation for minimising mass whilst
-%carrying direct stresses and stable under compression loads
-%want to vary boom area and separation
+boom_angle = linspace(0,360,no_stringer);
+x = d_fuslg/2 * cos(deg2rad(boom_angle));
+y = d_fuslg/2 * sin(deg2rad(boom_angle));
+z = zeros(1,no_stringer);
+u = zeros(1,no_stringer);
+v = zeros(1,no_stringer);
 
-%skin collaborative are
-B_i = 15 * (skin_thickness)^2;
+figure(1)
+hold on
+plot((d_fuslg/2).*cosd(0:0.01:360) , (d_fuslg/2).*sind(0:0.01:360),'b-')
+plot(x,y,".",MarkerSize=20 , Color='b')
+hold off
 
-B_eff = B_o + B_i;
+Ix = sum(A_boom*(y.*y)); % second moment of area about x
+Iy = sum(A_boom*(x.*x)); % second moment of area about y
 
-%find angles of each of the booms
-delta_theta = 360 / nstringer;
+x_max = max(x); % max x distance from centre
+y_max = max(y); % max y distance from centre
 
-% find boom properties
-%angles = 0: delta_theta : 360;
+sigx = moment_x*y/Ix;
+sigy = moment_y*x/Iy;
 
-x = cosd(angles);
-y = sind(angles);
-%}
+sigx_max = max(sigx);
+sigy_max = max(sigy);
+
+% Plot fuselage cross-section
+figure;
+hold on;
+grid on;
+plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
+plot3(x, y, z, '.','MarkerSize', 12,'Color','b')
+
+
+% Plot stress vectors at each stringer location
+quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);
+
+% Labels and title
+xlabel('x');
+ylabel('y');
+zlabel('Direct stress \sigma_z (MPa)');
+title('Direct stress distribution around fuselage');
+legend({'Fuselage cross-section', 'String Location','Direct Stress'}, 'Location', 'northeast');
+
+view(3); % Set 3D view
+hold off;
 
 
 

@@ -154,8 +154,7 @@ t2 = t2(id1, id2, id3)  ; %skin thickness
 sigma_0 = sigma_0(id1, id2, id3);
 sigma_cr = sigma_cr(id1, id2, id3);
 
-RATIO1= As/(b*t2)
-RATIO2 = ts / t2
+RATIO= As/(b*t2)
 
 % Rib_spacing =  0.5:0.05:2; % m
 % 

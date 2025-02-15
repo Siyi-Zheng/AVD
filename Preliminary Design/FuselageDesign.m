@@ -8,6 +8,8 @@ clc
 sigma_y = 431*10^6;
 E = 73850000000;
 G = 28700000000;
+density = 2765;
+v = 0.3365;
 
 %%
 %load calculation
@@ -409,6 +411,80 @@ stress_thickness_ratio_l = (P * D) / 4;
 
 
 %%
+%ADD STRINGER CODE HERE
 
+
+
+%%
 %light frame design
 
+%need to vary frame spacing, Lfs, frame section shape Sf and Frame section
+%dimensions to mnimise light frame mass, mlf
+
+%creating iterative function to vary through h, Lfs and 
+
+%set section shape -- true if section shape is rectanguler
+%                  -- false if section is C-shape
+
+shapefactor = false;
+
+%range for Lfs
+
+%Lfs = 0.1:0.1:10;
+
+%range for h
+
+h = 0.01:0.01:0.2;
+
+b = 0:0.01:0.6;
+
+%nested for loop to iterate for mass
+
+%initialising results
+masses = [];
+I_xx = [];
+nf = [];
+Af = [];
+t = [];
+
+Lfs = 0.6;
+
+for idx = 1:length(b)
+    for idx2 = 1:length(h)
+        
+        [masses(idx,idx2) , I_xx(idx,idx2) , nf(idx,idx2) , Af(idx,idx2) , t(idx,idx2)] = lightframes(Lfs , h(idx2) , b(idx) ,  shapefactor , E , density);
+
+    end
+end
+
+
+
+%finding minimum mass for optimal frame seperation and shape
+[min_mass , I_min] = min(masses(:));
+[row_idx , col_idx] = ind2sub(size(masses), I_min);
+
+[B,H] = meshgrid(b,h);
+
+% Surface plot
+figure
+s = surf(H', B', Af); % Use correctly shaped variables
+xlabel('Base Width (b)');
+ylabel('Frame Height (h)');
+zlabel('Frame Area (Af)');
+title('Frame Area vs. Base Width and Height');
+set(gca,'XDir','reverse','YDir','reverse')
+shading interp; % Smooth shading
+s.EdgeColor = "[0,0,0]";
+colorbar; % Add a color legend
+
+
+figure
+s = surf(H', B', t); % Use correctly shaped variables
+xlabel('Base Width (b)');
+ylabel('Frame Height (h)');
+zlabel('Frame Thickness (t)');
+title('Frame Thickness vs. Base Width and Height');
+set(gca,'XDir','reverse','YDir','reverse')
+shading interp; % Smooth shading
+s.EdgeColor = "[0,0,0]";
+colorbar; % Add a color legend

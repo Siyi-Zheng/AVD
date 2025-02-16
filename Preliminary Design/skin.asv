@@ -14,19 +14,20 @@ farrardata= table(9:16, 1:10);
 %%%%%%%%%Design panel size and stringer size
 % max bending moment - with stringers
 
-%fixed variables#
-density_comp = 1515;
-density_al = 2800;
+%material properties
+density_T861 = 2765; % all kg/m^3
+density_T36 = 2765;
+density_H34 = 2655;
+E_T861 = 73.85; % all GPa
+E_T36 = 73.85;
+E_H34 = 70.3;
+
 % if there is an error run wing_load_distribution.m first
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.4085; % m %wingbox width
 b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
-E_composite = 61; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus  
 density_comp = 1515;
 density_al = 2800;
-E_composite = 61 ; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 

@@ -1,0 +1,666 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-260.0, 114.3), 
+    point2=(260.0, -114.3))
+mdb.models['Model-1'].sketches['__profile__'].CircleByCenterPerimeter(center=(
+    -230.0, 21.5), point1=(-221.0, 21.5))
+mdb.models['Model-1'].sketches['__profile__'].CircleByCenterPerimeter(center=(
+    -90.0, 4.3), point1=(-81.0, 4.3))
+mdb.models['Model-1'].sketches['__profile__'].CircleByCenterPerimeter(center=(
+    230.0, -35.0), point1=(221.0, -35.0))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Flap Hinge', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Flap Hinge'].BaseSolidExtrude(depth=6.3, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'].sketch)
+mdb.models['Model-1'].parts['Flap Hinge'].projectReferencesOntoSketch(filter=
+    COPLANAR_EDGES, sketch=mdb.models['Model-1'].sketches['__edit__'], 
+    upToFeature=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'])
+del mdb.models['Model-1'].sketches['__edit__']
+mdb.models['Model-1'].Material(name='Al 6061-T6')
+mdb.models['Model-1'].materials['Al 6061-T6'].Density(table=((0.0027, ), ))
+mdb.models['Model-1'].materials['Al 6061-T6'].Elastic(table=((68900.0, 0.33), 
+    ))
+mdb.models['Model-1'].HomogeneousSolidSection(material='Al 6061-T6', name=
+    'Section-1', thickness=None)
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Flap Hinge-1', 
+    part=mdb.models['Model-1'].parts['Flap Hinge'])
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Flap Hinge-2', 
+    part=mdb.models['Model-1'].parts['Flap Hinge'])
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Flap Hinge-3', 
+    part=mdb.models['Model-1'].parts['Flap Hinge'])
+del mdb.models['Model-1'].rootAssembly.features['Flap Hinge-3']
+del mdb.models['Model-1'].rootAssembly.features['Flap Hinge-2']
+mdb.models['Model-1'].parts['Flap Hinge'].Set(cells=
+    mdb.models['Model-1'].parts['Flap Hinge'].cells.getSequenceFromMask((
+    '[#1 ]', ), ), name='Set-1')
+mdb.models['Model-1'].parts['Flap Hinge'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['Flap Hinge'].sets['Set-1'], sectionName=
+    'Section-1', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].edges.getSequenceFromMask(
+    ('[#108 ]', ), ), name='Set-1')
+mdb.models['Model-1'].EncastreBC(createStepName='Initial', localCsys=None, 
+    name='BC-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-1'])
+mdb.models['Model-1'].StaticStep(name='load', previous='Initial')
+mdb.models['Model-1'].rootAssembly.Set(name='Set-2', vertices=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].vertices.getSequenceFromMask(
+    ('[#2 ]', ), ))
+mdb.models['Model-1'].ConcentratedForce(cf2=-1.0, createStepName='load', 
+    distributionType=UNIFORM, field='', localCsys=None, name='Load-1', region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-2'])
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-1', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, numThreadsPerMpiProcess=1, queue=None, resultsFormat=
+    ODB, scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, 
+    waitMinutes=0)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ERROR, {'phase': BATCHPRE_PHASE, 
+    'message': 'in keyword *BOUNDARY, file "Job-1.inp", line 32: Unknown assembly node set SET-1', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ERROR, {'phase': BATCHPRE_PHASE, 
+    'message': 'in keyword *CLOAD, file "Job-1.inp", line 45: Unknown assembly set SET-2', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ERROR, {'phase': BATCHPRE_PHASE, 
+    'message': 'THIS MODEL HAS EITHER INCORRECT OR NO ELEMENT DEFINITIONS.', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ABORTED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase failed due to errors', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ERROR, {
+    'message': 'Analysis Input File Processor exited with an error - Please see the  Job-1.dat file for possible error messages if the file exists.', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_ABORTED, {
+    'message': 'Analysis Input File Processor exited with an error - Please see the  Job-1.dat file for possible error messages if the file exists.', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].parts['Flap Hinge'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=26.0)
+mdb.models['Model-1'].parts['Flap Hinge'].generateMesh()
+mdb.models['Model-1'].parts['Flap Hinge'].deleteMesh()
+mdb.models['Model-1'].parts['Flap Hinge'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=10.0)
+mdb.models['Model-1'].parts['Flap Hinge'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\SIMULIA\\EstProducts\\2022\\win_b64\\resources\\install\\cmdDirFeature\\Job-1.odb', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 27788, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-1', 'memory': 44.0})
+mdb.jobs['Job-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 15591.0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 19.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-1', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Job-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Mon Feb 17 11:18:19 2025', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].rootAssembly.DatumPlaneByPrincipalPlane(offset=3.15, 
+    principalPlane=XYPLANE)
+mdb.models['Model-1'].rootAssembly.DatumPlaneByPrincipalPlane(offset=-230.0, 
+    principalPlane=YZPLANE)
+mdb.models['Model-1'].rootAssembly.DatumPlaneByPrincipalPlane(offset=-90.0, 
+    principalPlane=YZPLANE)
+mdb.models['Model-1'].rootAssembly.DatumPlaneByPrincipalPlane(offset=230.0, 
+    principalPlane=YZPLANE)
+# Save by bgbg0 on 2025_02_17-11.19.57; build 2022 2021_09_15-18.57.30 176069
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.saveAs(pathName='C:/Users/bgbg0/Desktop/AVD/Detailed Design/flap_hinge.cae')
+del mdb.models['Model-1'].rootAssembly.features['Flap Hinge-1']
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Flap Hinge-1', 
+    part=mdb.models['Model-1'].parts['Flap Hinge'])
+del mdb.models['Model-1'].rootAssembly.features['Flap Hinge-1']
+mdb.models['Model-1'].parts['Flap Hinge'].deleteMesh()
+mdb.models['Model-1'].rootAssembly.Instance(dependent=OFF, name='Flap Hinge-1', 
+    part=mdb.models['Model-1'].parts['Flap Hinge'])
+mdb.models['Model-1'].rootAssembly.PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1 ]', ), ), datumPlane=mdb.models['Model-1'].rootAssembly.datums[10])
+mdb.models['Model-1'].rootAssembly.PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1 ]', ), ), datumPlane=mdb.models['Model-1'].rootAssembly.datums[11])
+mdb.models['Model-1'].rootAssembly.PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1 ]', ), ), datumPlane=mdb.models['Model-1'].rootAssembly.datums[12])
+mdb.models['Model-1'].rootAssembly.PartitionCellByDatumPlane(cells=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#2 ]', ), ), datumPlane=mdb.models['Model-1'].rootAssembly.datums[13])
+del mdb.models['Model-1'].loads['Load-1']
+del mdb.models['Model-1'].boundaryConditions['BC-1']
+mdb.models['Model-1'].rootAssembly.Set(name='Set-3', vertices=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].vertices.getSequenceFromMask(
+    ('[#1000 ]', ), ))
+mdb.models['Model-1'].ConcentratedForce(cf2=-13000.0, createStepName='load', 
+    distributionType=UNIFORM, field='', localCsys=None, name='Load-1', region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-3'])
+mdb.models['Model-1'].rootAssembly.Set(faces=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].faces.getSequenceFromMask(
+    ('[#18080008 #c ]', ), ), name='Set-4')
+mdb.models['Model-1'].EncastreBC(createStepName='load', localCsys=None, name=
+    'BC-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-4'])
+mdb.models['Model-1'].rootAssembly.seedPartInstance(deviationFactor=0.1, 
+    minSizeFactor=0.1, regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ), size=5.0)
+mdb.models['Model-1'].rootAssembly.setMeshControls(regions=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1f ]', ), ), technique=BOTTOM_UP)
+mdb.models['Model-1'].rootAssembly.setMeshControls(regions=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1f ]', ), ), technique=SWEEP)
+mdb.models['Model-1'].rootAssembly.generateMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.models['Model-1'].rootAssembly.deleteMesh(regions=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1f ]', ), ))
+mdb.models['Model-1'].rootAssembly.setMeshControls(elemShape=HEX_DOMINATED, 
+    regions=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1f ]', ), ))
+mdb.models['Model-1'].rootAssembly.generateMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\SIMULIA\\EstProducts\\2022\\win_b64\\resources\\install\\cmdDirFeature\\Job-1.odb', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 13328, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-1', 'memory': 202.0})
+mdb.jobs['Job-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 15591.0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 43.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-1', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Job-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Mon Feb 17 11:29:20 2025', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].rootAssembly.deleteMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.models['Model-1'].rootAssembly.seedPartInstance(deviationFactor=0.1, 
+    minSizeFactor=0.1, regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ), size=2.0)
+mdb.models['Model-1'].rootAssembly.generateMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\SIMULIA\\EstProducts\\2022\\win_b64\\resources\\install\\cmdDirFeature\\Job-1.odb', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 27732, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-1', 'memory': 3197.0})
+mdb.jobs['Job-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 15591.0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 447.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-1', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Job-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Mon Feb 17 11:32:44 2025', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].rootAssembly.Set(cells=
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'].cells.getSequenceFromMask(
+    ('[#1f ]', ), ), name='Set-8')
+mdb.models['Model-1'].TopologyTask(freezeBoundaryConditionRegions=ON, name=
+    'Task-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-8'])
+mdb.models['Model-1'].optimizationTasks['Task-1'].SingleTermDesignResponse(
+    drivingRegion=None, identifier='SIG_TOPO_MISES', name='D-Response-1', 
+    operation=MAXIMUM, region=MODEL, stepOptions=())
+mdb.models['Model-1'].optimizationTasks['Task-1'].SingleTermDesignResponse(
+    drivingRegion=None, identifier='WEIGHT', name='D-Response-2', operation=SUM
+    , region=MODEL, stepOptions=())
+mdb.models['Model-1'].optimizationTasks['Task-1'].ObjectiveFunction(name=
+    'Objective-1', objectives=((OFF, 'D-Response-1', 1.0, 0.0, ''), ))
+mdb.models['Model-1'].optimizationTasks['Task-1'].designResponses.changeKey(
+    fromName='D-Response-1', toName='stress')
+mdb.models['Model-1'].optimizationTasks['Task-1'].designResponses.changeKey(
+    fromName='D-Response-2', toName='weight')
+mdb.models['Model-1'].optimizationTasks['Task-1'].objectiveFunctions['Objective-1'].setValues(
+    objectives=((OFF, 'weight', 1.0, 0.0, ''), ))
+mdb.models['Model-1'].optimizationTasks['Task-1'].OptimizationConstraint(
+    designResponse='stress', name='Opt-Constraint-1', restrictionMethod=
+    ABSOLUTE_LESS_THAN_EQUAL, restrictionValue=270.0)
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'].sketch)
+mdb.models['Model-1'].parts['Flap Hinge'].projectReferencesOntoSketch(filter=
+    COPLANAR_EDGES, sketch=mdb.models['Model-1'].sketches['__edit__'], 
+    upToFeature=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'])
+mdb.models['Model-1'].sketches['__edit__'].offset(distance=6.0, objectList=(
+    mdb.models['Model-1'].sketches['__edit__'].geometry[6], 
+    mdb.models['Model-1'].sketches['__edit__'].geometry[7], 
+    mdb.models['Model-1'].sketches['__edit__'].geometry[8]), side=RIGHT)
+mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'].setValues(
+    sketch=mdb.models['Model-1'].sketches['__edit__'])
+del mdb.models['Model-1'].sketches['__edit__']
+mdb.models['Model-1'].parts['Flap Hinge'].regenerate()
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'].sketch)
+mdb.models['Model-1'].parts['Flap Hinge'].projectReferencesOntoSketch(filter=
+    COPLANAR_EDGES, sketch=mdb.models['Model-1'].sketches['__edit__'], 
+    upToFeature=
+    mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'])
+mdb.models['Model-1'].sketches['__edit__'].undo()
+mdb.models['Model-1'].sketches['__edit__'].undo()
+#* Nothing to undo.
+mdb.models['Model-1'].sketches['__edit__'].CircleByCenterPerimeter(center=(
+    -230.0, 21.5), point1=(-215.0, 21.5))
+mdb.models['Model-1'].sketches['__edit__'].undo()
+mdb.models['Model-1'].sketches['__edit__'].undo()
+#* Nothing to undo.
+mdb.models['Model-1'].sketches['__edit__'].undo()
+#* Nothing to undo.
+mdb.models['Model-1'].sketches['__edit__'].delete(objectList=(
+    mdb.models['Model-1'].sketches['__edit__'].geometry[9], 
+    mdb.models['Model-1'].sketches['__edit__'].geometry[10], 
+    mdb.models['Model-1'].sketches['__edit__'].geometry[11]))
+mdb.models['Model-1'].parts['Flap Hinge'].features['Solid extrude-1'].setValues(
+    sketch=mdb.models['Model-1'].sketches['__edit__'])
+del mdb.models['Model-1'].sketches['__edit__']
+mdb.models['Model-1'].parts['Flap Hinge'].regenerate()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.OptimizationProcess(dataSaveFrequency=OPT_DATASAVE_SPECIFY_CYCLE, 
+    description='', maxDesignCycle=50, model='Model-1', name='Opt-Process-1', 
+    odbMergeFrequency=2, prototypeJob='Opt-Process-1-Job', saveInitial=False, 
+    task='Task-1')
+mdb.optimizationProcesses['Opt-Process-1'].Job(atTime=None, 
+    getMemoryFromAnalysis=True, memory=90, memoryUnits=PERCENTAGE, model=
+    'Model-1', multiprocessingMode=DEFAULT, name='Opt-Process-1-Job', numCpus=8
+    , numDomains=8, numGPUs=0, numThreadsPerMpiProcess=1, queue=None, 
+    waitHours=0, waitMinutes=0)
+mdb.optimizationProcesses['Opt-Process-1'].submit(validate=True)
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] |           Tosca Structure Python Control           |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] |                3DEXPERIENCE R2022x                 |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] ------------------------------------------------------', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] Tosca started at Mon, 17 Feb 2025 11:41:05', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:05.698651|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:07.206465|tosca_python] Starting job Opt-Process-1', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:07.207466|tosca_python] Checking User Configuration', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {'message': ' [', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] The topology optimization formulation includes Von Mises stresses as Design Response', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] (DRESP).', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] When the Von Mises stresses are applied as Design Response (DRESP) in a topology', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] optimization formulation the following default settings are modified:', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] The move limit (DENSITY_MOVE = 0.1 in OPT_PARAM) on the design variables is decreased', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] from 0.25 to 0.1.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] It is recommended that the user allows the optimization system to perform 80 iterations.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep] (Currently a user defined STOP criteria is found in the database', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.012613|SMATsoToscaPrep]  so the setting from the user will be used as stop criteria).', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] --> Please ensure that the number of allowed iterations is sufficient to achieve', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] convergence', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] These default settings can be overwritten by setting STRESS_DRESP_OPT to OFF, e.g.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] OPT_PARAM', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep]   ......', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep]   STRESS_DRESP_OPT = OFF', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep]   DENSITY_MOVE = 0.15', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep]   DENSITY_UPDATE = CONSERVATIVE', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep]   ......', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.013612|SMATsoToscaPrep] END_', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:41:17.014611|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:41:20.97', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(COMPLETED, {
+    'time': 'Mon Feb 17 11:41:24 2025', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1'].submit()
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.253025|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.253025|tosca_python] |           Tosca Structure Python Control           |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.253025|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] |                3DEXPERIENCE R2022x                 |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] ------------------------------------------------------', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] Tosca started at Mon, 17 Feb 2025 11:42:00', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.254035|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.700781|tosca_python] Starting job Opt-Process-1', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:00.701781|tosca_python] Checking User Configuration', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:02.328267|tosca_python] Starting SIMULIA Tosca Structure Preprocessor', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {'message': ' [1', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] The topology optimization formulation includes Von Mises stresses as Design Response', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] (DRESP).', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] When the Von Mises stresses are applied as Design Response (DRESP) in a topology', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] optimization formulation the following default settings are modified:', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] The move limit (DENSITY_MOVE = 0.1 in OPT_PARAM) on the design variables is decreased', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] from 0.25 to 0.1.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] It is recommended that the user allows the optimization system to perform 80 iterations.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.502675|SMATsoToscaPrep] (Currently a user defined STOP criteria is found in the database', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]  so the setting from the user will be used as stop criteria).', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] --> Please ensure that the number of allowed iterations is sufficient to achieve', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] convergence', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] These default settings can be overwritten by setting STRESS_DRESP_OPT to OFF, e.g.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] OPT_PARAM', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]   ......', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]   STRESS_DRESP_OPT = OFF', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]   DENSITY_MOVE = 0.15', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]   DENSITY_UPDATE = CONSERVATIVE', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep]   ......', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] END_', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(WARNING, {
+    'message': ' [11:42:08.503674|SMATsoToscaPrep] ', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:12.25', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:42:14.203709|tosca_python] Starting abaqus analysis - design cycle 0', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1'].jobs['Opt-Process-1-Job']._Message(
+    ERROR, {'message': 'Error checking out Abaqus license.', 
+    'jobName': 'Opt-Process-1-Job'})
+mdb.optimizationProcesses['Opt-Process-1'].jobs['Opt-Process-1-Job']._Message(
+    JOB_ABORTED, {'message': 'Error checking out Abaqus license.', 
+    'jobName': 'Opt-Process-1-Job'})
+mdb.optimizationProcesses['Opt-Process-1']._archiveJob(jobName=
+    'Opt-Process-1-Job')
+mdb.optimizationProcesses['Opt-Process-1']._Message(ERROR, {
+    'message': 'Optimization process failed with an error.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(ABORTED, {
+    'jobName': 'Opt-Process-1'})
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\SIMULIA\\EstProducts\\2022\\win_b64\\resources\\install\\cmdDirFeature\\Job-1.odb', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'LAPTOP-DRC2HPO2', 'handle': 9720, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-1', 'memory': 3197.0})
+mdb.jobs['Job-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 15591.0, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 447.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-1', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Job-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Mon Feb 17 11:43:50 2025', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].rootAssembly.deleteMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.models['Model-1'].rootAssembly.seedPartInstance(deviationFactor=0.1, 
+    minSizeFactor=0.1, regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ), size=5.0)
+mdb.models['Model-1'].rootAssembly.generateMesh(regions=(
+    mdb.models['Model-1'].rootAssembly.instances['Flap Hinge-1'], ))
+mdb.optimizationProcesses['Opt-Process-1'].submit()
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] |           Tosca Structure Python Control           |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] |                3DEXPERIENCE R2022x                 |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] |                                                    |', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] ------------------------------------------------------', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] Tosca started at Mon, 17 Feb 2025 11:47:39', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.058117|tosca_python] ', 'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.514217|tosca_python] Starting job Opt-Process-1', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.514217|tosca_python] Checking User Configuration', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(STATUS, {
+    'message': ' [11:47:39.941280|tosca_python] Starting SIMULIA Tosca Structure Preprocessor', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1'].jobs['Opt-Process-1-Job']._Message(
+    ERROR, {'message': 'Error checking out Abaqus license.', 
+    'jobName': 'Opt-Process-1-Job'})
+mdb.optimizationProcesses['Opt-Process-1'].jobs['Opt-Process-1-Job']._Message(
+    JOB_ABORTED, {'message': 'Error checking out Abaqus license.', 
+    'jobName': 'Opt-Process-1-Job'})
+mdb.optimizationProcesses['Opt-Process-1']._archiveJob(jobName=
+    'Opt-Process-1-Job')
+mdb.optimizationProcesses['Opt-Process-1']._Message(ERROR, {
+    'message': 'Optimization process failed with an error.', 
+    'jobName': 'Opt-Process-1'})
+mdb.optimizationProcesses['Opt-Process-1']._Message(ABORTED, {
+    'jobName': 'Opt-Process-1'})
+# Save by bgbg0 on 2025_02_17-11.50.09; build 2022 2021_09_15-18.57.30 176069

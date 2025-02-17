@@ -267,3 +267,6 @@ ylim([0,200000])
 xlim([0,10])
 legend('MTOW Case','MZFW Case')
 hold off
+
+torqueData = Torque2;
+save("torque_htail", "torqueData")

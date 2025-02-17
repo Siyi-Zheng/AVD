@@ -4,7 +4,7 @@
 %the other is using farrar efficiency 
 clear,clc,close all
 
-Skin-stringer
+%Skin-stringer
 
 
 %wing box geometry & load estimation input
@@ -24,7 +24,7 @@ n_ribs = 20;
 b_h =14.1/2;
 L = b_h/n_ribs %Rib spacing in m
 
-Wing parameters
+%Wing parameters
 %wing parameter
 
 %wing chord distribution starting at the wing-fuselage intersection
@@ -35,21 +35,20 @@ c(y) = 7.5 + (3.0 - 7.5)*(y/7.05); %for our tailplane HT
 s_station = linspace(0, b_h, n_ribs);
 
 % defining new bm matching the span stations
-bm_new = spline(yspan, bm, s_station);
-bm_new(bm_new <0)= 0;
+bm_new = abs(spline(yspan, bm, s_station));
 
 c_box = double(vpa(0.5 * c(s_station))); %wingbox width (m)
 b_box = double(vpa(0.0942 * c(s_station))); %wingbox average height (m)
 N = bm_new./(c_box.*b_box); %compressive stress in N/m
 
 
-1. Initial buckling
+%1. Initial buckling
 t_init = ((N .* b_box.^2)./(3.62 * E)).^(1/3) * 1000; %skin thickness in mm
 cr_stress = N./(1000*t_init); %critical buckling stress of panel in N/mm^2 (sigma)
 area_init = c_box .* t_init .* 1000; %cross-sectional area of skin with in mm^2
 
 
-2. Design panel size and stringer size
+%2. Design panel size and stringer size
 n_st = 16;
 W = [];
 for j = 1:length(n_st)
@@ -64,7 +63,7 @@ d = f2w * h; %flange width of stringer
 As = (h + (2*d)) * ts; %cross-sectional area of the stringer
 b = c_box/n * 1000; %panel width in mm
 
-3. Use initial buckling of panel to find skin thickness
+%3. Use initial buckling of panel to find skin thickness
 t = 1000 .* ((N .* (b/1000).^2) ./ (3.62 * E)) .^ (1/3); %skin thickness with stringers added in mm
 cr_s0 = N./(1000*t); %critical buckling stress in N/mm^2 (sigma0)
 t_e = t + As./b; %panel effective thickness in mm (smeared thickness?)
@@ -103,7 +102,7 @@ X_grid = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
 Y_grid = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4];
 
 
-4. Getting sigma0/sigma ratio from Catchpole diagram
+%4. Getting sigma0/sigma ratio from Catchpole diagram
 R_sigma = interp2(Y_grid, X_grid, stressFactors, R_b, R_t);
 F = interp2(Y_grid, X_grid, f_testing, R_b, R_t);
 % i3 = find(isnan(R_sigma));
@@ -117,18 +116,18 @@ F = interp2(Y_grid, X_grid, f_testing, R_b, R_t);
 
 cr_stress1 = R_sigma .* cr_s0;
 
-5. Getting FARRAR efficiency for each span station
+%5. Getting FARRAR efficiency for each span station
 
 mean_stress = F.*sqrt((N .* E*10^9)./ L) * 10^-6;
 L = N(1) * E / (cr_stress1(1) * 10^6/F)^2 % length in m
 
-6. Panel weight calculations
+%6. Panel weight calculations
 rho = 2850; %density of AL2024 in kg/m^3
 
 W = [W, As_e(1) * rho/10^6]; %weight per unit length in grams
 end
 
-7. Plotting for skin thickness and stress distribution
+%7. Plotting for skin thickness and stress distribution
 t_step = ceil(t*2)/2;
 
 figure
@@ -151,13 +150,13 @@ hold off
 
 WEIGHT_SKIN = sum(As_e.* (b_h)/20)/1000000 * rho * 2
 
-8. Interaction between shear and compression
+%8. Interaction between shear and compression
 yspan = linspace(0,b_h, 1000);
 
 % 1) Load your torque .mat file
 torqueData = load("torque_htail.mat");  % or whatever it's called
-yspanTorque = torqueData.yspanTorque;   % if these arrays are in the file
-Tval        = torqueData.Tval;         % torque array [N·m]
+yspanTorque = yspan;
+Tval        = torqueData.torqueData;         % torque array [N·m]
 
 % 2) Interpolate torque to your stations
 T_s = spline(yspanTorque, Tval, s_station);
@@ -192,7 +191,7 @@ box on
 
 
 
-Rib Design
+%Rib Design
 % iterating through number of ribs for the weight optimisation
 %n_ribs = 15:1:30;
 % rib_array = 0.05:0.05:0.7;
@@ -224,7 +223,7 @@ c_box = double(vpa(0.5 .* chord)); %wingbox width
 b_box = double(vpa(0.0942 .* chord)); %wingbox average height (m)
 N = bm_new./(c_box.*b_box); %compressive stress in N/m
 
-1. Rib thickness
+%1. Rib thickness
 % calculating effective skin thickness
 n = 16; %number of panels
 ts = 1.5; %stringer thickness in mm
@@ -270,7 +269,7 @@ end
 
 WEIGHT_RIB = sum(ones(1,16)./ 1000 .* (c_box .* b_box)) .* rho_r
 
-2. Plotting
+%2. Plotting
 % %plotting weight opt
 % figure
 % hold on
@@ -332,12 +331,12 @@ hold off
 
 
 
-D-section design
+%D-section design
 N = 20; % number of pseudo-ribs;
 t_guess = 1 ;% mm
 t1 = t_guess.*ones(1,N); % guess d cell thickness array , mm
 
-Shear calculation
+%Shear calculation
 semi_span =  b_h; % wing semi span outside fuselage, m
 bref = 0:(semi_span/N):semi_span - (semi_span/N);
 E =  79.8*10^3; %Young's modulus, MPa
@@ -364,7 +363,7 @@ coeff_1 = b./sqrt(R(1).*(t1./1000))  % for a > b
 coeff_2 = a./sqrt(R(1).*(t1./1000)) % for a < b
 
 
-Getting Ks from plot
+%Getting Ks from plot
 x = [0, 2, 4, 6 ,8 ,10, 12, 14];
 y = [9, 12, 17, 23, 29, 37, 45, 54];
 
@@ -376,7 +375,7 @@ tau_crit = Ks(1).*E.*(t1(1)./(b(1).*1000)).^2 % critical buckling stress array, 
 t_req = sqrt(tresca_stress./(Ks.*E)).*b*1000
 
 
-Plotting
+%Plotting
 figure
 set(findobj(gcf,'type','axes'),'FontSize',20,'FontWeight','Bold', 'LineWidth', 1.5);
 plot(bref, t_req, 'xk', LineWidth=1.5)
@@ -387,7 +386,7 @@ xlim([0 7.05])
 box on
 WEIGHT_DSECCTION = sum(t_req./1000 .* (b .* box_h .* (2/3)) .* 2570)
 
-WING PLOT
+%WING PLOT
 semispan_vt = 14.1/2;
 n = 500;
 rib_no = 14;

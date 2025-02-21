@@ -210,41 +210,69 @@ end
 fuel_cg = 0.3994; % in m , cg of the fuel section when chord is 1
 cg_airfoil= 0.4141;
 
-lg_mass= m_mg/4;
+lg_mass= m_mg/2 ;
 lg_cg_stored = 0.55; %landing gear stored from structral layout digram approximate
 lg_cg_deployed = 5.7 /9.9; 
 
-engine_mass = m_engine; 
+engine_weight = m_engine; 
 engine_inner_cg = -0.677/8.532; 
 enginer_outer_cg= -0.677/8.532 ; 
-fuel_mass=  m_fuel;
+fuel_weight=  m_fuel;
 
 %case 1a - worst case scenario with no fuel weight
 
 cg_variation = zeros(4, length(chord));             %pre-define array
 cg_variation(1, :) = cg_airfoil .* chord;
 cg_variation(1, 311:359) = (cg_variation(1, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
-cg_variation(1, 685:760)= (cg_variation(1, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
-cg_variation(1, 1823:1898)= (cg_variation(1,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+cg_variation(1, 685:760)= (cg_variation(1, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_weight)/(m_dry+engine_weight);
+cg_variation(1, 1823:1898)= (cg_variation(1,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_weight)/(m_dry+engine_weight);
 
 % %case 1b - worst case scenario with no fuel weight
 cg_variation(2, :) = cg_airfoil .* chord;
 cg_variation(2, 311:359) = (cg_variation(2, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
-cg_variation(2, 685:760)= (cg_variation(2, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
-cg_variation(2, 1823:1898)= (cg_variation(2,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+cg_variation(2, 685:760)= (cg_variation(2, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_weight)/(m_dry+engine_weight);
+cg_variation(2, 1823:1898)= (cg_variation(2,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_weight)/(m_dry+engine_weight);
 
 %%case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
 cg_variation(3, :) = cg_airfoil .* chord;
 cg_variation(3, 311:359) = (cg_variation(3, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
-cg_variation(3, 685:760)= (cg_variation(3, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
-cg_variation(3, 1823:1898)= (cg_variation(3,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+cg_variation(3, 685:760)= (cg_variation(3, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_weight)/(m_dry+engine_weight);
+cg_variation(3, 1823:1898)= (cg_variation(3,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_weight)/(m_dry+engine_weight);
 
 % %case 3 - worst case scenario with fuel weight
-cg_variation(4, :) = (cg_airfoil .* chord.* m_dry + fuel_cg.*chord.*fuel_mass)/(m_dry+fuel_mass) ;
-cg_variation(4, 311:359) = (cg_variation(4, 311:359).*(m_dry+fuel_mass) + lg_cg_deployed.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass+fuel_mass);
-cg_variation(4, 685:760)= (cg_variation(4, 685:760) .* (m_dry+fuel_mass)  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass+fuel_mass);
-cg_variation(4, 1823:1898)= (cg_variation(4,1823:1898) .* (m_dry+fuel_mass)  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass+fuel_mass);
-cg_variation(4, 311:359) = (cg_variation(4, 311:359).*(m_dry+lg_mass+fuel_mass) + lg_cg_deployed.*chord(1,311:359).*(6.2349e6/9.81))/(m_dry+engine_mass+fuel_mass+ (6.2349e6/9.81));
+cg_variation(4, :) = (cg_airfoil .* chord.* m_dry + fuel_cg.*chord.*fuel_weight)/(m_dry+fuel_weight) ;
+cg_variation(4, 311:359) = (cg_variation(4, 311:359).*(m_dry+fuel_weight) + lg_cg_deployed.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass+fuel_weight);
+cg_variation(4, 685:760)= (cg_variation(4, 685:760) .* (m_dry+fuel_weight)  + engine_inner_cg.*chord(1, 685:760).*engine_weight)/(m_dry+engine_weight+fuel_weight);
+cg_variation(3, 1823:1898)= (cg_variation(3,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_weight)/(m_dry+engine_weight+fuel_weight);
+
+
+% dW_total(1,:) = dW_total(1,:) + dW_wing;                             %add weight of wing
+% dW_total(1,685:760) = dW_total(1,685:760) + dW_engine(1)/75;         %add weight of engine 1
+% dW_total(1,1823:1898) = dW_total(1,1823:1898) + dW_engine(1)/75;     %add weight of engine 2
+% dW_total(1,311:359) = dW_total(1,311:359) + dW_mg(1)/48;             %add weight of landing gear
+% dW_total(1,:) = dW_total(1,:) * 100;
+% 
+% %case 1b - worst case scenario with no fuel weight
+% dW_total(2,:) = dW_total(2,:) + dW_wing;                             %add weight of wing
+% dW_total(2,685:760) = dW_total(2,685:760) + dW_engine(2)/75;         %add weight of engine 1
+% dW_total(2,1823:1898) = dW_total(2,1823:1898) + dW_engine(2)/75;     %add weight of engine 2
+% dW_total(2,311:359) = dW_total(2,311:359) + dW_mg(2)/48;             %add weight of landing gear
+% dW_total(2,:) = dW_total(2,:) * 100;
+% 
+% %case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
+% dW_total(3,:) = dW_total(3,:) + dW_wing;                             %add weight of wing
+% dW_total(3,685:760) = dW_total(3,685:760) + dW_engine(3)/75;         %add weight of engine 1
+% dW_total(3,1823:1898) = dW_total(3,1823:1898) + dW_engine(3)/75;     %add weight of engine 2
+% dW_total(3,311:359) = dW_total(3,311:359) + dW_mg(3)/48;             %add weight of landing gear
+% dW_total(3,:) = dW_total(3,:) * 100;
+% 
+% %case 3 - worst case scenario with fuel weight
+% dW_total(4,:) = dW_total(4,:) + dW_wing + dW_fuel;                   %add weight of wing and fuel
+% dW_total(4,685:760) = dW_total(4,685:760) + dW_engine(4)/75;         %add weight of engine 1
+% dW_total(4,1823:1898) = dW_total(4,1823:1898) + dW_engine(4)/75;     %add weight of engine 2
+% dW_total(4,311:359) = dW_total(4,311:359) + dW_mg(4)/48;             %add weight of landing gear
+% dW_total(4,:) = dW_total(4,:) * 100;
+% dW_total(4,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
 
 %CALCULATING TORQUE
@@ -259,7 +287,7 @@ for i=1:4
         % temp1 = dL(i,j:length(span));
         % temp2 = dW_total(i,j:length(span));
         m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
-        dM(i,j) = dL(i,j)* (flexAxis_change(i,j) - x_quart(i,j))+dD(i,j) * 0 - dW_total(i,j) *(flexAxis_change(i,j) - cg_variation(i,j)) + m_0w(i,j);
+        dM(i,j) = dL(i,j)* (flexAxis_change(i,j) - x_quart(i,j))+dD(i,j) * 0 - dW_total(i,j) *(flexAxis_change(i,j) - cg_variation(i,j)) + - m_0w(i,j);
 
     end
 end
@@ -405,7 +433,7 @@ plot(span,M_torque(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
-ylabel(" Torque (Nm)");
+ylabel(" (N)");
 legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 % Get the sectional load vs spanwise diagram for case 1&3 under different

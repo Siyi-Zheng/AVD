@@ -14,19 +14,19 @@ farrardata= table(9:16, 1:10);
 %%%%%%%%%Design panel size and stringer size
 % max bending moment - with stringers
 
-%fixed variables#
-density_comp = 1515;
-density_al = 2800;
+%material properties
+density_T861 = 2765; % all kg/m^3
+density_T36 = 2765;
+density_H34 = 2655;
+sigma_y_T861 = 431; % Yield Stress, MPa
+E_T861 = 73.85; % all GPa
+E_T36 = 73.85;
+E_H34 = 70.3;
+
 % if there is an error run wing_load_distribution.m first
 momentMax = 4362716978.29012/100; % Nm % maximum bending moment
 c = (0.7 - 0.12) .* 12.4085; % m %wingbox width
 b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
-E_composite = 61; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus  
-density_comp = 1515;
-density_al = 2800;
-E_composite = 61 ; %Gpa
-E_Aluminium = 72.5; % GPa     %Young's modulus      
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
@@ -41,10 +41,8 @@ rib_spacing = 0.6; %vary this after iterations
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
-            % TODO: consider buckling of stringers, I think this is why we
-            % get unrealistic results with lots of tiny stringers
             As(i,j,k)= ts(j) .* (h(k) + 2 * d(k)); % mm^2
-            t2(i,j,k)= (N /3.62/ (E_composite*10^9) * (b(i) / 1000) ^ 2) ^ (1/3) *1000; % mm
+            t2(i,j,k)= (N /3.62/ (E_T861*10^9) * (b(i) / 1000) ^ 2) ^ (1/3) *1000; % mm
             sigma_0(i,j,k) = N / (t2(i,j,k) * 1000); % MPa
             t_e(i,j,k) = t2(i,j,k) + (As(i,j,k) / b(i)); % mm
             effectivePanelCSA(i,j,k) = n(i)* b(i)* t_e(i,j,k); % mm^2
@@ -53,7 +51,7 @@ for i = 1:length(n)
             catchpoleX(i,j,k) = As(i,j,k)/ (b(i)* t2(i,j,k)); % y-value to read
              %%optimise using mass
             volume(i,j,k) = n(i) * b(i) * t_e(i,j,k) * rib_spacing *1000;
-            mass(i,j,k) = (density_comp/(1000)^3) * volume(i,j,k);
+            mass(i,j,k) = (density_T861/(1000)^3) * volume(i,j,k);
         end
     end
 end
@@ -79,7 +77,6 @@ for i = 1:length(n)
     end
 end
 
-% shitty mass optimisation
 % F_factor = F_factor ./ As;
 
 sigma_cr = stressRatio .* sigma_0;
@@ -159,7 +156,7 @@ RATIO2 = ts / t2
 
 % Rib_spacing =  0.5:0.05:2; % m
 % 
-% sigma_f= mxv./sqrt(Rib_spacing./N./(E_Aluminium*10^9))./10^6;
+% sigma_f= mxv./sqrt(Rib_spacing./N./(E_T861*10^9))./10^6;
 % resultant = sigma_cr - sigma_f;
 % [result, index] = min(abs(resultant));
 % 
@@ -171,8 +168,7 @@ optimal_rib = 0.6;
 % spar
 
 a = optimal_rib; % Web panel spacing, m
-E = E_Aluminium; % Young's Modulus, GPa
-sigma_y = 495; % Yield Stress, MPa
+E = E_H34; % Young's Modulus, GPa
 Ks = 8.5; % Read from graph
 V = 3311650; % Shear Load, N
 T = 2.5e6; % Torque Load, Nm
@@ -188,11 +184,11 @@ M = momentMax;
 t_e = ts + (As / b);
 s = 2; % rib spacing, m
 I = (c * (t_e / 1000) ^ 3 / 12 + c * (t_e / 1000) * (b2 / 2) ^ 2); % 2nd moment of area of panel, m^4
-F = M^2 * s * b2 * (t_e / 1000) * c / (2 * E_Aluminium * 1e9) / (I ^ 2); % Crush load, N
+F = M^2 * s * b2 * (t_e / 1000) * c / (2 * E_T861 * 1e9) / (I ^ 2); % Crush load, N
 t_r = 7.3; % design rib thickness, mm
 sigma_c = (F / t_r) * (c / 1000); % crush stress, MPa
 sigma_b = F / (t_r * c * 1e3); % buckling stress, MPa
-t_r2 = F / (sigma_y * c * 1e3); % design rib thickness (for buckling), MPa
+t_r2 = F / (sigma_y_T861 * c * 1e3); % design rib thickness (for buckling), MPa
 
 %varying rib spacing with bending moments and then get how the rib
 %thickness varies with rib spacing.
@@ -222,15 +218,15 @@ c_span = chord * 0.58;
 I = c_span .* (t_e ./ 1000) .^ 3 / 12 + c_span .* (t_e ./ 1000) .* b2_span .^ 2 / 4;
 
 crush_load = M_x .^ 2 .* rib_spacing .* b2_span .* (t_e ./ 1000) .* c_span...
-    ./ (2 .* E_Aluminium .* 1e9 .* (I .^ 2)) ./ 10;
-t_r = (crush_load ./ c_span ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;
+    ./ (2 .* E_T861 .* 1e9 .* (I .^ 2)) ./ 10;
+t_r = (crush_load ./ c_span ./ 3.62 ./ (E_T861 .* 1e9) .* b2_span .^ 2) .^ (1/3) .* 1000;
 rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 % % calculation
 % chord = chord * 0.58;
 % I = chord .* (t_e ./ 1000) .^ 3 ./ 12 + chord .* (t_e / 1000) * b2 .^ 2 / 4;
 % crush_load = M_x .^ 2 .* rib_spacing .* b2 .* (t_e ./ 1000) .* chord...
-%     ./ (2 .* E_Aluminium .* 1e9 .* (I .^ 2)) ./ 10;
-% t_r = (crush_load ./ chord ./ 3.62 ./ (E_Aluminium .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
+%     ./ (2 .* E_T861 .* 1e9 .* (I .^ 2)) ./ 10;
+% t_r = (crush_load ./ chord ./ 3.62 ./ (E_T861 .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
 % rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 scatter(rib_list, rib_thickness, "kx");
 area_list = 0.0939 * c_span .^2;
@@ -239,7 +235,7 @@ for i = 1:length(rib_list)
     rib_loc = rib_list(i);
     rib_area_list = [rib_area_list max(area_list(span > rib_loc))];
 end
-main_rib_mass = sum(rib_area_list .* rib_thickness / 1000) * density_al;
+main_rib_mass = sum(rib_area_list .* rib_thickness / 1000) * density_T861;
 xlabel("Semi-span (m)")
 ylabel("Rib Thickness (mm)")
 ylim([0 max(rib_thickness) + 1])
@@ -250,12 +246,12 @@ grid on
 rib_spacing_test = 0.2:0.05:1.5; % m %vary this after iterations
 
 number_ribs = (32.5 ./rib_spacing_test) +1;
-t_e_farrar = (1/mxv) .* sqrt(N .* rib_spacing_test./ E_composite); %mm
+t_e_farrar = (1/mxv) .* sqrt(N .* rib_spacing_test./ E_T861); %mm
 
 volume= n .* b .* (t_e_farrar) .* rib_spacing_test.*1000; %mm^3
-mass_skin_stringer = (((density_comp.* 1e-9) .* volume))  ./(span(end) * c);
+mass_skin_stringer = (((density_T861.* 1e-9) .* volume))  ./(span(end) * c);
 
-mass_ribs = number_ribs .* ((rib_area_list(1).* rib_thickness(1) ./ 1000) .* density_al) ./(span(end) * c);
+mass_ribs = number_ribs .* ((rib_area_list(1).* rib_thickness(1) ./ 1000) .* density_T861) ./(span(end) * c);
 
 total_mass = (mass_skin_stringer + mass_ribs);
 
@@ -279,16 +275,15 @@ V_x(721) = [];
 T = max(abs(M_torque));
 T(721) = [];
 a = rib_thickness; % Web panel spacing, m
-E = E_Aluminium; % Young's Modulus, GPa
-sigma_y = 495; % Yield Stress, MPa
+E = E_T861; % Young's Modulus, GPa
 Ks = 7.5; % Read from graph
 V = V_x; % Shear Load, N
 q0 = T ./ (2 .* c_span .* b2_span .* 1000); % Torque shear flow, N/mm
 q2 = V ./ (2 .* b2_span .* 1000); % Load shear flow, N/mm
 q_FS = abs(q2 + q0); % Front spar shear flow, N/mm
 q_RS = abs(q2 - q0); % Rear spar shear flow, N/mm
-t_FS = (q_FS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Front web thickness, mm
-t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_Aluminium .* 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
+t_FS = (q_FS .* 1000 .* b2_span ./ (Ks .* E_H34 .* 1e9)) .^ (1/3) .* 1000; % Front web thickness, mm
+t_RS = (q_RS .* 1000 .* b2_span ./ (Ks .* E_H34 .* 1e9)) .^ (1/3) .* 1000; % Rear web thickness, mm
 
 t_FS_dis = discretisation_1mm(t_FS, 2);
 t_RS_dis = discretisation_1mm(t_RS, 2);
@@ -309,13 +304,13 @@ legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "D
 moment_span = M_x;
 b_span = c_span ./ n.* 1000;% skin panel width, mm
 N_span = moment_span ./ (c_span .* b2_span);
-t2_span= (N_span ./3.62 ./ (E_composite.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
+t2_span= (N_span ./3.62 ./ (E_T861.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
 t2_span(t2_span<1) = 1;
 t2_span_disc = discretisation_1mm(t2_span, 1);
 
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
-tau_cr = Ks .* E_Aluminium .* 1e9 .* (t2_span./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
+tau_cr = Ks .* E_T861 .* 1e9 .* (t2_span./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
 Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
 sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
@@ -385,10 +380,10 @@ for num_pseudoribs = min_pseudoribs:max_pseudoribs
             buckling_coeff = interp2(Y_grid, X_grid, buckling_coeffs,...
                 bucklingY, bucklingX);
             % shear stress calculation
-            t_s = sqrt(tau_cr .* 1e6 .* b^2 ./ (buckling_coeff .* E_composite .* 1e9)) .* 1000;
+            t_s = sqrt(tau_cr .* 1e6 .* b^2 ./ (buckling_coeff .* E_T861 .* 1e9)) .* 1000;
         end
-        skin_mass = skin_mass + b .* a .* t_s./1000 .* density_comp;
-        rib_mass = rib_mass + density_al * area_list(rib) * rib_thickness / 1000; % kg
+        skin_mass = skin_mass + b .* a .* t_s./1000 .* density_T861;
+        rib_mass = rib_mass + density_T861 * area_list(rib) * rib_thickness / 1000; % kg
     end
     total_skin_mass(num_pseudoribs) = skin_mass;
     total_rib_mass(num_pseudoribs) = rib_mass;

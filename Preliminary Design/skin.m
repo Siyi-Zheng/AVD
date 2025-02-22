@@ -163,7 +163,7 @@ RATIO2 = ts / t2
 % %optimal rib spacing
 % optimal_rib= Rib_spacing(index)
 
-optimal_rib = 0.6;
+optimal_rib = 0.5;
 
 % spar
 

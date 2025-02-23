@@ -320,7 +320,7 @@ val = R_s.^2 + R_c; % combined stress ratio
 
 figure
 plot(span, val)
-%% Get the final mass of all components
+%% Get the final masses of all components
 t_e_span = t2_span_disc + As ./ b; 
 unique_t2 = unique(t_e_span);
 volume_ss= n .* b .* unique_t2 .*1000; %mm^3
@@ -329,17 +329,15 @@ skin_stringer_fmass = sum(((density_T861.* 1e-9) .* volume_ss));
 ribs_fmass = main_rib_mass;
 
 [unique_fs, ln ]= (unique(t_FS_dis));
-length_ln = flip(span(ln));
-length_ln(end) = span(end);
+length_ln = span(ln);
 b2_span_unique = b2_span(ln);
-volume_FS = unique_fs .* b2_span_unique.*1000 .* [length_ln(1),diff(length_ln)].*1000; %mm^3
+volume_FS = unique_fs .* b2_span_unique.*1000 .* diflength_ln.*1000; %mm^3
 spar_fs_mass = sum((volume_FS).*(density_T861.* 1e-9));
 
 [unique_rs, lnr]= (unique(t_RS_dis));
-length_lnr = flip(span(lnr));
-length_lnr(end) = span(end);
+length_lnr = span(lnr);
 b2_span_uniquer = b2_span(lnr);
-volume_RS = unique_rs .* b2_span_uniquer .*1000 .* [length_lnr(1),diff(length_lnr)].*1000;
+volume_RS = unique_rs .* b2_span_uniquer .*1000 .* length_lnr.*1000;
 spar_rs_mass = sum((volume_RS).*(density_T861.* 1e-9));
 
 spar_mass = spar_fs_mass + spar_rs_mass;

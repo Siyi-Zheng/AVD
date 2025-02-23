@@ -632,6 +632,10 @@ clear P Q R
 % Define inputs
 syms P Q T R theta pi_sym
 
+R = 6.34;
+
+theta = 0:0.1:360]
+
 % Tangential unit load case
 M_T = (P*R/(2*pi_sym)) * ((3*sin(theta)/2) + (pi_sym - theta)*cos(theta) - 1);
 N_T = (P/(2*pi_sym)) * (sin(theta)/2 - (pi_sym - theta)*cos(theta));
@@ -651,3 +655,4 @@ S_M = (T/(2*pi_sym*R)) * (1 + 2*cos(theta));
 M = M_T + M_R + M_M;
 N = N_T + N_R + N_M;
 S = S_T + S_R + S_M;
+

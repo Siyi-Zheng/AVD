@@ -628,8 +628,31 @@ colorbar; % Add a color legend
 clear P Q R
 %heavy frames
 
-%Defining key loading points
-%need loads from tailplane, landing gear, and wings
 
+% Define inputs
+syms P Q T R theta pi_sym
 
+R = 6.34;
+
+theta = 0:0.1:360]
+
+% Tangential unit load case
+M_T = (P*R/(2*pi_sym)) * ((3*sin(theta)/2) + (pi_sym - theta)*cos(theta) - 1);
+N_T = (P/(2*pi_sym)) * (sin(theta)/2 - (pi_sym - theta)*cos(theta));
+S_T = (P/(2*pi_sym)) * ((pi_sym - theta)*sin(theta) - (1 - cos(theta))/2);
+
+% Radial unit load case
+M_R = (Q*R/(2*pi_sym)) * (cos(theta)/2 + (pi_sym - theta)*sin(theta) + 1);
+N_R = (Q/(2*pi_sym)) * (3*cos(theta)/2 + (pi_sym - theta)*sin(theta));
+S_R = (Q/(2*pi_sym)) * ((pi_sym - theta)*cos(theta) - sin(theta)/2);
+
+% Moment unit load case
+M_M = (T/(2*pi_sym)) * (pi_sym - 2*sin(theta) - theta);
+N_M = (T/(2*pi_sym*R)) * (3*cos(theta)/2 + (pi_sym - theta)*sin(theta));
+S_M = (T/(2*pi_sym*R)) * (1 + 2*cos(theta));
+
+%superpose final results
+M = M_T + M_R + M_M;
+N = N_T + N_R + N_M;
+S = S_T + S_R + S_M;
 

@@ -163,7 +163,7 @@ RATIO2 = ts / t2
 % %optimal rib spacing
 % optimal_rib= Rib_spacing(index)
 
-optimal_rib = 0.6;
+optimal_rib = 0.5;
 
 % spar
 
@@ -171,7 +171,7 @@ a = optimal_rib; % Web panel spacing, m
 E = E_H34; % Young's Modulus, GPa
 Ks = 8.5; % Read from graph
 V = 3311650; % Shear Load, N
-T = 4200000; % Torque Load, Nm
+T = 2.5e6; % Torque Load, Nm
 q0 = T / (2 * c * b2 * 1000); % Torque shear flow, N/mm
 q2 = V / (2 * b2 * 1000); % Load shear flow, N/mm
 q_FS = q2 + q0; % Front spar shear flow, N/mm

@@ -134,10 +134,7 @@ dW_total(4,311:359) = dW_total(4,311:359) + dW_mg(4)/48;             %add weight
 dW_total(4,:) = dW_total(4,:) * 100;
 dW_total(4,311:359) = dW_total(3,311:359) - 6.2349e6/48;             %add force of main landing gear on the wing at touch down
 
-
-
 dW_total = dW_total.*n;
-
 
 %loading lifting distribution
 data1 = load("WingLoadCase1.mat");
@@ -205,6 +202,50 @@ for i = 1:4
     end
 end
 
+%% 
+
+%Calculating how the cg varies due to engine, landing gear and fuel system:
+
+%calculate the centre of gravity of the fuel system:
+fuel_cg = 0.3994; % in m , cg of the fuel section when chord is 1
+cg_airfoil= 0.4141;
+
+lg_mass= m_mg/4;
+lg_cg_stored = 0.55; %landing gear stored from structral layout digram approximate
+lg_cg_deployed = 5.7 /9.9; 
+
+engine_mass = m_engine; 
+engine_inner_cg = -0.677/8.532; 
+enginer_outer_cg= -0.677/8.532 ; 
+fuel_mass=  m_fuel;
+
+%case 1a - worst case scenario with no fuel weight
+
+cg_variation = zeros(4, length(chord));             %pre-define array
+cg_variation(1, :) = cg_airfoil .* chord;
+cg_variation(1, 311:359) = (cg_variation(1, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
+cg_variation(1, 685:760)= (cg_variation(1, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
+cg_variation(1, 1823:1898)= (cg_variation(1,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+
+% %case 1b - worst case scenario with no fuel weight
+cg_variation(2, :) = cg_airfoil .* chord;
+cg_variation(2, 311:359) = (cg_variation(2, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
+cg_variation(2, 685:760)= (cg_variation(2, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
+cg_variation(2, 1823:1898)= (cg_variation(2,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+
+%%case 2 - OEI no fuel in the wings. worst case scenario at take of (using take off speed)
+cg_variation(3, :) = cg_airfoil .* chord;
+cg_variation(3, 311:359) = (cg_variation(3, 311:359).* m_dry + lg_cg_stored.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass);
+cg_variation(3, 685:760)= (cg_variation(3, 685:760) .* m_dry  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass);
+cg_variation(3, 1823:1898)= (cg_variation(3,1823:1898) .* m_dry  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass);
+
+% %case 3 - worst case scenario with fuel weight
+cg_variation(4, :) = (cg_airfoil .* chord.* m_dry + fuel_cg.*chord.*fuel_mass)/(m_dry+fuel_mass) ;
+cg_variation(4, 311:359) = (cg_variation(4, 311:359).*(m_dry+fuel_mass) + lg_cg_deployed.*chord(1,311:359).*lg_mass)/(m_dry+lg_mass+fuel_mass);
+cg_variation(4, 685:760)= (cg_variation(4, 685:760) .* (m_dry+fuel_mass)  + engine_inner_cg.*chord(1, 685:760).*engine_mass)/(m_dry+engine_mass+fuel_mass);
+cg_variation(4, 1823:1898)= (cg_variation(4,1823:1898) .* (m_dry+fuel_mass)  + engine_inner_cg.*chord(1, 1823:1898).*engine_mass)/(m_dry+engine_mass+fuel_mass);
+cg_variation(4, 311:359) = (cg_variation(4, 311:359).*(m_dry+lg_mass+fuel_mass) + lg_cg_deployed.*chord(1,311:359).*(6.2349e6/9.81))/(m_dry+engine_mass+fuel_mass+ (6.2349e6/9.81));
+
 
 %CALCULATING TORQUE
 
@@ -212,12 +253,13 @@ M_torque = zeros(4, length(span));
 for i=1:4
     for j = 1: length(span)
         x_quart(i, j) = 0.25 * chord(j);
+        flexAxis_change(i,j) = flexAxis .*chord(j);
         z_f = 0.07; % depends how we define the axis
         x_cg= cg;
         % temp1 = dL(i,j:length(span));
         % temp2 = dW_total(i,j:length(span));
         m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
-        dM(i,j) = dL(i,j)* (flexAxis - x_quart(i,j))+dD(i,j) * 0 + dW_total(i,j) *(flexAxis - x_cg) + - m_0w(i,j);
+        dM(i,j) = dL(i,j)* (flexAxis_change(i,j) - x_quart(i,j))+dD(i,j) * 0 - dW_total(i,j) *(flexAxis_change(i,j) - cg_variation(i,j)) + m_0w(i,j);
 
     end
 end
@@ -227,6 +269,7 @@ for i=1:4
         M_torque(i,j)= sum(temp)*dy;
      end
 end
+%% 
 
 % M_torque = zeros(4, length(span));
 % % landing_gear_force_case3 = zeros(length(span));
@@ -362,7 +405,7 @@ plot(span,M_torque(4,:),"g:", LineWidth = 1.5);
 hold off
 grid on
 xlabel("Semi-span (m)");
-ylabel(" (N)");
+ylabel(" Torque (Nm)");
 legend("Case 1a","Case 1b","Case 2", "Case 3");
 
 % Get the sectional load vs spanwise diagram for case 1&3 under different

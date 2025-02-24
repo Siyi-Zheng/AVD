@@ -156,3 +156,4 @@ sig_skin = 3.6*E*(t_skin/dl_stringer)^2;
 fprintf("Skin buckling stress: %.2g MPa \n" ,sig_skin/1e6);
 
 
+

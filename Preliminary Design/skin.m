@@ -330,16 +330,23 @@ ribs_fmass = main_rib_mass;
 
 [unique_fs, ln ]= (unique(t_FS_dis));
 length_ln = flip(span(ln));
-length_ln(end) = span(end);
+kh = 0.12*chord(ln);
 b2_span_unique = b2_span(ln);
-volume_FS = unique_fs .* b2_span_unique.*1000 .* [length_ln(1),diff(length_ln)].*1000; %mm^3
+length_x= [diff(length_ln), span(end)-length_ln(end)];
+length_y = [diff(kh), 0.12*chord(end)-kh(end)];
+length = sqrt(length_x.^2 + length_y.^2);
+
+volume_FS = unique_fs .* b2_span_unique.*1000 .* length.*1000; %mm^3
 spar_fs_mass = sum((volume_FS).*(density_T861.* 1e-9));
 
 [unique_rs, lnr]= (unique(t_RS_dis));
 length_lnr = flip(span(lnr));
-length_lnr(end) = span(end);
 b2_span_uniquer = b2_span(lnr);
-volume_RS = unique_rs .* b2_span_uniquer .*1000 .* [length_lnr(1),diff(length_lnr)].*1000;
+khr = 0.7*chord(lnr);
+lengthr_x = [diff(length_lnr), span(end)-length_lnr(end)];
+lengthr_y = [diff(khr), 0.7* chord(end)-khr(end)];
+lengthr = sqrt(lengthr_x.^2 + lengthr_y.^2);
+volume_RS = unique_rs .* b2_span_uniquer .*1000 .* lengthr.*1000;
 spar_rs_mass = sum((volume_RS).*(density_T861.* 1e-9));
 
 spar_mass = spar_fs_mass + spar_rs_mass;

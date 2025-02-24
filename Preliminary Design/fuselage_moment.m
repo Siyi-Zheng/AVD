@@ -108,3 +108,4 @@ sig_euler = pi^2*E*I/(L_eff^2*A_stringer); % euler buckling stress
 sig_skin = 3.6*E*(t_skin/dl_stringer)^2;
 
 
+

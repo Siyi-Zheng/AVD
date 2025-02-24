@@ -324,7 +324,7 @@ plot(span, val)
 t_e_span = t2_span_disc + As ./ b; 
 unique_t2 = unique(t_e_span);
 volume_ss= n .* b .* unique_t2 .*1000; %mm^3
-skin_stringer_fmass = sum(((density_T861.* 1e-9) .* volume_ss));
+skin_stringer_fmass = (sum(((density_T861.* 1e-9) .* volume_ss)))*2;
 
 ribs_fmass = main_rib_mass;
 

@@ -529,7 +529,7 @@ constraint = @(x) deal([], 2*x(3)*x(1) + (x(2) - 2*x(1))*x(1) - A_stringer);
 x0 = [2e-3, 0.1, 0.06];
 
 % Define bounds [t_stringer, h_web, w_flange]
-lb = [1e-3, 0.01, 0.01]; % Lower bounds (A = 58e-6)
+lb = [1e-3, 0.02, 0.02]; % Lower bounds (A = 58e-6)
 ub = [5e-3, 0.10, 0.10]; % Upper bounds (A = 1450e-6)
 
 % Run optimization
@@ -597,7 +597,7 @@ fprintf("Maximum stress: %.2g MPa, Yield stress: %.2g MPa \n",sig_max/1e6,sig_yi
 
 % check for stringer buckling
 % L_eff = [0.8, 1.6, 3.2, 4.8, 6.4]; % effective length 
-sig_euler = pi^2*E*(-I_max)/(Lfs.^2*A_stringer); % euler buckling stress
+sig_euler = pi^2*E*(-I_max)/(Lfs^2*A_stringer); % euler buckling stress
 % sig_euler = double(subs(sig_euler, [t_stringer, w_flange, h_web, L_eff], [1.5e-3, 10e-3, 9e-3, 0.4]));
 fprintf("Stringer buckling stress: %.2g MPa\n" ,sig_euler/1e6);
 

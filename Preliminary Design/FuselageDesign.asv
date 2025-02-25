@@ -419,7 +419,7 @@ D_tl = D/(4*0.001);
 
 sigma_allow = 210*10^6;
 
-skint_required = (P * D) / (2 * sigma_allow);
+skint_required = (P * D) / (2 * si)
 
 stress_ratio = sigma_allow/P;
 
@@ -434,7 +434,7 @@ assert(stress_l < (sigma_allow), 'Error: stress is too high');
 %getting hemispherical ends
 thickness_ratio = (2-v)/(1-v);
 
-hemispherical_thickness = skint_required / thickness_ratio;
+hemispherical_thickness = skin_thickness / thickness_ratio;
 
 
 %%
@@ -444,7 +444,7 @@ no_stringer = 77; % number of stringers
 A_stringer = 5.80162795540503e-05; % one stringer area (m^2)
 Lfs = 0.955094414422828; % light frame separation
 
-t_skin = 1.47e-3; % skin thickness (m)
+t_skin = 1e-3; % skin thickness (m)
 moment_x = max_bending; % bending moment about x (Nm)
 moment_y = 10; % bending moment about y (Nm)
 d_fuslg = 6.3; % fuselage diameter (m)
@@ -728,7 +728,7 @@ colorbar; % Add a color legend
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.00146 * 2 * pi * 6.34 * 77 * density;
+mass_skin = 0.0013 * 2 * pi * 6.34 * 77 * density;
 
 
 %stringers 

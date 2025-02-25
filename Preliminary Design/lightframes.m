@@ -10,10 +10,11 @@ Cf = 1/16000; % empirical based off work performed by Lockheed Martin and Shanle
 
 %syms Lfs %frame spacing
 
-M_ult = 2.6 * 10^9;
+M_ult = 1.6e7;
 
 %set a fixed IF_xx
 If = (Cf * M_ult * D^2) / (E * Lfs);
+
 
 %C design or rectangular design (delete as needed)
 %syms t;

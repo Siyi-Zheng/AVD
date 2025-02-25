@@ -88,27 +88,27 @@ Area = 2*w_flange*t_stringer + (h_web - 2*t_stringer)*t_stringer == A_stringer; 
 I = (t_stringer*h_web^3)/12 + 2*(t_stringer*w_flange*(h_web/2)^2); % second moment of area of stringer
 
 
-% f = solve(Area, h_web); % Solve for h_web in terms of t_stringer and w_flange
-% f = matlabFunction(f, 'Vars', [t_stringer, w_flange]); % Convert symbolic function to numerical function
-% figure(3)
-% fsurf(f, [1e-3 5e-3 5e-2 20e-2]); % Plot h_web as a surface against t_stringer (1-4mm) and w_flange (5-20cm)
-% xlabel("Thickness (m)")
-% ylabel("Flange Width (m)")
-% zlabel("Web Height (m)")
-% title("Stringer Total Area")
-% 
-% t_fixed = 1e-3; % Fixed t_stringer value
-% I_func = subs(I, t_stringer, t_fixed);
-% I_func = matlabFunction(I_func, 'Vars', [w_flange, h_web]);
-% % % Plot the surface
-% figure(4);
-% fsurf(I_func, [1e-2 10e-2 5e-2 20e-2]);
-% xlabel('h_{web} (Height of Web)');
-% ylabel('w_{flange} (Width of Flange)');
-% zlabel('I (Moment of Inertia)');
-% title(['Moment of Inertia with t_{stringer} = ', num2str(t_fixed)]);
-% colorbar;
-% shading interp;
+f = solve(Area, h_web); % Solve for h_web in terms of t_stringer and w_flange
+f = matlabFunction(f, 'Vars', [t_stringer, w_flange]); % Convert symbolic function to numerical function
+figure(3)
+fsurf(f, [1e-3 5e-3 5e-2 20e-2]); % Plot h_web as a surface against t_stringer (1-4mm) and w_flange (5-20cm)
+xlabel("Thickness (m)")
+ylabel("Flange Width (m)")
+zlabel("Web Height (m)")
+title("Stringer Total Area")
+
+t_fixed = 1e-3; % Fixed t_stringer value
+I_func = subs(I, t_stringer, t_fixed);
+I_func = matlabFunction(I_func, 'Vars', [w_flange, h_web]);
+% % Plot the surface
+figure(4);
+fsurf(I_func, [1e-2 10e-2 5e-2 20e-2]);
+xlabel('h_{web} (Height of Web)');
+ylabel('w_{flange} (Width of Flange)');
+zlabel('I (Moment of Inertia)');
+title(['Moment of Inertia with t_{stringer} = ', num2str(t_fixed)];
+colorbar;
+shading interp;
 
 %%
 

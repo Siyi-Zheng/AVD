@@ -569,9 +569,9 @@ shapefactor = false;
 
 %range for h
 
-h = 0.01:0.01:0.2;
+h = 0.02:0.01:0.2;
 
-b = 0.01:0.01:0.6;
+b = 0.02:0.01:0.6;
 
 %nested for loop to iterate for mass
 
@@ -641,6 +641,8 @@ mass_stringers = no_stringer * dA_boom * length_fus;
 
 %light frames
 mass_lf = n_lframes * mass_lframes;
+
+total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
 %%
 clear P Q R

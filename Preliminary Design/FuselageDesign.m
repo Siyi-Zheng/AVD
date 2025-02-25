@@ -61,7 +61,7 @@ L_tail_A = (n*W0*l1-M_A)/l2; % lift produce by tail at VA (downwards positive)
 L_tail_D = (n*W0*l1-M_D)/l2; % lift produce by tail at VD (downwards positive)
 
 %%% 2. Reaction Force from Wing
-
+ 
 %%%%%% i. Lift
 L_wing = W0*n; 
 l_F = abs(x_cg-x_fspar);
@@ -429,6 +429,8 @@ assert(stress_l < (sigma_y/3), 'Error: stress is too high');
 thickness_ratio = (2-v)/(1-v);
 
 hemispherical_thickness = skin_thickness / thickness_ratio;
+
+
 %%
 % Stringer and Direct Stress
 
@@ -714,6 +716,20 @@ colorbar; % Add a color legend
 
 
 
+%%
+
+%total mass calcluation
+%skin
+syms length_fus n_frames
+
+mass_skin = skin_thickness * 2 * pi * R * length_fus * density;
+
+
+%stringers 
+mass_stringers = no_stringer * dA_boom * length_fus;
+
+%light frames
+mass_lf = n_lframes * mass_lframes;
 
 %%
 clear P Q R
@@ -721,6 +737,23 @@ clear P Q R
 
 %Defining key loading points
 %need loads from tailplane, landing gear, and wings
+%spar loads
+
+%wing spar loads
+R_F_A;
+R_R_A;
+R_F_D;
+R_R_D;
+
+%wing heavy frame calculation
+
+%front spar frame
+%RFD is maximum
+
+%need to obtain loading locatrions angle wise
+syms theta
+
+
 
 
 

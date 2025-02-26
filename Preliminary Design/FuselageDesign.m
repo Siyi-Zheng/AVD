@@ -715,6 +715,7 @@ for idx = 1:length(b)
     end
 end
 
+[mass , I_xxs , nf , Af , t] = lightframes(Lfs , )
 
 
 %finding minimum mass for optimal frame seperation and shape
@@ -758,14 +759,14 @@ colormap(hot(20));
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.0014 * 2 * pi * 6.34 * 77 * density;
+mass_skin = 0.0014 * pi * 6.34 * 77 * density;
 
 
 %stringers 
-mass_stringers = no_stringer * dA_boom(1) * 77;
+mass_stringers = no_stringer * A_stringer * 77 * density;
 
 %light frames
-mass_lf = 77 * 200;
+mass_lf = 0.0024 * density * pi * 6.34 * (77/0.5);
 
 total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
@@ -788,6 +789,9 @@ Horizontal_stabiliser_rear = 2.27*10^5;
 
 HS_toruqe = T_vs;
 
+
+
+%considering wing spars
 
 
 

@@ -758,14 +758,14 @@ colormap(hot(20));
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.0035 * 2 * pi * 6.7 * 60 * density;
+mass_skin = 0.0014 * 2 * pi * 6.34 * 77 * density;
 
 
 %stringers 
-mass_stringers = no_stringer * dA_boom(1) * 77;
+mass_stringers = no_stringer * A_stringer * 77 * density;
 
 %light frames
-mass_lf = 77 * 200;
+mass_lf = 154 * 100;
 
 total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
@@ -785,6 +785,15 @@ Rear_spar = 35.7*10^5;
 
 Horizontal_stabiliser_front = 2.27*10^5;
 Horizontal_stabiliser_rear = 2.27*10^5;
+
+HS_toruqe = T_vs;
+
+
+
+%considering wing spars
+
+
+
 
 
 

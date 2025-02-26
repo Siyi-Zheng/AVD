@@ -3,7 +3,7 @@ function q = shearflowplot(P , Q , T)
 
 
 %data for fuselage ring
-r = 6.34;
+r = 3.17;
 
 
 phi = 0:10:360;

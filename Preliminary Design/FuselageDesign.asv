@@ -5,7 +5,7 @@ clc
 
 %%
 %selected material properites (probably going to change this!!)
-sigma_y = 431*10^6;
+sigma_y = 378*10^6;
 E = 73850000000;
 G = 28700000000;
 density = 2765;
@@ -138,22 +138,6 @@ load1_D(round(x_vtail/dl)) = load1_D(round(x_vtail/dl)) - n*W_vtail;
 load1_D(round(x_mlg/dl)) = load1_D(round(x_mlg/dl)) - n*W_mlg*2;
 load1_D(round(x_nlg/dl)) = load1_D(round(x_nlg/dl)) - n*W_nlg;
 
-% % Plot Load Distribution
-% figure(1)
-% plot(distance,load1_A,'LineStyle','-');
-% title("Weight distribution along fuselage");
-% xlabel("Length (m)");
-% ylabel("Weight distribution (N)");
-% % ylim([-100000,100000])
-% grid on
-% 
-% figure(2)
-% plot(distance,load1_D,'LineStyle','-');
-% title("Weight distribution along fuselage");
-% xlabel("Length (m)");
-% ylabel("Weight distribution (N)");
-% % ylim([-10000,10000])
-% grid on
 
 
 
@@ -198,20 +182,6 @@ load2_v(round(x_vtail/dl)) = load2_v(round(x_vtail/dl)) - W_vtail;
 load2_v(round(x_mlg/dl)) = load2_v(round(x_mlg/dl)) - W_mlg*2;
 load2_v(round(x_nlg/dl)) = load2_v(round(x_nlg/dl)) - W_nlg;
 
-% figure(3)
-% yyaxis left
-% plot(distance,load2_v,'LineStyle','-','LineWidth',1.5);
-% ylabel("Vertical Load Distribution (N)");
-% xlabel("Length (m)");
-% xlim([0,l_plane])
-% ylim([-5e5,20e5])
-% yyaxis right
-% plot(distance,load2_h,'LineStyle','-.','LineWidth',1.5)
-% % title("Weight distribution along fuselage");
-% ylabel("Horizontal Load Distribution (N)");
-% ylim([-5e6/8,2.5e6])
-% legend("Vertical Load","Horizontal Load",Location="northwest")
-% grid on
 
 
 
@@ -262,55 +232,87 @@ load3(round(x_ffuelt/dl):round(x_rfuelt/dl)) = load3(round(x_ffuelt/dl):round(x_
 % calculate shear
 shear1_D = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear1_D(i) = shear1_D(i-1) - load1_D(i);
+    shear1_D(i) = shear1_D(i-1) - dl*load1_D(i);
 end
 
 % calculate moment
 moment1_D = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment1_D(i) = moment1_D(i-1) + shear1_D(i);
+    moment1_D(i) = moment1_D(i-1) + dl*shear1_D(i);
 end
 
 shear1_A = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear1_A(i) = shear1_A(i-1) - load1_A(i);
+    shear1_A(i) = shear1_A(i-1) - dl*load1_A(i);
 end
 
 % calculate moment
 moment1_A = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment1_A(i) = moment1_A(i-1) + shear1_A(i);
+    moment1_A(i) = moment1_A(i-1) + dl*shear1_A(i);
 end
 
 shear2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear2_v(i) = shear2_v(i-1) - load2_v(i);
+    shear2_v(i) = shear2_v(i-1) - dl*load2_v(i);
 end
 % calculate moment
 moment2_v = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment2_v(i) = moment2_v(i-1) + shear2_v(i);
+    moment2_v(i) = moment2_v(i-1) + dl*shear2_v(i);
 end
 
 shear2_h = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear2_h(i) = shear2_h(i-1) - load2_h(i);
+    shear2_h(i) = shear2_h(i-1) - dl*load2_h(i);
 end
 % calculate moment
 moment2_h = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment2_h(i) = moment2_h(i-1) + shear2_h(i);
+    moment2_h(i) = moment2_h(i-1) + dl*shear2_h(i);
 end
 
 shear3 = zeros(n_discrete,1);
 for i = 2:n_discrete
-    shear3(i) = shear3(i-1) - load3(i);
+    shear3(i) = shear3(i-1) - dl*load3(i);
 end
 % calculate moment
 moment3 = zeros(n_discrete,1);
 for i = 2:n_discrete
-    moment3(i) = moment3(i-1) + shear3(i);
+    moment3(i) = moment3(i-1) + dl*shear3(i);
 end
+
+figure('Position', [150, 150, 800*1.1, 300*1.1])
+plot(distance,shear1_D,LineWidth=2,Color='r');
+hold on 
+plot(distance,shear1_A,LineWidth=2,Color='b',LineStyle='--');
+plot(distance,shear2_v,LineWidth=2,Color='k',LineStyle='-.');
+plot(distance,shear3,LineWidth=2,Color='g',LineStyle=':');
+xlabel("Length (m)",FontSize=14);
+ylabel("Shear distribution (N/m)",FontSize=14);
+legend("Case 1a", "Case 1b","Case 2","Case 3",FontSize=14)
+ylim([-1e6 1.2e6])
+xlim([0 l_plane])
+grid on
+
+figure('Position', [150, 150, 800*1.1, 300*1.1])
+plot(distance,moment1_D,LineWidth=2,Color='r');
+hold on 
+plot(distance,moment1_A,LineWidth=2,Color='b',LineStyle='--');
+plot(distance,moment2_v,LineWidth=2,Color='k',LineStyle='-.');
+plot(distance,moment3,LineWidth=2,Color='g',LineStyle=':');
+xlabel("Length (m)",FontSize=14);
+ylabel("Moment distribution (Nm)",FontSize=14);
+legend("Case 1a", "Case 1b","Case 2","Case 3",FontSize=14)
+ylim([-2e6 18e6])
+xlim([0 l_plane])
+grid on
+
+max_shear = max(abs(shear3));
+max_bending = max(abs(moment3));
+max_torsion = T_vs;
+
+fprintf("Max Shear Stress: %.3g \nMax Bending Moment: %.3g \nMax Torsion: %.3g \n",max_shear,max_bending,max_torsion)
 
 %%
 %skin thickness shear flow
@@ -331,6 +333,9 @@ q3  = shearflowplot(0 , shear3 , 0);
 [row_max1D, col_max1D] = ind2sub(size(q1D), I1D);
 [row_max2, col_max2] = ind2sub(size(q2), I2);
 [row_max3, col_max3] = ind2sub(size(q3), I3);
+
+q_max = shearflowplot(0 , 1.08*10^6 , 2.23*10^6);
+q_max = max(q_max);
 
 %plotting shear for max case
 %copy data
@@ -372,7 +377,7 @@ t = 0:0.0001:0.01;
 
 %take maximum acceptable yield stress as 1/3 of yield stress
 max_stress = zeros(length(t) , 1);
-max_stress(:) = sigma_y;
+max_stress(:) = sigma_y * 0.58;
 
 %t in mm
 t_mm = t*1000;
@@ -387,7 +392,7 @@ ylabel('Stress (Mpa)')
 xlabel('Skin Thickess (m)')
 hold off
 
-skin_thickness = max3 / sigma_y;
+skin_thickness = q_max / (sigma_y * 0.58);
 
 %%
 %Pressurization Loads
@@ -405,52 +410,54 @@ P = Pi - Po;
 %fuselage is perfect cylinder with diameter 
 D = 6.34;
 
-hoop_stress = (P * D) / (2 * skin_thickness);
+hoop_stress = (P * D) / (2 * 0.0013);
 
-long_stress = (P * D) / (4 * skin_thickness);
+long_stress = (P * D) / (4 * 0.0013);
 
-D_th = D/(2*skin_thickness);
-D_tl = D/(4*skin_thickness);
+D_th = D/(2*0.001);
+D_tl = D/(4*0.001);
 
-sigma_allow = sigma_y;
+sigma_allow = sigma_y/1.5;
 
-stress_ratio = sigma_allow/P;
+skint_required = (P * D) / (2 * sigma_allow);
+
+stress_ratio = sigma_allow;
 
 stress_h = D_th * P;
 stress_l = D_tl * P;
 
+%{
 %check stress is below maximum allowable stress
-assert(stress_h < (sigma_y/3), 'Error: stress is too high');
-assert(stress_l < (sigma_y/3), 'Error: stress is too high');
+assert(stress_h < (sigma_allow), 'Error: stress is too high');
+assert(stress_l < (sigma_allow), 'Error: stress is too high');
+%}
 
 %getting hemispherical ends
 thickness_ratio = (2-v)/(1-v);
 
-hemispherical_thickness = skin_thickness / thickness_ratio;
+hemispherical_thickness = skint_required / thickness_ratio;
 
+total_skin_t = skint_required + skin_thickness;
 
 %%
-%ADD STRINGER CODE HERE
+% Stringer and Direct Stress
 
+no_stringer = 77; % number of stringers
+A_stringer = 5.80162795540503e-05; % one stringer area (m^2)
+Lfs = 0.955094414422828; % light frame separation
 
-%constants
-moment_x = 2.6393e+09; % bending moment about x (Nm)
-moment_y = 1000; % bending moment about y (Nm)
+t_skin = total_skin_t; % skin thickness (m)
+moment_x = max_bending; % bending moment about x (Nm)
+moment_y = 10; % bending moment about y (Nm)
 d_fuslg = 6.3; % fuselage diameter (m)
 circum_fuslg = pi*d_fuslg; % fuselage circumference (m)
-skin_thickness;
-
-%inputs
-no_stringer = 80; % number of stringers
 dl_stringer = circum_fuslg/no_stringer; % stringer spacing
-fprintf("Stringer Spacing : %.3g inches \n",dl_stringer*39.3701)
-A_stringer = 60e-6; % one stringer area (m^2)
-dA_boom = ones(1,no_stringer) * 15*skin_thickness^2; % skin collaborative area
+fprintf("Stringer Spacing : %.3g cm, %.3g inches \n",dl_stringer*100,dl_stringer*39.3701)
+dA_boom = ones(1,no_stringer) * 15*t_skin*t_skin; % skin collaborative area
 A_boom =  A_stringer + dA_boom; % boom area (m^2)
-fprintf("Boom Area (0) : %.3g \n",A_boom(1));
+fprintf("Boom Area : %.3g , Stringer Area: %.3g\n",A_boom(1),A_stringer);
 
 
-%calculating boom distribution
 boom_angle = linspace(0,360,no_stringer+1);
 boom_angle = boom_angle(1:no_stringer);
 x = d_fuslg/2 * cos(deg2rad(boom_angle)); % x location of booms
@@ -470,11 +477,11 @@ sigy = moment_y*x/Iy; % direct stress due to y bending moment
 sig = sigx + sigy; % direct stress due to x and y bending moment
 
 
-dA_boom(1) = skin_thickness/6 * (2 + sig(no_stringer)/sig(1)) + skin_thickness/6 * (2 + sig(2)/sig(1));
+dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
 for i = 2:no_stringer-1
-    dA_boom(i) = skin_thickness/6 * (2 + sig(i-1)/sig(i)) + skin_thickness/6 * (2 + sig(i+1)/sig(i));
+    dA_boom(i) = t_skin/6 * (2 + sig(i-1)/sig(i)) + t_skin/6 * (2 + sig(i+1)/sig(i));
 end
-dA_boom(no_stringer) = skin_thickness/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + skin_thickness/6 * (2 + sig(1)/sig(no_stringer));
+dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
 A_boom =  A_stringer + dA_boom;
 fprintf("Boom Area (1) : %.3g \n",A_boom(2));
 
@@ -484,68 +491,158 @@ for i = 1:5
     sigx = moment_x*y/Ix; % direct stress due to x bending moment
     sigy = moment_y*x/Iy; % direct stress due to y bending moment
     sig = sigx + sigy; % direct stress due to x and y bending moment
-    dA_boom(1) = skin_thickness/6 * (2 + sig(no_stringer)/sig(1)) + skin_thickness/6 * (2 + sig(2)/sig(1));
+    dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
     for j = 2:no_stringer-1
-        dA_boom(j) = skin_thickness/6 * (2 + sig(j-1)/sig(j)) + skin_thickness/6 * (2 + sig(j+1)/sig(j));
+        dA_boom(j) = t_skin/6 * (2 + sig(j-1)/sig(j)) + t_skin/6 * (2 + sig(j+1)/sig(j));
     end
-    dA_boom(no_stringer) = skin_thickness/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + skin_thickness/6 * (2 + sig(1)/sig(no_stringer));
+    dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
     A_boom =  A_stringer + dA_boom;
     fprintf("Boom Area (%d) : %.3g \n",i+1,A_boom(2));
 end
 
-
 sig_max = max(sig);
 
-% plot boom location
-figure(1)
-plot(x,y,".",MarkerSize=8)
 
-% Plot fuselage cross-section
-figure(2);
-hold on;
-grid on;
-plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
-plot3(x, y, z, '.','MarkerSize', 12,'Color','b') 
-% Plot stress vectors at each stringer location
-quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);
-% Labels and title
-xlabel('x');
-ylabel('y');
-zlabel('Direct stress \sigma_z (MPa)');
-title('Direct stress distribution around fuselage');
-legend({'Fuselage cross-section', 'String Location','Direct Stress'}, 'Location', 'northeast');
-view(3); % Set 3D view
-hold off;
-
+% % Plot fuselage cross-section
+% figure();
+% hold on;
+% grid on;
+% plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
+% plot3(x, y, z, '.','MarkerSize', 12,'Color','b') 
+% % Plot stress vectors at each stringer location
+% quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);
+% % Labels and title
+% xlabel('x');
+% ylabel('y');
+% zlabel('Direct stress \sigma_z (MPa)');
+% title('Direct stress distribution around fuselage');
+% legend({'Fuselage cross-section', 'String Location','Direct Stress'}, 'Location', 'northeast');
+% view(3); 
 
 % using Z shape stringer
 syms t_stringer; % stringer thickness
 syms w_flange;  % stringer flange width
 syms h_web; % stringer web height
-Area = 2*w_flange*t_stringer + (h_web - 2*t_stringer)*t_stringer == A_stringer; % total area of stringer
-% need to be the same as A_stringer
+Area = 2*w_flange*t_stringer + (h_web - 2*t_stringer)*t_stringer == A_stringer; % total area of stringer, need to be the same as A_stringer
 I = (t_stringer*h_web^3)/12 + 2*(t_stringer*w_flange*(h_web/2)^2); % second moment of area of stringer
-f = solve(Area,h_web);
-f = matlabFunction(f, 'Vars', [t_stringer, w_flange]);
-fsurf(f,[1e-3 5e-3 5e-2 20e-2])
+
+
+% Define the objective function (negative for maximization)
+objective = @(x) -((x(1)*x(2)^3)/12 + 2*(x(1)*x(3)*(x(2)/2)^2));
+
+% Define the constraint function (equality constraint)
+constraint = @(x) deal([], 2*x(3)*x(1) + (x(2) - 2*x(1))*x(1) - A_stringer);
+
+% Set initial guesses [t_stringer, h_web, w_flange]
+x0 = [2e-3, 0.1, 0.06];
+
+% Define bounds [t_stringer, h_web, w_flange]
+lb = [1e-3, 0.02, 0.02]; % Lower bounds (A = 58e-6)
+ub = [5e-3, 0.10, 0.10]; % Upper bounds (A = 1450e-6)
+
+% Run optimization
+options = optimoptions('fmincon', 'Algorithm', 'sqp');
+[x_opt, I_max] = fmincon(objective, x0, [], [], [], [], lb, ub, constraint, options);
+opt_t_stringer = x_opt(1);
+opt_h_web = x_opt(2);
+opt_w_flange = x_opt(3);
+
+area = @(x) 2*x(3)*x(1) + (x(2) - 2*x(1))*x(1) - A_stringer;
+fprintf("Area constraint: %.2g \n",area(x_opt));
+
+
+% Display results
+disp('Optimal t_stringer, h_web, w_flange:');
+disp(x_opt);
+disp('Maximum I:');
+disp(-I_max); % Since we minimized -I, negate it to get max value
+
+D = 6.34; %frame diameter
+Cf = 1/16000; % empirical based off work performed by Lockheed Martin and Shanley, J. Aero Science
+M_ult = 1.6e7; % max bending stress
+E = 73.85e9; % Young's Modulus
+
+%set a fixed IF_xx
+If = (Cf * M_ult * D^2) / (E * Lfs);
+% Lfs = (Cf * M_ult * D^2) / (E * If);
+
+%C design 
+% If =  t * ((h^3/12) + (0.5 * b * h^2)); % subject to constraint
+% Af = (2 * b + h) * t; % minimise area(mass)
+
+
+% Define the objective function (minimizing Af)
+objective = @(x) (2 * x(2) + x(1)) * x(3);
+
+% Define the constraint function (equality constraint)
+constraint = @(x) deal([], x(3) * ((x(1)^3 / 12) + (0.5 * x(2) * x(1)^2)) - If);
+
+% Set initial guesses [h, b, t]
+x0 = [0.15, 0.03, 2e-3];
+
+% Define bounds [h, b, t]
+lb = [0.10, 0.02, 1e-3]; % Lower bounds (I = 1.833e-7, 2.97m)
+ub = [0.20, 0.1, 5e-3]; % Upper bounds  (I = 1.333e-5, 0.04m)
+
+% Run optimization
+options = optimoptions('fmincon', 'Algorithm', 'sqp');
+[x_opt, Af_min] = fmincon(objective, x0, [], [], [], [], lb, ub, constraint, options);
+I_area = @(x) x(3) * ((x(1)^3 / 12) + (0.5 * x(2) * x(1)^2)) - If;
+fprintf("I constraint: %.2g \n",I_area(x_opt));
+
+% Display results
+disp('Optimized values:');
+disp(['h = ', num2str(x_opt(1))]);
+disp(['b = ', num2str(x_opt(2))]);
+disp(['t = ', num2str(x_opt(3))]);
+disp(['Minimum Af = ', num2str(Af_min)]);
 
 
 % check for failure
 % material: Al 2024-T861
 sig_yield = 431e6; % yield stress
-fprintf("Maximum stress: %.2g MPa \nYield stress: %.2g MPa",sig_max/1e6,sig_yield/1e6);
+fprintf("Maximum stress: %.2g MPa, Yield stress: %.2g MPa \n",sig_max/1e6,sig_yield/1e6);
 
 % check for stringer buckling
-E = 73.85e9; % Young's Modulus
-syms L_eff % effective length
-sig_euler = pi^2*E*I/(L_eff^2*A_stringer); % euler buckling stress
+% L_eff = [0.8, 1.6, 3.2, 4.8, 6.4]; % effective length 
+sig_euler = pi^2*E*(-I_max)/(Lfs^2*A_stringer); % euler buckling stress
+% sig_euler = double(subs(sig_euler, [t_stringer, w_flange, h_web, L_eff], [1.5e-3, 10e-3, 9e-3, 0.4]));
+fprintf("Stringer buckling stress: %.2g MPa\n" ,sig_euler/1e6);
 
 % check for skin buckling
-sig_skin = 3.6*E*(skin_thickness/dl_stringer)^2;
+w = 1.90*t_skin*sqrt(E/sig_max);
+if w < dl_stringer*0.8
+    sig_skin = 3.6*E*(t_skin/(dl_stringer - w))^2;
+else
+    sig_skin = 3.6*E*(t_skin/(dl_stringer))^2;
+end
+fprintf("Skin buckling stress: %.2g MPa \n" ,sig_skin/1e6);
 
 
+%%
 
+% objective
+objective = @(x) mass_function(x(1), x(2), x(3));  % x = [no_stringer, A_stringer, Lfs]
 
+% Constraint function
+constraint = @(x) fuslg_constraints(x);  
+
+% Set initial guesses [no_stringer, A_stringer, Lfs]
+x0 = [150, 400e-6, 0.8];
+
+% Define bounds [no_stringer, A_stringer, Lfs]
+lb = [50, 58e-6, 0.04]; 
+ub = [400, 1450e-6, 2.97]; 
+
+intcon = 1; 
+
+% Run optimization using genetic algorithm
+options = optimoptions('ga', ...
+    'Display', 'iter', ...
+    'MaxGenerations', 100, ...
+    'PopulationSize', 100);
+
+[x_opt, mass_min] = ga(objective, 3, [], [], [], [], lb, ub, constraint, intcon, options);
 
 
 
@@ -569,9 +666,35 @@ shapefactor = false;
 
 %range for h
 
-h = 0.01:0.01:0.2;
+%section shape consideration
+% for a fixed I_xx
+%comparing areas for both
+sectionshape = true;
+Lfs = 0.01:0.01:1;
+h = 0.15;
 
-b = 0.01:0.01:0.6;
+for idx = 1:length(Lfs)
+[mlf_rec , If_rec , ~ , Af_rec , ~] = lightframes(Lfs,h,b,sectionshape,E,rho);
+end
+sectionshape = false;
+b = 0.02;
+for idx = 1:length(Lfs)
+[mlf_C , If_C , ~ , Af_C , ~] = lightframes(Lfs,h,b,sectionshape,E,rho);
+end
+
+figure
+hold on
+plot(If_rec , Af_rec , LineWidth=2 , DisplayName='Rectangular Section')
+plot(If_C , Af_C , LineWidth=2 , DisplayName='C-Section')
+legend;
+xlabel('Moment of Inertia of Frame')
+ylabel('Required CSA (m^2)')
+hold off
+
+
+h = 0.02:0.01:0.2;
+
+b = 0.02:0.01:0.2;
 
 %nested for loop to iterate for mass
 
@@ -603,26 +726,28 @@ end
 % Surface plot
 figure
 s = surf(H', B', Af); % Use correctly shaped variables
-xlabel('Base Width (b)');
-ylabel('Frame Height (h)');
+ylabel('Base Width (m)');
+xlabel('Frame Height (m)');
 zlabel('Frame Area (Af)');
-title('Frame Area vs. Base Width and Height');
+%title('Frame Area vs. Base Width and Height');
 set(gca,'XDir','reverse','YDir','reverse')
 shading interp; % Smooth shading
-s.EdgeColor = "[0,0,0]";
-colorbar; % Add a color legend
+s.EdgeColor = "k";
+colormap(hot(20));
+%colorbar; 
 
 
 figure
 s = surf(H', B', t); % Use correctly shaped variables
-xlabel('Base Width (b)');
-ylabel('Frame Height (h)');
-zlabel('Frame Thickness (t)');
-title('Frame Thickness vs. Base Width and Height');
+ylabel('Base Width (m)');
+xlabel('Frame Height (m)');
+zlabel('Frame Thickness (m)');
+%title('Frame Thickness vs. Base Width and Height');
 set(gca,'XDir','reverse','YDir','reverse')
 shading interp; % Smooth shading
-s.EdgeColor = "[0,0,0]";
-colorbar; % Add a color legend
+s.EdgeColor = "k";
+colormap(hot(20));
+%colorbar;
 
 
 
@@ -631,12 +756,18 @@ colorbar; % Add a color legend
 
 %total mass calcluation
 %skin
+syms length_fus n_frames
 
-mass_skin = skin_thickness * 2 * pi * R * 77 * density;
+mass_skin = 0.0014 * 2 * pi * 6.34 * 77 * density;
 
 
 %stringers 
-mass_stringers = no_stringer * dA_boom * 
+mass_stringers = no_stringer * A_stringer * 77 * density;
+
+%light frames
+mass_lf = 154 * 100;
+
+total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
 %%
 clear P Q R
@@ -646,19 +777,26 @@ clear P Q R
 %need loads from tailplane, landing gear, and wings
 %spar loads
 
-%wing spar loads
-R_F_A;
-R_R_A;
-R_F_D;
-R_R_D;
+%defining critical point loads
+Landing_gear = 247*10^5;
 
-%wing heavy frame calculation
+Front_Spar = 75.8*10^5;
+Rear_spar = 35.7*10^5;
 
-%front spar frame
-%RFD is maximum
+Horizontal_stabiliser_front = 2.27*10^5;
+Horizontal_stabiliser_rear = 2.27*10^5;
 
-%need to obtain loading locatrions angle wise
-syms theta
+HS_toruqe = T_vs;
+
+
+
+%considering wing spars
+
+
+
+
+
+
 
 
 

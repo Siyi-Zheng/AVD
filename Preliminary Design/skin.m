@@ -35,11 +35,11 @@ flangeWebRatio = 0.3; % ratio of flange length to web height
 n = 5:1: 48;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
-ts= 1:0.1:30;     %stringer thickness
-h = 20:0.5:120;     %stringer web height
+ts= 1:0.2:10;     %stringer thickness
+h = 20:0.5:100;     %stringer web height
 b = c ./ n.* 1000; % mm      % Panel width
 d = h .* flangeWebRatio; % mm  %flange width of stringer
-rib_spacing = 0.5; %vary this after iterations
+rib_spacing = 0.65; %vary this after iterations
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
@@ -152,8 +152,7 @@ Rib_spacing =  0.5; % m
 sigma_f= mxv./sqrt(Rib_spacing./N./(E_T861*10^9))./10^6;
 resultant = sigma_cr - sigma_f
 
-optimal_rib = 0.5;
-%% 
+optimal_rib = 0.65;
 
 % spar
 
@@ -517,12 +516,15 @@ disc_val(disc_val< min_val) = min_val;
 
 end
 %% plot how mass varies with number of stringers
-t2_span_disc= @(n) (N /3.62/ (E_T861*10^9) * ((c/n *1000) / 1000) ^ 2) ^ (1/3) *1000;
-t_e_span =@(n) t2_span_disc + As /(c/n *1000)  ;
+n = 1:1:60;
+t2_span_disc=  (N ./3.62./ (E_T861.*10.^9) .* ((c./n .*1000) ./ 1000) .^ 2) .^ (1/3) .*1000;
+t2_y = N / sigma_y_T861 / 1000;
+           % check for yield
+t_e_span =t2_span_disc + As ./(c./n .*1000);
 % [unique_t_e, stations] = unique(t_e_span);
 
 figure
-fplot(t_e_span, [1 70])
+plot(n, t_e_span)
 
 % stations_r = flip(stations);
 % span_ss= span(stations_r);

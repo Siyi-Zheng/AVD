@@ -36,10 +36,10 @@ n = 5:1: 48;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:30;     %stringer thickness
-h = 20:0.5:120;     %stringer web height
+h = 20:1.5:120;     %stringer web height
 b = c ./ n.* 1000; % mm      % Panel width
 d = h .* flangeWebRatio; % mm  %flange width of stringer
-rib_spacing = 0.5; %vary this after iterations
+rib_spacing = 0.65; %vary this after iterations
 for i = 1:length(n)
     for j=1:length(ts)
         for k = 1:length(h)
@@ -82,7 +82,7 @@ end
 sigma_cr = stressRatio .* sigma_0;
 
 % get the optimal values based on the farrar plot
-[if1, if2, if3] = ind2sub(size(F_factor), find(F_factor>0.7));
+[if1, if2, if3] = ind2sub(size(F_factor), find(F_factor>0.8));
 % Extract values from mass at the found indices
 selectedValues = mass(sub2ind(size(mass), if1, if2, if3));
 
@@ -152,8 +152,7 @@ Rib_spacing =  0.5; % m
 sigma_f= mxv./sqrt(Rib_spacing./N./(E_T861*10^9))./10^6;
 resultant = sigma_cr - sigma_f
 
-optimal_rib = 0.5;
-%% 
+optimal_rib = 0.65;
 
 % spar
 
@@ -517,21 +516,28 @@ disc_val(disc_val< min_val) = min_val;
 
 end
 %% plot how mass varies with number of stringers
-t2_span_disc= @(n) (N /3.62/ (E_T861*10^9) * ((c/n *1000) / 1000) ^ 2) ^ (1/3) *1000;
-t_e_span = t2_span_disc + As ./ ;
-[unique_t_e, stations] = unique(t_e_span);
-stations_r = flip(stations);
-span_ss= span(stations_r);
-l_y_ss= (0.7-0.12).*chord(stations_r);
+n = 1:1:60;
+t2_span_disc=  (N ./3.62./ (E_T861.*10.^9) .* ((c./n .*1000) ./ 1000) .^ 2) .^ (1/3) .*1000;
+t2_y = N / sigma_y_T861 / 1000;
+           % check for yield
+t_e_span =t2_span_disc + As ./(c./n .*1000);
+% [unique_t_e, stations] = unique(t_e_span);
 
+figure
+plot(n, t_e_span)
 
-for jn=1:length(l_y_ss)
-    if jn == length(l_y_ss)
-        area_ss(jn)= 0.5*(l_y_ss(jn) + (0.7-0.12)*chord(end)) *(span(end)-span_ss(jn));
-    else
-        area_ss(jn) = 0.5* (l_y_ss(jn) + l_y_ss(jn+1)) * (span_ss(jn+1)-span(jn));
-    end
-end
-
-volume_ss = sum(area_ss.* (unique_t_e./1000)); %m^3
-skin_stringer_fmass = ((density_T861) .* volume_ss);
+% stations_r = flip(stations);
+% span_ss= span(stations_r);
+% l_y_ss= (0.7-0.12).*chord(stations_r);
+% 
+% 
+% for jn=1:length(l_y_ss)
+%     if jn == length(l_y_ss)
+%         area_ss(jn)= 0.5*(l_y_ss(jn) + (0.7-0.12)*chord(end)) *(span(end)-span_ss(jn));
+%     else
+%         area_ss(jn) = 0.5* (l_y_ss(jn) + l_y_ss(jn+1)) * (span_ss(jn+1)-span(jn));
+%     end
+% end
+% 
+% volume_ss = sum(area_ss.* (unique_t_e./1000)); %m^3
+% skin_stringer_fmass = ((density_T861) .* volume_ss);

@@ -30,7 +30,7 @@ b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 5: 1: 30;   % no of panels
+n = 5: 1: 48;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:0.1:15;     %stringer thickness
@@ -51,7 +51,7 @@ for i = 1:length(n)
             catchpoleX(i,j,k) = As(i,j,k)/ (b(i)* t2(i,j,k)); % y-value to read
              %%optimise using mass
             volume(i,j,k) = n(i) * b(i) * t_e(i,j,k) * rib_spacing *1000;
-            mass(i,j,k) = (density_T861/(1000)^3) * volume(i,j,k);
+            mass(i,j,k) = ((density_T861/(1000)^3) * volume(i,j,k));
         end
     end
 end
@@ -81,49 +81,6 @@ end
 
 sigma_cr = stressRatio .* sigma_0;
 
-% % 3d plot
-% figure
-% F_factor(F_factor <= 0.7) = NaN;
-% for i = 1:length(h)
-%     slice = squeeze(mass(:,:,i));
-%     % mass = squeeze(effectivePanelCSA(:,:,i));
-%     xData = n;
-%     yData = ts;
-%     color = h(i) .* slice' ./ slice';
-%     surf(n, ts, slice', color, "EdgeColor", "none");
-%     % surf(n, ts, mass')
-%     hold on
-% end
-% colormap("turbo")
-% bar = colorbar;
-% bar.Label.String = "Stringer Height (mm)";
-% xlabel("Number of Stringers")
-% ylabel("Stringer Thickness (mm)")
-% zlabel("Mass")
-% 
-% figure;
-% F_factor(F_factor <= 0.7) = NaN;
-% 
-% % Plot the original surface plot
-% for i = 1:length(h)
-%     slice = squeeze(mass(:,:,i)); % Extract mass slice
-%     xData = n;  % Number of stringers
-%     yData = ts; % Stringer thickness
-%     color = 100 .* slice' ./ slice'; % Color mapping based on height
-% 
-%     surf(n, ts, slice', color, "EdgeColor", "none");
-%     hold on;
-% end
-% 
-% colormap("turbo");
-% bar = colorbar;
-% bar.Label.String = "Stringer Height (mm)";
-% xlabel("Number of Stringers");
-% ylabel("Stringer Thickness (mm)");
-% zlabel("Mass");
-
-
-
 % get the optimal values based on the farrar plot
 [if1, if2, if3] = ind2sub(size(F_factor), find(F_factor>0.7));
 % Extract values from mass at the found indices
@@ -131,6 +88,32 @@ selectedValues = mass(sub2ind(size(mass), if1, if2, if3));
 
 % Find the minimum value and its index
 [minValue, minIdx] = min(selectedValues);
+
+% % 3d plot
+figure
+F_factor(F_factor <= 0.7) = NaN;
+for i = 1:length(h)
+    slice = squeeze(mass(:,:,i));
+    % mass = squeeze(effectivePanelCSA(:,:,i));
+    xData = n;
+    yData = ts;
+    color = h(i) .* slice' ./ slice';
+    surf(n, ts, slice', color, "EdgeColor", "none");
+    % surf(n, ts, mass')
+    hold on
+end
+X= xData(if1);
+Y= yData(if2);
+Z = selectedValues;
+scatter3(X, Y, Z, "x")
+
+
+colormap("turbo")
+bar = colorbar;
+bar.Label.String = "Stringer Height (mm)";
+xlabel("Number of Stringers")
+ylabel("Stringer Thickness (mm)")
+zlabel("Mass")
 
 % Get the corresponding row, column, and depth indices
 id1 = if1(minIdx);
@@ -145,6 +128,7 @@ h = h(id3)
 b = c ./ n.* 1000; % mm
 mxv = F_factor(id1, id2, id3)
 
+
 % extract other values at this optimum
 As = As(id1, id2, id3);
 t2 = t2(id1, id2, id3)  ; %skin thickness
@@ -154,14 +138,14 @@ sigma_cr = sigma_cr(id1, id2, id3);
 RATIO1= As/(b*t2)
 RATIO2 = ts / t2
 
-% Rib_spacing =  0.5:0.05:2; % m
-% 
-% sigma_f= mxv./sqrt(Rib_spacing./N./(E_T861*10^9))./10^6;
-% resultant = sigma_cr - sigma_f;
-% [result, index] = min(abs(resultant));
-% 
-% %optimal rib spacing
-% optimal_rib= Rib_spacing(index)
+Rib_spacing =  0.5:0.05:2; % m
+
+sigma_f= mxv./sqrt(Rib_spacing./N./(E_T861*10^9))./10^6;
+resultant = sigma_cr - sigma_f;
+[result, index] = min(abs(resultant));
+
+%optimal rib spacing
+optimal_rib_idk= Rib_spacing(index)
 
 optimal_rib = 0.5;
 
@@ -228,7 +212,7 @@ rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
 %     ./ (2 .* E_T861 .* 1e9 .* (I .^ 2)) ./ 10;
 % t_r = (crush_load ./ chord ./ 3.62 ./ (E_T861 .* 1e9) .* b2 .^ 2) .^ (1/3) .* 1000;
 % rib_thickness = max(minThickness, interp1(span, t_r, rib_list));
-scatter(rib_list, rib_thickness, "kx");
+scatter(rib_list, rib_thickness, 70, "kx");
 area_list = 0.0939 * c_span .^2;
 rib_area_list = [];
 for i = 1:length(rib_list)
@@ -246,7 +230,7 @@ grid on
 rib_spacing_test = 0.2:0.05:1.5; % m %vary this after iterations
 
 number_ribs = (32.5 ./rib_spacing_test) +1;
-t_e_farrar = (1/mxv) .* sqrt(N .* rib_spacing_test./ E_T861); %mm
+t_ e_farrar = (1/mxv) .* sqrt(N .* rib_spacing_test./ E_T861); %mm
 
 volume= n .* b .* (t_e_farrar) .* rib_spacing_test.*1000; %mm^3
 mass_skin_stringer = (((density_T861.* 1e-9) .* volume))  ./(span(end) * c);
@@ -256,12 +240,14 @@ mass_ribs = number_ribs .* ((rib_area_list(1).* rib_thickness(1) ./ 1000) .* den
 total_mass = (mass_skin_stringer + mass_ribs);
 
 figure 
-plot(rib_spacing_test, total_mass)
+plot(rib_spacing_test, total_mass, Linewidth = 1.5)
 hold on
-plot(rib_spacing_test, mass_skin_stringer)
-plot(rib_spacing_test, mass_ribs)
+plot(rib_spacing_test, mass_skin_stringer, Linewidth = 1.5)
+plot(rib_spacing_test, mass_ribs, Linewidth = 1.5)
+xlabel("Rib spacing")
+ylabel("Mass per unit area (Kg/m^2)")
 grid on
-legend('total mass', 'mass skin-stringer', 'mass ribs')
+legend('Total', 'Skin-stringer', 'Ribs')
 hold off
 
 [value, in ]= min(total_mass);
@@ -276,7 +262,7 @@ T = max(abs(M_torque));
 T(721) = [];
 a = rib_thickness; % Web panel spacing, m
 E = E_T861; % Young's Modulus, GPa
-Ks = 7.5; % Read from graph
+Ks = 8.1; % Read from graph
 V = V_x; % Shear Load, N
 q0 = T ./ (2 .* c_span .* b2_span .* 1000); % Torque shear flow, N/mm
 q2 = V ./ (2 .* b2_span .* 1000); % Load shear flow, N/mm
@@ -302,54 +288,83 @@ legend("Theoretical rear spar thickness", "Theoretical front spar thickness", "D
 
 %%%%%%%%%shear flow in skin
 moment_span = M_x;
-b_span = c_span ./ n.* 1000;% skin panel width, mm
+% b_span = c_span ./ n.* 1000;% skin panel width, mm
+b_span = b;
 N_span = moment_span ./ (c_span .* b2_span);
 t2_span= (N_span ./3.62 ./ (E_T861.*10^9) .* (b_span./ 1000) .^ 2) .^ (1/3) .*1000; % mm
-t2_span(t2_span<1) = 1;
+t2_span(t2_span<1) =  1;
 t2_span_disc = discretisation_1mm(t2_span, 1);
 
 %compression-shear combination for stringer and skin
 tau_0 = q0 ./ t2_span; % shear stress, N/mm
 tau_cr = Ks .* E_T861 .* 1e9 .* (t2_span./ b_span) .^ 2 .* 1e-6; % critical shear buckling stress, MPa
 sigma_0_span= N_span ./ (t2_span .* 1000); % MPa
-Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts/t2, As/(b*t2));
+Stress_Ratio_optimal = interp2(Y_grid, X_grid , stressFactors, ts./t2_span, As./(b.*t2_span));
 sigma_cr_span = Stress_Ratio_optimal .* sigma_0_span;
 R_c = sigma_0_span ./ sigma_cr_span; % Compressive stress ratio
 R_s = tau_0 ./ tau_cr; % Shear stress ratio
 val = R_s.^2 + R_c; % combined stress ratio
 
+disp(max(val))
+
 figure
 plot(span, val)
-%% Get the final mass of all components
-t_e_span = t2_span_disc + As ./ b; 
-unique_t2 = unique(t_e_span);
-volume_ss= n .* b .* unique_t2 .*1000; %mm^3
-skin_stringer_fmass = (sum(((density_T861.* 1e-9) .* volume_ss)))*2;
+
+% Get the final mass of all components
+t_e_span = t2_span_disc + As ./ b;
+[unique_t_e, stations] = unique(t_e_span);
+stations_r = flip(stations);
+span_ss= span(stations_r);
+l_y_ss= (0.7-0.12).*chord(stations_r);
+
+
+for jn=1:length(l_y_ss)
+    if jn == length(l_y_ss)
+        area_ss(jn)= 0.5*(l_y_ss(jn) + (0.7-0.12)*chord(end)) *(span(end)-span_ss(jn));
+    else
+        area_ss(jn) = 0.5* (l_y_ss(jn) + l_y_ss(jn+1)) * (span_ss(jn+1)-span(jn));
+    end
+end
+
+volume_ss = sum(area_ss.* (unique_t_e./1000)); %m^3
+skin_stringer_fmass = ((density_T861) .* volume_ss)*2;
+
+% n_span = floor(c_span(stations_r) ./ (b) .*1000)
+% dx= [diff(span_ss), span(end)-span_ss(end)];
+% y_ss = (1-0.41).* chord(stations_r)
+% length_y_ss = [diff(y_ss), y_ss(end)- (1-0.41)*chord(end)]
+% length_ss = sqrt(dx.^2 + length_y_ss.^2)
+% volume_ss= n_span.* b .* unique_t_e .*1000 .* length_ss.*1000 %mm^3
+% masse= (density_T861.* 1e-9) .* volume_ss
+% skin_stringer_fmass = (sum(((density_T861.* 1e-9) .* volume_ss)))*2;
 
 ribs_fmass = main_rib_mass;
 
-[unique_fs, ln ]= (unique(t_FS_dis));
+[unique_fs, ln]= (unique(t_FS_dis));
 length_ln = flip(span(ln));
-kh = 0.12*chord(ln);
+kh = (1-0.12)*chord(ln);
 b2_span_unique = b2_span(ln);
-length_x= [diff(length_ln), span(end)-length_ln(end-1)];
-length_y = [diff(kh), 0.12*chord(end)-kh(end-1)];
-length = sqrt(length_x.^2 + length_y.^2);
+length_x= [diff(length_ln), span(end)-length_ln(end)];
+length_y = [diff(kh), kh(end)-(1-0.12)*chord(end)];
+length_s = sqrt(length_x.^2 + length_y.^2);
 
-volume_FS = unique_fs .* b2_span_unique.*1000 .* length.*1000; %mm^3
-spar_fs_mass = sum((volume_FS).*(density_T861.* 1e-9));
+volume_FS = unique_fs .* b2_span_unique.*1000 .* length_s.*1000; %mm^3
+spar_fs_mass = sum((volume_FS).*(density_H34.* 1e-9));
 
 [unique_rs, lnr]= (unique(t_RS_dis));
 length_lnr = flip(span(lnr));
 b2_span_uniquer = b2_span(lnr);
-khr = 0.7*chord(lnr);
-lengthr_x = [diff(length_lnr), span(end)-length_lnr(end-1)];
-lengthr_y = [diff(khr), 0.7* chord(end)-kh(end-1)];
+khr = (1-0.7)*chord(lnr);
+lengthr_x = [diff(length_lnr), span(end)-length_lnr(end)];
+lengthr_y = [diff(khr), khr(end)-(1-0.7)* chord(end)];
 lengthr = sqrt(lengthr_x.^2 + lengthr_y.^2);
 volume_RS = unique_rs .* b2_span_uniquer .*1000 .* lengthr.*1000;
-spar_rs_mass = sum((volume_RS).*(density_T861.* 1e-9));
+spar_rs_mass = sum((volume_RS).*(density_H34.* 1e-9));
 
 spar_mass = spar_fs_mass + spar_rs_mass;
+
+mass_fuck = ribs_fmass + skin_stringer_fmass + spar_mass
+disp(mass_fuck)
 %% 
 
 span_old_var = span; % so it doesn't get overwritten

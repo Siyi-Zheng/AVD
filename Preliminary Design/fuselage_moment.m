@@ -106,8 +106,9 @@ fsurf(I_func, [1e-2 10e-2 5e-2 20e-2]);
 xlabel('h_{web} (Height of Web)');
 ylabel('w_{flange} (Width of Flange)');
 zlabel('I (Moment of Inertia)');
-title(['Moment of Inertia with t_{stringer} = ', num2str(t_fixed)];
+title(sprintf('Moment of Inertia with t_{stringer} = %.1g mm', t_fixed*1000));
 colorbar;
+colormap(hot(20));
 shading interp;
 
 %%

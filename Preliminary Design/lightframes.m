@@ -13,25 +13,25 @@ Cf = 1/16000; % empirical based off work performed by Lockheed Martin and Shanle
 M_ult = 1.6e7;
 
 %set a fixed IF_xx
-If = (Cf * M_ult * D^2) / (E * Lfs);
+If = (Cf * M_ult * D^2) ./ (E * Lfs);
 
 
 %C design or rectangular design (delete as needed)
 %syms t;
 %syms b;
 %syms h;
-
 if sectionshape == true
     b = ((If * 12) / h^3);
     Af = b * h;
+    t = b;
 else
-    t = If / ((h^3/12) + (0.5 * b * h^2));
+    t = If ./ ((h^3/12) + (0.5 * b * h^2));
     Af = (2 * b + h) * t;
 end
 
-nf = 51.6/Lfs;
+nf = 51.6./Lfs;
 
 %calculating total frame mass
-mlf = rho * (Af * pi * D) * nf;
+mlf = rho * (Af * pi * D) .* nf;
 
 end

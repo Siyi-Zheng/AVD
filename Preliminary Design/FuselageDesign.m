@@ -5,7 +5,7 @@ clc
 
 %%
 %selected material properites (probably going to change this!!)
-sigma_y = 431*10^6;
+sigma_y = 378*10^6;
 E = 73850000000;
 G = 28700000000;
 density = 2765;
@@ -417,34 +417,36 @@ long_stress = (P * D) / (4 * 0.0013);
 D_th = D/(2*0.001);
 D_tl = D/(4*0.001);
 
-sigma_allow = 210*10^6;
+sigma_allow = sigma_y/1.5;
 
 skint_required = (P * D) / (2 * sigma_allow);
 
-stress_ratio = sigma_allow/P;
+stress_ratio = sigma_allow;
 
 stress_h = D_th * P;
 stress_l = D_tl * P;
 
+%{
 %check stress is below maximum allowable stress
 assert(stress_h < (sigma_allow), 'Error: stress is too high');
 assert(stress_l < (sigma_allow), 'Error: stress is too high');
-
+%}
 
 %getting hemispherical ends
 thickness_ratio = (2-v)/(1-v);
 
 hemispherical_thickness = skint_required / thickness_ratio;
 
+total_skin_t = skint_required + skin_thickness;
 
 %%
 % Stringer and Direct Stress
 
 no_stringer = 77; % number of stringers
-A_stringer = 5.80162795540503e-05; % one stringer area (m^2)
-Lfs = 0.955094414422828; % light frame separation
+A_stringer = 0.0001; % one stringer area (m^2)
+Lfs = 0.499; % light frame separation
 
-t_skin = 1.47e-3; % skin thickness (m)
+t_skin = total_skin_t; % skin thickness (m)
 moment_x = max_bending; % bending moment about x (Nm)
 moment_y = 10; % bending moment about y (Nm)
 d_fuslg = 6.3; % fuselage diameter (m)
@@ -626,11 +628,11 @@ objective = @(x) mass_function(x(1), x(2), x(3));  % x = [no_stringer, A_stringe
 constraint = @(x) fuslg_constraints(x);  
 
 % Set initial guesses [no_stringer, A_stringer, Lfs]
-x0 = [150, 400e-6, 0.8];
+x0 = [150, 400e-6, 0.4];
 
 % Define bounds [no_stringer, A_stringer, Lfs]
 lb = [50, 58e-6, 0.04]; 
-ub = [400, 1450e-6, 2.97]; 
+ub = [400, 1450e-6, 0.5]; 
 
 intcon = 1; 
 
@@ -664,9 +666,35 @@ shapefactor = false;
 
 %range for h
 
+%section shape consideration
+% for a fixed I_xx
+%comparing areas for both
+sectionshape = true;
+Lfs = 0.01:0.01:1;
+h = 0.15;
+
+for idx = 1:length(Lfs)
+[mlf_rec , If_rec , ~ , Af_rec , ~] = lightframes(Lfs,h,b,sectionshape,E,rho);
+end
+sectionshape = false;
+b = 0.02;
+for idx = 1:length(Lfs)
+[mlf_C , If_C , ~ , Af_C , ~] = lightframes(Lfs,h,b,sectionshape,E,rho);
+end
+
+figure
+hold on
+plot(If_rec , Af_rec , LineWidth=2 , DisplayName='Rectangular Section')
+plot(If_C , Af_C , LineWidth=2 , DisplayName='C-Section')
+legend;
+xlabel('Moment of Inertia of Frame')
+ylabel('Required CSA (m^2)')
+hold off
+
+
 h = 0.02:0.01:0.2;
 
-b = 0.02:0.01:0.6;
+b = 0.02:0.01:0.2;
 
 %nested for loop to iterate for mass
 
@@ -687,6 +715,7 @@ for idx = 1:length(b)
     end
 end
 
+[mass , I_xxs , nf , Af , t] = lightframes(Lfs , )
 
 
 %finding minimum mass for optimal frame seperation and shape
@@ -698,26 +727,28 @@ end
 % Surface plot
 figure
 s = surf(H', B', Af); % Use correctly shaped variables
-xlabel('Base Width (b)');
-ylabel('Frame Height (h)');
+ylabel('Base Width (m)');
+xlabel('Frame Height (m)');
 zlabel('Frame Area (Af)');
-title('Frame Area vs. Base Width and Height');
+%title('Frame Area vs. Base Width and Height');
 set(gca,'XDir','reverse','YDir','reverse')
 shading interp; % Smooth shading
-s.EdgeColor = "[0,0,0]";
-colorbar; % Add a color legend
+s.EdgeColor = "k";
+colormap(hot(20));
+%colorbar; 
 
 
 figure
 s = surf(H', B', t); % Use correctly shaped variables
-xlabel('Base Width (b)');
-ylabel('Frame Height (h)');
-zlabel('Frame Thickness (t)');
-title('Frame Thickness vs. Base Width and Height');
+ylabel('Base Width (m)');
+xlabel('Frame Height (m)');
+zlabel('Frame Thickness (m)');
+%title('Frame Thickness vs. Base Width and Height');
 set(gca,'XDir','reverse','YDir','reverse')
 shading interp; % Smooth shading
-s.EdgeColor = "[0,0,0]";
-colorbar; % Add a color legend
+s.EdgeColor = "k";
+colormap(hot(20));
+%colorbar;
 
 
 
@@ -728,14 +759,14 @@ colorbar; % Add a color legend
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.00146 * 2 * pi * 6.34 * 77 * density;
+mass_skin = 0.0014 * pi * 6.34 * 77 * density;
 
 
 %stringers 
-mass_stringers = no_stringer * dA_boom(1) * 77;
+mass_stringers = no_stringer * A_stringer * 77 * density;
 
 %light frames
-mass_lf = 77 * 200;
+mass_lf = 0.0024 * density * pi * 6.34 * (77/0.5);
 
 total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
@@ -748,7 +779,23 @@ clear P Q R
 %spar loads
 
 %defining critical point loads
-Landing_gear = 247*e^5;
+Landing_gear = 247*10^5;
+
+Front_Spar = 75.8*10^5;
+Rear_spar = 35.7*10^5;
+
+Horizontal_stabiliser_front = 2.27*10^5;
+Horizontal_stabiliser_rear = 2.27*10^5;
+
+HS_toruqe = T_vs;
+
+
+
+%considering wing spars
+
+
+
+
 
 
 

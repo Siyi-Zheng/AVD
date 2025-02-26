@@ -435,8 +435,8 @@ hemispherical_thickness = skin_thickness / thickness_ratio;
 % Stringer and Direct Stress
 
 no_stringer = 77; % number of stringers
-A_stringer = 5.80162795540503e-05; % one stringer area (m^2)
-Lfs = 0.955094414422828; % light frame separation
+A_stringer = 0.0001; % one stringer area (m^2)
+Lfs = 0.499; % light frame separation
 
 t_skin = 2e-3; % skin thickness (m)
 moment_x = max_bending; % bending moment about x (Nm)
@@ -620,11 +620,11 @@ objective = @(x) mass_function(x(1), x(2), x(3));  % x = [no_stringer, A_stringe
 constraint = @(x) fuslg_constraints(x);  
 
 % Set initial guesses [no_stringer, A_stringer, Lfs]
-x0 = [150, 400e-6, 0.8];
+x0 = [150, 400e-6, 0.4];
 
 % Define bounds [no_stringer, A_stringer, Lfs]
 lb = [50, 58e-6, 0.04]; 
-ub = [400, 1450e-6, 2.97]; 
+ub = [400, 1450e-6, 0.5]; 
 
 intcon = 1; 
 

@@ -10,6 +10,7 @@ E = 73850000000;
 G = 28700000000;
 density = 2765;
 v = 0.3365;
+tau_y = sigma_y/sqrt(3);
 
 %%
 %load calculation
@@ -410,9 +411,9 @@ P = Pi - Po;
 %fuselage is perfect cylinder with diameter 
 D = 6.34;
 
-hoop_stress = (P * D) / (2 * 0.0013);
+stress_hoop = (P * D) / (2 * 0.0015);
 
-long_stress = (P * D) / (4 * 0.0013);
+stress_long = (P * D) / (4 * 0.0015);
 
 D_th = D/(2*0.001);
 D_tl = D/(4*0.001);
@@ -438,6 +439,9 @@ thickness_ratio = (2-v)/(1-v);
 hemispherical_thickness = skint_required / thickness_ratio;
 
 total_skin_t = skint_required + skin_thickness;
+
+%calculate stress using 1.5 mil
+stress = P * D / 2 * 0.0015;
 
 %%
 % Stringer and Direct Stress
@@ -665,7 +669,7 @@ shapefactor = false;
 %Lfs = 0.1:0.1:10;
 
 %range for h
-
+%{
 %section shape consideration
 % for a fixed I_xx
 %comparing areas for both
@@ -690,7 +694,7 @@ legend;
 xlabel('Moment of Inertia of Frame')
 ylabel('Required CSA (m^2)')
 hold off
-
+%}
 
 h = 0.02:0.01:0.2;
 
@@ -715,7 +719,6 @@ for idx = 1:length(b)
     end
 end
 
-[mass , I_xxs , nf , Af , t] = lightframes(Lfs , )
 
 
 %finding minimum mass for optimal frame seperation and shape
@@ -759,14 +762,14 @@ colormap(hot(20));
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.0014 * pi * 6.34 * 77 * density;
+mass_skin = 0.002 * pi * 6.34 * 77 * density;
 
 
 %stringers 
-mass_stringers = no_stringer * A_stringer * 77 * density;
+mass_stringers = 126 * 2.04*10^-5 * 77 * density;
 
 %light frames
-mass_lf = 0.0024 * density * pi * 6.34 * (77/0.5);
+mass_lf = 0.000228 * density * pi * 6.34 * (77/0.5);
 
 total_fuselage_mass = mass_skin + mass_stringers + mass_lf;
 
@@ -792,9 +795,269 @@ HS_toruqe = T_vs;
 
 
 %considering wing spars
+Loads = [...
+    33.25, 30.5, 22.5, 0;  % Front Wing Spar
+    40.57, 14.4, 10.6, 0;  % Rear Wing Spar
+    38.86, 67.8, 103.2, 0;  % Landing Gear
+    71.00, 1.91, 1.24, 0;  % Horizontal Stabiliser
+    71.18, 1.885, 0, 22.3];  % Vertical Stabiliser
+
+%calculating WISE plots for each
+
+Loads = Loads * 10^5;
+
+%front spar wing 
+[M_fs1 , N_fs1 , S_fs1 , ~] = heavyframes(Loads(1,2) , Loads(1,3) , Loads(1,4));
+
+[M_fs2 , N_fs2 , S_fs2 , theta] = heavyframes(Loads(1,2) , Loads(1,3) , Loads(1,4));
+
+%correct frame of reference
+[M_fs1new , N_fs1new , S_fs1new] = anglechange(M_fs1 , N_fs1 , S_fs1 , 53.6);
+[M_fs2new , N_fs2new , S_fs2new] = anglechange(M_fs2 , N_fs2 , S_fs2 , (360-53.6));
+
+%superpose both loads
+M_fs = M_fs1new + M_fs2new;
+N_fs = N_fs1new + N_fs2new;
+S_fs = S_fs1new + S_fs2new;
+
+theta = theta * (180/pi);
+
+%or doing it with both loads assumed to act at the same point
+M_fscst = M_fs1 + M_fs2;
+N_fscst = N_fs1 + N_fs2;
+S_fscst = S_fs1 + S_fs2;
+
+
+figure
+hold on
+plot(theta , M_fs , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_fs , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_fs , LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+figure
+hold on
+plot(theta , M_fscst , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_fscst , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_fscst , LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+
+%rear spar wing 
+[M_rs1 , N_rs1 , S_rs1 , ~] = heavyframes(Loads(2,2) , Loads(2,3) , Loads(2,4));
+
+[M_rs2 , N_rs2 , S_rs2 , ~] = heavyframes(Loads(2,2) , Loads(2,3) , Loads(2,4));
+
+%correct frame of reference
+[M_rs1new , N_rs1new , S_rs1new] = anglechange(M_rs1 , N_rs1 , S_rs1 , 53.6);
+[M_rs2new , N_rs2new , S_rs2new] = anglechange(M_rs2 , N_rs2 , S_rs2 , (360-53.6));
+
+%superpose both loads
+M_rs = M_rs1new + M_rs2new;
+N_rs = N_rs1new + N_rs2new;
+S_rs = S_rs1new + S_rs2new;
+
+%or doing it with both loads assumed to act at the same point
+M_rscst = M_rs1 + M_rs2;
+N_rscst = N_rs1 + N_rs2;
+S_rscst = S_rs1 + S_rs2;
+
+figure
+hold on
+plot(theta , M_rs , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_rs , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_rs , LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+figure
+hold on
+plot(theta , M_rscst , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_rscst , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_rscst , LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+
+%landing gear 
+[M_lg1 , N_lg1 , S_lg1 , ~] = heavyframes(Loads(3,2) , Loads(3,3) , Loads(3,4));
+
+[M_lg2 , N_lg2 , S_lg2 , ~] = heavyframes(Loads(3,2) , Loads(3,3) , Loads(3,4));
+
+%correct frame of reference
+[M_lg1new , N_lg1new , S_lg1new] = anglechange(M_lg1 , N_lg1 , S_lg1 , 33.3);
+[M_lg2new , N_lg2new , S_lg2new] = anglechange(M_lg2 , N_lg2 , S_lg2 , (360-33.3));
+
+%superpose both loads
+M_lg = M_lg1new + M_lg2new;
+N_lg = N_lg1new + N_lg2new;
+S_lg = S_lg1new + S_lg2new;
+
+
+%or doing it with both loads assumed to act at the same point
+M_lgcst = M_lg1 + M_lg2;
+N_lgcst = N_lg1 + N_lg2;
+S_lgcst = S_lg1 + S_lg2;
+
+
+figure
+hold on
+plot(theta , M_lg , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_lg , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_lg , LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+figure
+hold on
+plot(theta , M_lgcst, LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_lgcst, LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_lgcst, LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
 
 
 
+%Horizontal Stabiliser 
+[M_hs1 , N_hs1 , S_hs1 , ~] = heavyframes(Loads(4,2) , Loads(4,3) , Loads(4,4));
+
+[M_hs2 , N_hs2 , S_hs2 , ~] = heavyframes(Loads(4,2) , Loads(4,3) , Loads(4,4));
+
+%correct frame of reference
+[M_hs1new , N_hs1new , S_hs1new] = anglechange(M_hs1 , N_hs1 , S_hs1 , (180-57.1));
+[M_hs2new , N_hs2new , S_hs2new] = anglechange(M_hs2 , N_hs2 , S_hs2 , (180+57.1));
+
+%superpose both loads
+M_hs = M_hs1new + M_hs2new;
+N_hs = N_hs1new + N_hs2new;
+S_hs = S_hs1new + S_hs2new;
+
+
+%or doing it with both loads assumed to act at the same point
+M_hscst = M_hs1 + M_hs2;
+N_hscst = N_hs1 + N_hs2;
+S_hscst = S_hs1 + S_hs2;
+
+
+
+figure
+hold on
+plot(theta , M_hs , LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_hs , LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_hs ,  LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+figure
+hold on
+plot(theta , M_hscst ,  LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_hscst ,  LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_hscst ,  LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+
+
+
+%vertical Stabiliser 
+[M_vs1 , N_vs1 , S_vs1 , ~] = heavyframes(Loads(5,2) , Loads(5,3) , Loads(5,4));
+
+
+%correct frame of reference
+[M_vs1new , N_vs1new , S_vs1new] = anglechange(M_vs1 , N_vs1 , S_vs1 , (180));
+
+%superpose both loads
+M_vs = M_vs1new ;
+N_vs = N_vs1new ;
+S_vs = S_vs1new ;
+
+
+%or doing it with both loads assumed to act at the same point
+M_vscst = M_vs1;
+N_vscst = N_vs1;
+S_vscst = S_vs1;
+
+
+
+figure
+hold on
+plot(theta , M_vs ,  LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_vs ,  LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_vs ,  LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+legend;
+hold off
+
+figure
+hold on
+plot(theta , M_vscst ,  LineWidth=1.5 , DisplayName='Moment')
+plot(theta , N_vscst,  LineWidth=1.5 , DisplayName='Normal Force')
+plot(theta , S_vscst ,  LineWidth=1.5 , DisplayName='Shear Force')
+legend;
+xlabel('Circumferential location (degrees)')
+ylabel('Load (NM or N)')
+hold off
+
+%obtaining maximum loads in each case
+Max_M_fs = max(M_fs);
+Max_M_fsc = max(M_fscst);
+Max_N_fs = max(N_fs);
+Max_N_fsc = max(N_fscst);
+Max_S_fs = max(S_fs);
+Max_S_fsc = max(S_fscst);
+
+Max_M_rs = max(M_rs);
+Max_M_rsc = max(M_rscst);
+Max_N_rs = max(N_rs);
+Max_N_rsc = max(N_rscst);
+Max_S_rs = max(S_rs);
+Max_S_rsc = max(S_rscst);
+
+Max_M_lg = max(M_lg);
+Max_M_lg = max(M_lgcst);
+Max_N_lg = max(N_lg);
+Max_N_lg = max(N_lgcst);
+Max_S_lg = max(S_lg);
+Max_S_lg = max(S_lgcst);
+
+Max_M_hs = max(M_hs);
+Max_M_hs = max(M_hscst);
+Max_N_hs = max(N_hs);
+Max_N_hs = max(N_hscst);
+Max_S_hs = max(S_hs);
+Max_S_hs = max(S_hscst);
+
+Max_M_vs = max(M_vs);
+Max_M_vs = max(M_vscst);
+Max_N_vs = max(N_vs);
+Max_N_vs = max(N_vscst);
+Max_S_vs = max(S_vs);
+Max_S_vs = max(S_vscst);
+
+
+%required section areas
+
+%front spar
 
 
 

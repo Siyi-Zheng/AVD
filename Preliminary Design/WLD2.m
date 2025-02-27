@@ -259,7 +259,7 @@ for i=1:4
         % temp1 = dL(i,j:length(span));
         % temp2 = dW_total(i,j:length(span));
         m_0w(i,j) = 0.5* rho * v(i)^2 * chord(j)^2 * Cmoairf; 
-        dM(i,j) = dL(i,j)* (flexAxis_change(i,j) - x_quart(i,j))+dD(i,j) * 0 - dW_total(i,j) *(flexAxis_change(i,j) - cg_variation(i,j)) + m_0w(i,j);
+        dM(i,j) = (dL(i,j)* (flexAxis_change(i,j) - x_quart(i,j))+dD(i,j) * 0 - dW_total(i,j) *(flexAxis_change(i,j) - cg_variation(i,j)) - m_0w(i,j));
 
     end
 end

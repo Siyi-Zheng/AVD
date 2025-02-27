@@ -91,20 +91,10 @@ plot(x, te_new, 'k-', 'LineWidth', 1)
 for i = 1:length(rib_list)
     loc = rib_list(i);
     if loc < max(x)
-        ribFore = interp1(x, front_spar, loc);
+        ribFore = interp1(x, le_new, loc);
         ribAft = interp1(x, te_new, loc);
         plot([loc loc], [ribFore ribAft], "k-")
     end
-end
-
-% plot pseudoribs
-num_pribs = 24;
-prib_loc = linspace(2.55, 32.5, num_pribs);
-for i = 1:length(prib_loc)
-    loc = prib_loc(i);
-    ribFore = interp1(x, le_new, loc);
-    ribAft = interp1(x, front_spar, loc);
-    plot([loc loc], [ribFore ribAft], "k-")
 end
 
 xlim([0 35])

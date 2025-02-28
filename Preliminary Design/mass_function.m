@@ -1,12 +1,11 @@
-function mass = mass_function(no_stringer, A_stringer, Lfs)
+function mass = mass_function(no_stringer, A_stringer, Lfs, t_skin)
     % Constants
-    l_plane = 77.8;      
-    t_skin = 2e-3;    
+    l_plane = 77.8;         
     d_fuslg = 6.34;  
     circum_fuslg = pi*d_fuslg;
 
     % Compute Af_min from fuslg_failure
-    [~, ~, ~, Af_min] = fuslg_failure(no_stringer, A_stringer, Lfs);
+    [~, ~, ~, Af_min] = fuslg_failure(no_stringer, A_stringer, Lfs, t_skin);
 
     % Compute mass
     mass = 2765*l_plane * t_skin * circum_fuslg + ...

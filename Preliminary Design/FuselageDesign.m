@@ -778,7 +778,7 @@ mass_stringers = no_stringer * A_stringer * 77 * density
 %light frames
 mass_lf = 0.00024 * density * pi * 6.34 * (77/0.5)
 
-total_fuselage_mass = mass_skin + mass_stringers + mass_lf + total_heavy_frame_mass;
+total_fuselage_mass = mass_skin + mass_stringers + mass_lf
 
 %%
 clear P Q R
@@ -841,7 +841,7 @@ plot(theta , M_fs , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_fs , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_fs , LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from bottom of fuselage (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
@@ -851,11 +851,11 @@ plot(theta , M_fscst , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_fscst , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_fscst , LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from loading point (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
-%%
+
 %rear spar wing 
 [M_rs1 , N_rs1 , S_rs1 , ~] = heavyframes(Loads(2,2) , Loads(2,3) , Loads(2,4));
 
@@ -881,7 +881,7 @@ plot(theta , M_rs , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_rs , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_rs , LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from bottom of fuselage (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
@@ -891,11 +891,11 @@ plot(theta , M_rscst , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_rscst , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_rscst , LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from loading point (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
-%%
+
 %landing gear 
 [M_lg1 , N_lg1 , S_lg1 , ~] = heavyframes(Loads(3,2) , Loads(3,3) , Loads(3,4));
 
@@ -923,7 +923,7 @@ plot(theta , M_lg , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_lg , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_lg , LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from bottom of fuselage (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
@@ -933,12 +933,12 @@ plot(theta , M_lgcst, LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_lgcst, LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_lgcst, LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location  from loading point (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
 
-%%
+
 %Horizontal Stabiliser 
 [M_hs1 , N_hs1 , S_hs1 , ~] = heavyframes(Loads(4,2) , Loads(4,3) , Loads(4,4));
 
@@ -967,7 +967,7 @@ plot(theta , M_hs , LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_hs , LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_hs ,  LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from bottom of fuselage (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
@@ -977,13 +977,13 @@ plot(theta , M_hscst ,  LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_hscst ,  LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_hscst ,  LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from loading point (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
 
 
-%%
+
 %vertical Stabiliser 
 [M_vs1 , N_vs1 , S_vs1 , ~] = heavyframes(Loads(5,2) , Loads(5,3) , Loads(5,4));
 
@@ -1010,7 +1010,7 @@ plot(theta , M_vs ,  LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_vs ,  LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_vs ,  LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from bottom of fuselage (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 legend;
 hold off
@@ -1021,11 +1021,10 @@ plot(theta , M_vscst ,  LineWidth=1.5 , DisplayName='Moment')
 plot(theta , N_vscst,  LineWidth=1.5 , DisplayName='Normal Force')
 plot(theta , S_vscst ,  LineWidth=1.5 , DisplayName='Shear Force')
 legend;
-xlabel('Circumferential location from loading point (degrees)')
+xlabel('Circumferential location (degrees)')
 ylabel('Load (NM or N)')
 hold off
 
-%%
 %obtaining maximum loads in each case
 Max_M_fs = max(M_fs);
 Max_M_fsc = max(M_fscst);
@@ -1042,112 +1041,30 @@ Max_S_rs = max(S_rs);
 Max_S_rsc = max(S_rscst);
 
 Max_M_lg = max(M_lg);
-Max_M_lgc = max(M_lgcst);
+Max_M_lg = max(M_lgcst);
 Max_N_lg = max(N_lg);
-Max_N_lgc = max(N_lgcst);
+Max_N_lg = max(N_lgcst);
 Max_S_lg = max(S_lg);
-Max_S_lgc = max(S_lgcst);
+Max_S_lg = max(S_lgcst);
 
 Max_M_hs = max(M_hs);
-Max_M_hsc = max(M_hscst);
+Max_M_hs = max(M_hscst);
 Max_N_hs = max(N_hs);
-Max_N_hsc = max(N_hscst);
+Max_N_hs = max(N_hscst);
 Max_S_hs = max(S_hs);
-Max_S_hsc = max(S_hscst);
+Max_S_hs = max(S_hscst);
 
 Max_M_vs = max(M_vs);
-Max_M_vsc = max(M_vscst);
+Max_M_vs = max(M_vscst);
 Max_N_vs = max(N_vs);
-Max_N_vsc = max(N_vscst);
+Max_N_vs = max(N_vscst);
 Max_S_vs = max(S_vs);
-Max_S_vsc = max(S_vscst);
+Max_S_vs = max(S_vscst);
 
 
-%required section areas and calculating profiles
+%required section areas
 
 %front spar
-A1_fs = Max_N_fsc / sigma_y;
-A2_fs = Max_S_fsc / tau_y;
-I_min_fs = Max_M_fsc * h/ (2 * sigma_y);
-
-
-%rear spar
-A1_rs = Max_N_rsc / sigma_y;
-A2_rs = Max_S_rsc / tau_y;
-I_min_fs = Max_M_rsc * h/ (2 * sigma_y);
-
-%landing gear
-A1_lg = Max_N_lgc / sigma_y;
-A2_lg = Max_S_lgc / tau_y;
-I_min_lg = Max_M_lgc * h/ (2 * sigma_y);
-
-%horizontal stabiliser
-A1_hs = Max_N_hsc / sigma_y;
-A2_hs = Max_S_hsc / tau_y;
-I_min_hs = Max_M_hsc * h/ (2 * sigma_y);
-
-%vertical stabiliser
-A1_vs = Max_N_vsc / sigma_y;
-A2_vs = Max_S_vsc / tau_y;
-I_min_vs = Max_M_vsc * h/ (2 * sigma_y);
-
-%iterating for landing gear frames
-%area array
-A_lg = zeros(length(t_f) , length(t_w));
-I_lg = zeros(length(t_f) , length(t_w));
-
-
-%%
-
-%front spar section (adjusted until area is satisfied)
-h = 0.144;
-b = 0.116;
-t = 0.028;
-
-[A_fs , I_fs] = Isection(t , b , h);
-
-mass_fs = A_fs * pi * D * density;
-
-
-%rear spar section 
-h = 0.144;
-b = 0.095;
-t = 0.015;
-
-[A_rs , I_rs] = Isection(t , b , h);
-
-mass_rs = A_rs * pi * D * density;
-
-%landing gear section 
-h = 0.144;
-b = 0.25;
-t = 0.04;
-
-[A_lg , I_lg] = Isection(t , b , h);
-
-mass_lg = A_lg * pi * D * density;
-
-%Horizontal stabiliser section 
-h = 0.144;
-b = 0.055;
-t = 0.0023;
-
-[A_hs , I_hs] = Isection(t , b , h);
-
-mass_hs = A_hs * pi * D * density;
-
-%vertical stabiliser section 
-h = 0.144;
-b = 0.116;
-t = 0.014;
-
-[A_vs , I_vs] = Isection(t , b , h);
-
-mass_vs = A_vs * pi * D * density;
-
-total_heavy_frame_mass = mass_fs + mass_rs + mass_lg + mass_hs + mass_vs;
-
-
 
 
 

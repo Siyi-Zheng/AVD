@@ -36223,3 +36223,38 @@ mdb.jobs['Job-2']._Message(COMPLETED, {'message': 'Analysis phase complete',
 mdb.jobs['Job-2']._Message(JOB_COMPLETED, {'time': 'Mon Feb 24 21:48:25 2025', 
     'jobName': 'Job-2'})
 # Save by bgbg0 on 2025_02_24-21.53.57; build 2024 2023_09_21-13.55.25 RELr426 190762
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+del mdb.models['Model-1'].parts['Part-1']
+del mdb.models['Model-1'].boundaryConditions['BC-1']
+mdb.models['Model-1'].rootAssembly.Set(faces=
+    mdb.models['Model-1'].rootAssembly.instances['merged-1'].faces.getSequenceFromMask(
+    ('[#0:5 #4 ]', ), ), name='Set-62')
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, buckleCase=
+    PERTURBATION_AND_BUCKLING, createStepName='load', distributionType=UNIFORM, 
+    fieldName='', fixed=OFF, localCsys=None, name='close hole', region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-62'], u1=0.0, u2=0.0, u3=UNSET
+    , ur1=0.0, ur2=0.0, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.Set(faces=
+    mdb.models['Model-1'].rootAssembly.instances['merged-1'].faces.getSequenceFromMask(
+    ('[#0:4 #8000000 ]', ), ), name='Set-63')
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, buckleCase=
+    PERTURBATION_AND_BUCKLING, createStepName='load', distributionType=UNIFORM, 
+    fieldName='', fixed=OFF, localCsys=None, name='far hole', region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-63'], u1=0.0, u2=0.0, u3=UNSET
+    , ur1=0.0, ur2=0.0, ur3=UNSET)
+mdb.models['Model-1'].boundaryConditions['close hole'].setValues(buckleCase=
+    PERTURBATION_AND_BUCKLING, u3=0.0)
+mdb.jobs['Job-2'].submit(consistencyChecking=OFF)
+# Save by bgbg0 on 2025_02_27-19.23.53; build 2024 2023_09_21-13.55.25 RELr426 190762

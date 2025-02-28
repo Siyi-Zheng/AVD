@@ -32,10 +32,10 @@ b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 10:2:60;   % no of panels
+n = 10:2:50;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
-ts= 5:1:50;     %stringer thickness
+ts= 1:1:15;     %stringer thickness
 h = 20:5:200;     %stringer web height
 b = c ./ n.* 1000; % mm      % Panel width
 d = h .* flangeWebRatio; % mm  %flange width of stringer
@@ -90,39 +90,38 @@ selectedValues = mass(sub2ind(size(mass), if1, if2, if3));
 % Find the minimum value and its index
 [minValue, minIdx] = min(selectedValues);
 
-% % % 3d plot
-% figure
-% F_factor(F_factor <= 0.7) = NaN;
-% for i = 1:length(h)
-%     slice = squeeze(mass(:,:,i));
-%     % mass = squeeze(effectivePanelCSA(:,:,i));
-%     xData = n;
-%     yData = ts;
-%     color = h(i) .* slice' ./ slice';
-%     surf(n, ts, slice', color, "EdgeColor", "none");
-%     % surf(n, ts, mass')
-%     hold on
-% end
-% X= xData(if1);
-% Y= yData(if2);
-% Z = selectedValues;
-% scatterHandle = scatter3(X, Y, Z, "x", 'DisplayName', 'Farrar factors > 0.7');
-% colormap("turbo")
-% bar = colorbar;
-% bar.Label.String = "Stringer Height (mm)";
-% xlabel("Number of Stringers")
-% ylabel("Stringer Thickness (mm)")
-% zlabel("Mass near the (Kg)")
-% 
+% % 3d plot
+% get optimal n surface
+id1 = if1(minIdx);
+n = n(id1)
+
+figure
+F_factor(F_factor <= 0.7) = NaN;
+slice = squeeze(mass(id1,:,:));
+% mass = squeeze(effectivePanelCSA(:,:,i));
+xData = ts;
+yData = h;
+color = slice';
+surf(ts, h, slice', color, "EdgeColor", "none");
+% surf(n, ts, mass')
+hold on
+X= xData(if2);
+Y= yData(if3);
+Z = selectedValues;
+scatterHandle = scatter3(X, Y, Z, ".", 'DisplayName', 'Farrar factors > 0.7', "MarkerEdgeColor",[0 0.5 1]);
+colormap("hot")
+xlabel("Stringer Thickness (mm)")
+ylabel("Stringer Height (mm)")
+zlabel("Mass near the first wing box (kg)")
+legend(scatterHandle, "F ≥ 0.7")
+
 % legend(scatterHandle)
 % Get the corresponding row, column, and depth indices
-id1 = if1(minIdx);
 id2 = if2(minIdx);
 id3 = if3(minIdx);
 % new_mass= mass([if1, if2, if3])
 % [mxv, idx] = min(mass(:));
 % [id1, id2, id3] = ind2sub(size(F_factor), idx);
-n = n(id1)
 ts = ts(id2)
 h = h(id3)
 b = c ./ n.* 1000; % mm

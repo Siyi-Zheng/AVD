@@ -3,12 +3,13 @@ function [c, ceq] = fuslg_constraints(x)
     no_stringer = round(x(1));
     A_stringer = x(2);
     Lfs = x(3);
+    t_skin = x(4);
 
     % Constants
     sig_yield = 431e6;
 
     % Get values from fuslg_failure
-    [sig_skin, sig_euler, sig_max, ~] = fuslg_failure(no_stringer, A_stringer, Lfs);
+    [sig_skin, sig_euler, sig_max, ~] = fuslg_failure(no_stringer, A_stringer, Lfs, t_skin);
 
     % Define inequality constraints (should be ≤ 0)
     c = [

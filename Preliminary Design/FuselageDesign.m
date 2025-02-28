@@ -446,11 +446,11 @@ stress = P * D / 2 * 0.0015;
 %%
 % Stringer and Direct Stress
 
-no_stringer = 77; % number of stringers
-A_stringer = 0.0001; % one stringer area (m^2)
-Lfs = 0.499; % light frame separation
+no_stringer = 103; % number of stringers
+A_stringer = 52e-6; % one stringer area (m^2)
+Lfs = 0.60; % light frame separation
+t_skin = 0.0015; % skin thickness (m)
 
-t_skin = total_skin_t; % skin thickness (m)
 moment_x = max_bending; % bending moment about x (Nm)
 moment_y = 10; % bending moment about y (Nm)
 d_fuslg = 6.3; % fuselage diameter (m)
@@ -507,21 +507,21 @@ end
 sig_max = max(sig);
 
 
-% % Plot fuselage cross-section
-% figure();
-% hold on;
-% grid on;
-% plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
-% plot3(x, y, z, '.','MarkerSize', 12,'Color','b') 
-% % Plot stress vectors at each stringer location
-% quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);
-% % Labels and title
-% xlabel('x');
-% ylabel('y');
-% zlabel('Direct stress \sigma_z (MPa)');
+% Plot fuselage cross-section
+figure();
+hold on;
+grid on;
+plot3(x, y, z, 'LineWidth', 2,'Color','r'); % Circular fuselage cross-section
+plot3(x, y, z, '.','MarkerSize', 12,'Color','b') 
+% Plot stress vectors at each stringer location
+quiver3(x, y, z, u, v, sigx+sigy, 'k', 'LineWidth', 1, 'MaxHeadSize', 0.5);
+% Labels and title
+xlabel('x',FontSize=14);
+ylabel('y',FontSize=14);
+zlabel('Direct stress \sigma_z (MPa)',FontSize=14);
 % title('Direct stress distribution around fuselage');
-% legend({'Fuselage cross-section', 'String Location','Direct Stress'}, 'Location', 'northeast');
-% view(3); 
+legend({'Fuselage cross-section', 'String Location','Direct Stress'}, 'Location', 'northeast',FontSize=14);
+view(3); 
 
 % using Z shape stringer
 syms t_stringer; % stringer thickness
@@ -538,11 +538,11 @@ objective = @(x) -((x(1)*x(2)^3)/12 + 2*(x(1)*x(3)*(x(2)/2)^2));
 constraint = @(x) deal([], 2*x(3)*x(1) + (x(2) - 2*x(1))*x(1) - A_stringer);
 
 % Set initial guesses [t_stringer, h_web, w_flange]
-x0 = [2e-3, 0.1, 0.06];
+x0 = [2e-3, 0.02, 0.01];
 
 % Define bounds [t_stringer, h_web, w_flange]
-lb = [1e-3, 0.02, 0.02]; % Lower bounds (A = 58e-6)
-ub = [5e-3, 0.10, 0.10]; % Upper bounds (A = 1450e-6)
+lb = [1e-3, 0.01, 0.005]; % Lower bounds (A = 18e-6)
+ub = [3e-3, 0.04, 0.02]; % Upper bounds (A = 222e-6)
 
 % Run optimization
 options = optimoptions('fmincon', 'Algorithm', 'sqp');
@@ -586,7 +586,7 @@ x0 = [0.15, 0.03, 2e-3];
 
 % Define bounds [h, b, t]
 lb = [0.10, 0.02, 1e-3]; % Lower bounds (I = 1.833e-7, 2.97m)
-ub = [0.20, 0.1, 5e-3]; % Upper bounds  (I = 1.333e-5, 0.04m)
+ub = [0.20, 0.08, 4e-3]; % Upper bounds  (I = 9.067e-6, 0.06m)
 
 % Run optimization
 options = optimoptions('fmincon', 'Algorithm', 'sqp');
@@ -614,7 +614,7 @@ sig_euler = pi^2*E*(-I_max)/(Lfs^2*A_stringer); % euler buckling stress
 fprintf("Stringer buckling stress: %.2g MPa\n" ,sig_euler/1e6);
 
 % check for skin buckling
-w = 1.90*t_skin*sqrt(E/sig_max);
+w = 1.0*t_skin*sqrt(E/sig_max);
 if w < dl_stringer*0.8
     sig_skin = 3.6*E*(t_skin/(dl_stringer - w))^2;
 else
@@ -626,17 +626,17 @@ fprintf("Skin buckling stress: %.2g MPa \n" ,sig_skin/1e6);
 %%
 
 % objective
-objective = @(x) mass_function(x(1), x(2), x(3));  % x = [no_stringer, A_stringer, Lfs]
+objective = @(x) mass_function(x(1), x(2), x(3), x(4));  % x = [no_stringer, A_stringer, Lfs, t_skin]
 
 % Constraint function
 constraint = @(x) fuslg_constraints(x);  
 
-% Set initial guesses [no_stringer, A_stringer, Lfs]
-x0 = [150, 400e-6, 0.4];
+% Set initial guesses [no_stringer, A_stringer, Lfs, t_skin]
+x0 = [100, 100e-6, 0.4, 2e-3];
 
-% Define bounds [no_stringer, A_stringer, Lfs]
-lb = [50, 58e-6, 0.04]; 
-ub = [400, 1450e-6, 0.5]; 
+% Define bounds [no_stringer, A_stringer, Lfs, t_skin]
+lb = [50, 52e-6, 0.2, 1.5e-3]; 
+ub = [200, 222e-6, 0.6, 4e-3]; 
 
 intcon = 1; 
 
@@ -644,9 +644,16 @@ intcon = 1;
 options = optimoptions('ga', ...
     'Display', 'iter', ...
     'MaxGenerations', 100, ...
-    'PopulationSize', 100);
+    'PopulationSize', 100, ...
+    'PlotFcn', @gaplotbestf);  % Built-in function to plot the best objective value
 
-[x_opt, mass_min] = ga(objective, 3, [], [], [], [], lb, ub, constraint, intcon, options);
+
+[x_opt, mass_min] = ga(objective, 4, [], [], [], [], lb, ub, constraint, intcon, options);
+no_stringer = x_opt(1);
+A_stringer = x_opt(2);
+Lfs = x_opt(3);
+t_skin = x_opt(4);
+
 
 
 
@@ -762,14 +769,14 @@ colormap(hot(20));
 %skin
 syms length_fus n_frames
 
-mass_skin = 0.002 * pi * 6.34 * 77 * density;
+mass_skin = 0.0014 * pi * 6.34 * 77 * density
 
 
 %stringers 
-mass_stringers = 126 * 2.04*10^-5 * 77 * density;
+mass_stringers = no_stringer * A_stringer * 77 * density
 
 %light frames
-mass_lf = 0.000228 * density * pi * 6.34 * (77/0.5);
+mass_lf = 0.00024 * density * pi * 6.34 * (77/0.5)
 
 total_fuselage_mass = mass_skin + mass_stringers + mass_lf + total_heavy_frame_mass;
 

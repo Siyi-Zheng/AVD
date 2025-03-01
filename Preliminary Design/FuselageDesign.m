@@ -446,7 +446,7 @@ stress = P * D / 2 * 0.0015;
 %%
 % Stringer and Direct Stress
 
-no_stringer = 103; % number of stringers
+no_stringer = 115; % number of stringers
 A_stringer = 52e-6; % one stringer area (m^2)
 Lfs = 0.60; % light frame separation
 t_skin = 0.0015; % skin thickness (m)
@@ -632,11 +632,11 @@ objective = @(x) mass_function(x(1), x(2), x(3), x(4));  % x = [no_stringer, A_s
 constraint = @(x) fuslg_constraints(x);  
 
 % Set initial guesses [no_stringer, A_stringer, Lfs, t_skin]
-x0 = [100, 100e-6, 0.4, 2e-3];
+x0 = [100, 100e-6, 0.4, 3e-3];
 
 % Define bounds [no_stringer, A_stringer, Lfs, t_skin]
-lb = [50, 52e-6, 0.2, 1.5e-3]; 
-ub = [200, 222e-6, 0.6, 4e-3]; 
+lb = [50, 200e-6, 0.2, 2.2e-3]; 
+ub = [120, 372e-6, 0.5, 4e-3]; 
 
 intcon = 1; 
 

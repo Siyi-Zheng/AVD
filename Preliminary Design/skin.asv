@@ -32,7 +32,7 @@ b2 = 0.097 * 12.4085; % m     web height (wingbox height)  %
 N = momentMax / (c .* b2); % N/m compressive load per unit length
 flangeWebRatio = 0.3; % ratio of flange length to web height
 
-n = 10:2:60;   % no of panels
+n = 10:2:50;   % no of panels
 % ts = linspace(1,15, length(n)); % mm      %stringer thickness
 % h = linspace(20, 300, length(n)); % mm      %stringer web height
 ts= 1:1:15;     %stringer thickness
@@ -319,15 +319,17 @@ t_2_span_disc_bottom = (t2_span_disc .* percent_moment) + t2_span_disc;
 t_2_span_disc_bottom(t_2_span_disc_bottom<1)=1;
 
 figure
-plot(span, t2_span, LineWidth=1.5, LineStyle="--")
+plot(span, t_2_span, LineWidth=1.5, LineStyle="--")
 hold on
 plot(span, t_2_span_bottom,LineWidth=1.5, LineStyle="--" )
-plot(span, t2_span_disc, Linewidth =1.5, LineStyle="-")
+plot(span, t_2_span_disc, Linewidth =1.5, LineStyle="-")
 plot(span, t_2_span_disc_bottom, Linewidth =1.5, LineStyle="-")
 grid on
 xlabel("Semi-span (m)")
 ylabel("Skin thickness (mm)")
-legend('Top panel', 'Bottom panel', 'Top panel discretised','Bottom panel discretised')
+legend('Top panel', '')
+
+
 
 disp(max(val))
 
@@ -405,6 +407,10 @@ lengthr = sqrt(lengthr_x.^2 + lengthr_y.^2);
 volume_RS = unique_rs .* b2_span_uniquer .*1000 .* lengthr.*1000;
 spar_rs_mass = sum((volume_RS).*(density_H34.* 1e-9));
 
+spar_mass = spar_fs_mass + spar_rs_mass;
+
+
+
 % new spar mass calculations
 spar_angle = 1/cosd(30.3);
 spar_area_f = b2_span .* t_FS_dis * 1.4; % consider flanges
@@ -412,7 +418,7 @@ spar_area_r = b2_span .* t_RS_dis * 1.4; % consider flanges
 mass_fs = trapz(span, spar_area_f) * density_H34 * 1e-3;
 mass_rs = trapz(span, spar_area_r) * density_H34 * 1e-3;
 
-total_mass_wing = ribs_fmass + skin_stringer_fmass + mass_fs + mass_rs + skin_stringer_fmass_b;
+mass_fuck = ribs_fmass + skin_stringer_fmass + spar_mass + skin_stringer_fmass_b
 disp(mass_fuck)
 %% 
 

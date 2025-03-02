@@ -24,26 +24,26 @@ function [sig_skin, sig_euler, sig_max, Af_min] = fuslg_failure(no_stringer,A_st
     sig = sigx + sigy; % direct stress due to x and y bending moment
     
     
-    dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
-    for i = 2:no_stringer-1
-        dA_boom(i) = t_skin/6 * (2 + sig(i-1)/sig(i)) + t_skin/6 * (2 + sig(i+1)/sig(i));
-    end
-    dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
-    A_boom =  A_stringer + dA_boom;
-    
-    for i = 1:5
-        Ix = sum(A_boom.*(y.*y)); % second moment of area about x
-        Iy = sum(A_boom.*(x.*x)); % second moment of area about y
-        sigx = moment_x*y/Ix; % direct stress due to x bending moment
-        sigy = moment_y*x/Iy; % direct stress due to y bending moment
-        sig = sigx + sigy; % direct stress due to x and y bending moment
-        dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
-        for j = 2:no_stringer-1
-            dA_boom(j) = t_skin/6 * (2 + sig(j-1)/sig(j)) + t_skin/6 * (2 + sig(j+1)/sig(j));
-        end
-        dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
-        A_boom =  A_stringer + dA_boom;
-    end
+    % dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
+    % for i = 2:no_stringer-1
+    %     dA_boom(i) = t_skin/6 * (2 + sig(i-1)/sig(i)) + t_skin/6 * (2 + sig(i+1)/sig(i));
+    % end
+    % dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
+    % A_boom =  A_stringer + dA_boom;
+    % 
+    % for i = 1:5
+    %     Ix = sum(A_boom.*(y.*y)); % second moment of area about x
+    %     Iy = sum(A_boom.*(x.*x)); % second moment of area about y
+    %     sigx = moment_x*y/Ix; % direct stress due to x bending moment
+    %     sigy = moment_y*x/Iy; % direct stress due to y bending moment
+    %     sig = sigx + sigy; % direct stress due to x and y bending moment
+    %     dA_boom(1) = t_skin/6 * (2 + sig(no_stringer)/sig(1)) + t_skin/6 * (2 + sig(2)/sig(1));
+    %     for j = 2:no_stringer-1
+    %         dA_boom(j) = t_skin/6 * (2 + sig(j-1)/sig(j)) + t_skin/6 * (2 + sig(j+1)/sig(j));
+    %     end
+    %     dA_boom(no_stringer) = t_skin/6 * (2 + sig(no_stringer-1)/sig(no_stringer)) + t_skin/6 * (2 + sig(1)/sig(no_stringer));
+    %     A_boom =  A_stringer + dA_boom;
+    % end
     
     sig_max = max(sig);
     
@@ -59,9 +59,9 @@ function [sig_skin, sig_euler, sig_max, Af_min] = fuslg_failure(no_stringer,A_st
     x0 = [2e-3, 0.06, 0.02];
     
     % Define bounds [t_stringer, h_web, w_flange]
-    lb = [2e-3, 0.02, 0.005]; % Lower bounds (A = 52e-6)
-    ub = [3e-3, 0.04, 0.02]; % Upper bounds (A = 222e-6)
-    
+    lb = [2e-3, 0.04, 0.02]; % Lower bounds (A = 132e-6)
+    ub = [3e-3, 0.07, 0.04]; % Upper bounds (A = 372e-6)
+ 
     % Run optimization
     options = optimoptions('fmincon', 'Algorithm', 'sqp');
     [x_opt, I_max] = fmincon(objective, x0, [], [], [], [], lb, ub, constraint, options);
@@ -69,12 +69,11 @@ function [sig_skin, sig_euler, sig_max, Af_min] = fuslg_failure(no_stringer,A_st
     disp(x_opt);
     disp('Maximum I:');
     disp(-I_max); % Since we minimized -I, negate it to get max value
-    w_flange = x_opt(3);
     
     D = 6.34; %frame diameter
     Cf = 1/16000; % empirical based off work performed by Lockheed Martin and Shanley, J. Aero Science
     M_ult = 1.6e7; % max bending stress
-    E = 73.85e9; % Young's Modulus 
+    E = 65.5e9; % Young's Modulus 
     
     
     %set a fixed IF_xx
@@ -89,11 +88,11 @@ function [sig_skin, sig_euler, sig_max, Af_min] = fuslg_failure(no_stringer,A_st
     constraint = @(x) deal([], x(3) * ((x(1)^3 / 12) + (0.5 * x(2) * x(1)^2)) - If);
     
     % Set initial guesses [h, b, t]
-    x0 = [0.15, 0.03, 2e-3];
+    x0 = [0.08, 0.03, 2e-3];
     
     % Define bounds [h, b, t]
-    lb = [0.10, 0.02, 2e-3]; % Lower bounds (I = 3.667e-7, 1.48m)
-    ub = [0.20, 0.08, 4e-3]; % Upper bounds  (I = 9.067e-6, 0.06m)
+    lb = [0.14, 0.06, 2.5e-3]; % Lower bounds (I = 3.667e-7, 1.48m)
+    ub = [0.18, 0.10, 4e-3]; % Upper bounds  (I = 9.067e-6, 0.06m)
     
     % Run optimization
     options = optimoptions('fmincon', 'Algorithm', 'sqp');
@@ -111,7 +110,7 @@ function [sig_skin, sig_euler, sig_max, Af_min] = fuslg_failure(no_stringer,A_st
     
     
     % check for skin buckling
-    w = 1.9*t_skin*sqrt(E/sig_max);
+    w = 2.1*t_skin*sqrt(E/sig_max);
     if w < dl_stringer*0.8
         sig_skin = 3.6*E*(t_skin/(dl_stringer - w))^2;
     else
